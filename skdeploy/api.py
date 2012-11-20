@@ -44,12 +44,17 @@ class Skdeploy(API):
         return rawResponse['prediction']
 
     def upload(self, modelname, pml):
-        className = pml.__class__.__name__
-        filesource = "\n"
-        filesource += "class %s(PML):" % className + "\n"
-        filesource += inspect.getsource(pml.transform)+ "\n"
-        filesource += inspect.getsource(pml.predict)
-
+        print "uploading...",
+        try:
+            className = pml.__class__.__name__
+            filesource = "\n"
+            filesource += "class %s(PML):" % className + "\n"
+            filesource += inspect.getsource(pml.transform)+ "\n"
+            filesource += inspect.getsource(pml.predict)
+        except Exception, e:
+            print
+            print "Could not extract code. Either run script to compile a .pyc, or paste your code here."
+            raw_input(":")
         userFiles = vars(pml)
         pickledUserFiles = {}
         for f, uf in userFiles.iteritems():
@@ -61,7 +66,9 @@ class Skdeploy(API):
             "className": className
         }
 
-        return self.post("model", self.q, payload)
+        rsp = self.post("model", self.q, payload)
+        print "done!"
+        return rsp
 
 
 

@@ -3,7 +3,7 @@ import json
 import pickle
 import inspect
 
-BASE_URI = "http://ec2-54-242-232-2.compute-1.amazonaws.com/"
+BASE_URI = "http://ec2-54-234-11-0.compute-1.amazonaws.com/"
 
 class API(object):
     def __init__(self, base_uri):
@@ -17,9 +17,14 @@ class API(object):
     
     def post(self, endpoint, params, data):
         try:
-            return requests.post(self.base_uri + endpoint + "?",
+            r = requests.post(self.base_uri + endpoint + "?",
                                  params=params,
-                                 data=json.dumps(data)).json
+                                 data=json.dumps(data))
+            print r.text
+            return r.json
+            # return requests.post(self.base_uri + endpoint + "?",
+            #                      params=params,
+            #                      data=json.dumps(data)).json
         except Exception, e:
             raise e
 

@@ -4,11 +4,11 @@ required = ['requests==0.14.2']
 
 setup(
     author='glamp',
-    name='skdeploy-api',
+    name='yhat-client',
     version='0.0.1',
-    description='Official Python driver for the skdeploy api',
+    description='Official Python driver for the yhat api',
     long_description=open('README.md').read(),
-    url='https://github.com/anecdotally/skdeploy-client/',
+    url='https://github.com/anecdotally/yhat-client',
     license='Apache License',
     classifiers=(
         'Development Status :: 5 - Production/Stable',
@@ -19,7 +19,7 @@ setup(
         'Topic :: Internet :: WWW/HTTP',
         'Topic :: Software Development :: Libraries :: Python Modules',
     ),
-    keywords=['skdeploy', 'scikits', 'numpy', 'pandas'],
+    keywords=['yhat', 'scikits', 'numpy', 'pandas'],
     packages=find_packages(),
     install_requires=required
 )

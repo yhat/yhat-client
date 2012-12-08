@@ -1,9 +1,8 @@
-from skdeploy import Skdeploy
+from yhat import Yhat, BaseModel
 import pprint as pp
 import requests
 import json
 import pickle
-from skdeploy.pml import PML
 
 
 
@@ -16,7 +15,7 @@ from skdeploy.pml import PML
 #            [  0.,   2.,  14.,   5.,  10.,  12.,   0.,   0.],
 #            [  0.,   0.,   6.,  13.,  10.,   0.,   0.,   0.]]
 
-skd = Skdeploy("glamp", "abcd1234")
+yh = Yhat("glamp", "abcd1234")
 
 # pp.pprint(skd.show_models())
 # print "*"*80
@@ -26,7 +25,7 @@ skd = Skdeploy("glamp", "abcd1234")
 # print "*"*80
 
 
-class DecisionTreePML(PML):
+class DecisionTreePML(BaseModel):
     def transform(self, rawData):
         pair = [2, 3]
         data = np.array(rawData)
@@ -40,14 +39,14 @@ class DecisionTreePML(PML):
         return self.clf.predict(data)
 
 
-clf = pickle.load(open('./skdeploy/test/decisiontree.model', 'rb'))
-xtrain = pickle.load(open('./skdeploy/test/xtrain.model', 'rb'))
+clf = pickle.load(open('./yhat/test/decisiontree.model', 'rb'))
+xtrain = pickle.load(open('./yhat/test/xtrain.model', 'rb'))
 
 myTree = DecisionTreePML(clf=clf, xtrain=xtrain)
 
 
 
-pp.pprint(skd.upload("gregsTree", myTree))
+pp.pprint(yh.upload("gregsTree", myTree))
 
 
 

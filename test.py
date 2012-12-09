@@ -15,7 +15,8 @@ import pickle
 #            [  0.,   2.,  14.,   5.,  10.,  12.,   0.,   0.],
 #            [  0.,   0.,   6.,  13.,  10.,   0.,   0.,   0.]]
 
-yh = Yhat("glamp", "abcd1234")
+# yh = Yhat("greg", "MWFAJnAn4hhd531MWrNpE6hQeiwX0HsB7PdB1d1aEhw", "http://localhost:5000/")
+yh = Yhat("greg", "MWFAJnAn4hhd531MWrNpE6hQeiwX0HsB7PdB1d1aEhw")
 
 # pp.pprint(skd.show_models())
 # print "*"*80

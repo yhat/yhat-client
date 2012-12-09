@@ -63,10 +63,10 @@ class Yhat(API):
     ------------------------------------------------------------------------------------------
     """
 
-    def __init__(self, username, apikey):
+    def __init__(self, username, apikey, uri=BASE_URI):
         self.username = username
         self.apikey = apikey
-        self.base_uri = BASE_URI
+        self.base_uri = uri
         self.q = {"username": self.username, "apikey": apikey}
 
     def show_models(self):

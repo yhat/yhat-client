@@ -3,7 +3,8 @@ import json
 import pickle
 import inspect
 
-BASE_URI = "http://ec2-54-234-11-0.compute-1.amazonaws.com/"
+BASE_URI = "http://api.yhathq.com/"
+
 
 class API(object):
     def __init__(self, base_uri):

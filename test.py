@@ -15,8 +15,8 @@ import pickle
 #            [  0.,   2.,  14.,   5.,  10.,  12.,   0.,   0.],
 #            [  0.,   0.,   6.,  13.,  10.,   0.,   0.,   0.]]
 
-# yh = Yhat("greg", "MWFAJnAn4hhd531MWrNpE6hQeiwX0HsB7PdB1d1aEhw", "http://localhost:5000/")
-yh = Yhat("greg", "MWFAJnAn4hhd531MWrNpE6hQeiwX0HsB7PdB1d1aEhw")
+yh = Yhat("greg", "MWFAJnAn4hhd531MWrNpE6hQeiwX0HsB7PdB1d1aEhw", "http://localhost:5000/")
+# yh = Yhat("greg", "MWFAJnAn4hhd531MWrNpE6hQeiwX0HsB7PdB1d1aEhw")
 
 # pp.pprint(skd.show_models())
 # print "*"*80
@@ -37,8 +37,8 @@ class DecisionTreePML(BaseModel):
         return X
 
     def predict(self, data):
-        return self.clf.predict(data)
-
+        pred = self.clf.predict(data).tolist()
+        return pred
 
 clf = pickle.load(open('./yhat/test/decisiontree.model', 'rb'))
 xtrain = pickle.load(open('./yhat/test/xtrain.model', 'rb'))

@@ -3,7 +3,7 @@ import pprint as pp
 import requests
 import json
 import pickle
-
+import time
 
 
 # raw_data = [[  0.,   0.,   5.,  13.,   9.,   1.,   0.,   0.],
@@ -15,12 +15,14 @@ import pickle
 #            [  0.,   2.,  14.,   5.,  10.,  12.,   0.,   0.],
 #            [  0.,   0.,   6.,  13.,  10.,   0.,   0.,   0.]]
 
-yh = Yhat("greg", "MWFAJnAn4hhd531MWrNpE6hQeiwX0HsB7PdB1d1aEhw", "http://localhost:5000/")
-# yh = Yhat("greg", "MWFAJnAn4hhd531MWrNpE6hQeiwX0HsB7PdB1d1aEhw")
+# yh = Yhat("greg", "MWFAJnAn4hhd531MWrNpE6hQeiwX0HsB7PdB1d1aEhw", "http://localhost:5000/")
+yh = Yhat("greg", "MWFAJnAn4hhd531MWrNpE6hQeiwX0HsB7PdB1d1aEhw", "http://166.78.26.170/")
 
 # pp.pprint(skd.show_models())
 # print "*"*80
-# pp.pprint(skd.raw_predict('irisTree', [2, 3, 2, 2]))
+s = time.time()
+pp.pprint(yh.raw_predict('gregsTree_v11', [2, 3, 2, 2]))
+print time.time() - s
 # print "*"*80
 # pp.pprint(skd.predict('digits', raw_data))
 # print "*"*80

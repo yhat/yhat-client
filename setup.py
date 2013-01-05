@@ -8,7 +8,7 @@ setup(
     version='0.0.1',
     description='Official Python driver for the yhat api',
     long_description=open('README.md').read(),
-    url='https://github.com/anecdotally/yhat-client',
+    url='https://github.com/yhat/yhat-client',
     license='Apache License',
     classifiers=(
         'Development Status :: 5 - Production/Stable',

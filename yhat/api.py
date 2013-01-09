@@ -19,8 +19,7 @@ class API(object):
     def post(self, endpoint, params, data):
         try:
             return requests.post(self.base_uri + endpoint + "?",
-                                 params=params,
-                                 data=json.dumps(data)).json
+                                 params=params, data=data).json
         except Exception, e:
             raise e
 

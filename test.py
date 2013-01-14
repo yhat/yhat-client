@@ -15,22 +15,23 @@ import time
 #            [  0.,   2.,  14.,   5.,  10.,  12.,   0.,   0.],
 #            [  0.,   0.,   6.,  13.,  10.,   0.,   0.,   0.]]
 
-# yh = Yhat("greg", "MWFAJnAn4hhd531MWrNpE6hQeiwX0HsB7PdB1d1aEhw", "http://localhost:5000/")
-yh = Yhat("greg", "MWFAJnAn4hhd531MWrNpE6hQeiwX0HsB7PdB1d1aEhw", "http://166.78.26.170/")
+# yh = Yhat("greg", "fCVZiLJhS95cnxOrsp5e2VSkk0GfypZqeRCntTD1nHA", "http://localhost:5000/")
+# yh = Yhat("greg", "fCVZiLJhS95cnxOrsp5e2VSkk0GfypZqeRCntTD1nHA", "http://166.78.26.170/")
+yh = Yhat("greg", "fCVZiLJhS95cnxOrsp5e2VSkk0GfypZqeRCntTD1nHA", "http://54.235.251.150/")
 
-# pp.pprint(skd.show_models())
-# print "*"*80
-s = time.time()
-pp.pprint(yh.raw_predict('gregsTree_v11', [2, 3, 2, 2]))
-print time.time() - s
-# print "*"*80
-# pp.pprint(skd.predict('digits', raw_data))
-# print "*"*80
+# # pp.pprint(skd.show_models())
+# # print "*"*80
+# s = time.time()
+# pp.pprint(yh.raw_predict('gregsTree_v11', [2, 3, 2, 2]))
+# print time.time() - s
+# # print "*"*80
+# # pp.pprint(skd.predict('digits', raw_data))
+# # print "*"*80
 
 
 class DecisionTreePML(BaseModel):
     def transform(self, rawData):
-        pair = [2, 3]
+        pair = [5, 3]
         data = np.array(rawData)
         X = data[:, pair]
         mean = self.xtrain.mean(axis=0)

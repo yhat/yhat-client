@@ -2,6 +2,7 @@ import requests
 import json
 import pickle
 import inspect
+import urllib2, urllib
 
 BASE_URI = "http://api.yhathq.com/"
 
@@ -9,17 +10,27 @@ BASE_URI = "http://api.yhathq.com/"
 class API(object):
     def __init__(self, base_uri):
         self.base_uri = base_uri
+        self.headers = {'Content-Type': 'application/json'}
 
     def get(self, endpoint, params):
         try:
-            return requests.get(self.base_uri + endpoint + "?", params=params).json
+            url = self.base_uri + endpoint + "?" + urllib.urlencode(params)
+            req = urllib2.Request(url)
+            req.add_header('Content-Type', 'application/json')
+            response = urllib2.urlopen(req)
+            rsp = response.read()
+            return json.loads(rsp)
         except Exception, e:
             raise e
     
     def post(self, endpoint, params, data):
         try:
-            return requests.post(self.base_uri + endpoint + "?",
-                                 params=params, data=data).json
+            url = self.base_uri + endpoint + "?" + urllib.urlencode(params)
+            req = urllib2.Request(url)
+            req.add_header('Content-Type', 'application/json')
+            response = urllib2.urlopen(req, json.dumps(data))
+            rsp = response.read()
+            return json.loads(rsp)
         except Exception, e:
             raise e
 
@@ -67,6 +78,7 @@ class Yhat(API):
         self.username = username
         self.apikey = apikey
         self.base_uri = uri
+        self.headers = {'Content-Type': 'application/json'}
         self.q = {"username": self.username, "apikey": apikey}
 
     def show_models(self):
@@ -101,7 +113,7 @@ class Yhat(API):
         try:
             className = pml.__class__.__name__
             filesource = "\n"
-            filesource += "class %s(PML):" % className + "\n"
+            filesource += "class %s(BaseModel):" % className + "\n"
             filesource += inspect.getsource(pml.transform)+ "\n"
             filesource += inspect.getsource(pml.predict)
         except Exception, e:
@@ -118,7 +130,6 @@ class Yhat(API):
             "code": filesource,
             "className": className
         }
-
         rsp = self.post("model", self.q, payload)
         print "done!"
         return rsp

@@ -16,8 +16,8 @@ import time
 #            [  0.,   0.,   6.,  13.,  10.,   0.,   0.,   0.]]
 
 # yh = Yhat("greg", "fCVZiLJhS95cnxOrsp5e2VSkk0GfypZqeRCntTD1nHA", "http://localhost:5000/")
-# yh = Yhat("greg", "fCVZiLJhS95cnxOrsp5e2VSkk0GfypZqeRCntTD1nHA", "http://166.78.26.170/")
-yh = Yhat("greg", "fCVZiLJhS95cnxOrsp5e2VSkk0GfypZqeRCntTD1nHA", "http://54.235.251.150/")
+yh = Yhat("clotheshorse", "gwAaXlkkIyasM2ue7iwjUmuoUKCodSZjobNU9a5WmKc", "http://166.78.26.170/")
+# yh = Yhat("greg", "fCVZiLJhS95cnxOrsp5e2VSkk0GfypZqeRCntTD1nHA", "http://54.235.251.150/")
 
 # # pp.pprint(skd.show_models())
 # # print "*"*80
@@ -50,7 +50,9 @@ myTree = DecisionTreePML(clf=clf, xtrain=xtrain)
 
 
 
-pp.pprint(yh.upload("gregsTree", myTree))
+# pp.pprint(yh.upload("chTestTree", myTree))
+
+print yh.predict("chTestTree", 1, [2, 3, 2, 4, 2, 3, 2])
 
 
 

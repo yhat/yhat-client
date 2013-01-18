@@ -87,7 +87,7 @@ class Yhat(API):
         """
         return self.get("showmodels", self.q)
 
-    def raw_predict(self, model, data):
+    def raw_predict(self, model, version, data):
         """
         Runs a prediction for the model specified and returns the same
         prediction you would see from the REST API
@@ -95,14 +95,15 @@ class Yhat(API):
         data = {"data": data}
         q = self.q
         q['model'] = model
+        q['version'] = version
         return self.post('predict', q, data)
 
-    def predict(self, model, data):
+    def predict(self, model, version, data):
         """
         Runs a prediction for the model specified and returns only the
         prediction.
         """
-        rawResponse = self.raw_predict(model, data)
+        rawResponse = self.raw_predict(model, version, data)
         return rawResponse['prediction']
 
     def upload(self, modelname, pml):

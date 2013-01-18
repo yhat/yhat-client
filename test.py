@@ -50,9 +50,9 @@ myTree = DecisionTreePML(clf=clf, xtrain=xtrain)
 
 
 
-# pp.pprint(yh.upload("chTestTree", myTree))
+pp.pprint(yh.upload("chTestTree", myTree))
 
-print yh.predict("chTestTree", 1, [2, 3, 2, 4, 2, 3, 2])
+print yh.predict("chTestTree", 2, [2, 3, 2, 4, 2, 3, 2])
 
 
 

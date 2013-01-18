@@ -1,3 +1,4 @@
+import sys
 import requests
 import json
 import pickle
@@ -81,6 +82,10 @@ class Yhat(API):
         self.headers = {'Content-Type': 'application/json'}
         self.q = {"username": self.username, "apikey": apikey}
 
+    def _check_obj_size(self, obj):
+        if sys.getsizeof(obj) > 52428800:
+            raise Exception("Sorry, your file is too big for a free account.")
+
     def show_models(self):
         """
         Lists the models you've deployed.
@@ -103,7 +108,7 @@ class Yhat(API):
         Runs a prediction for the model specified and returns only the
         prediction.
         """
-        rawResponse = self.raw_predict(model, version, data)
+        rawResponse = self.raw_predict(model, version,  data)
         return rawResponse['prediction']
 
     def upload(self, modelname, pml):
@@ -125,6 +130,7 @@ class Yhat(API):
         pickledUserFiles = {}
         for f, uf in userFiles.iteritems():
             pickledUserFiles[f] = pickle.dumps(uf)
+            self._check_obj_size(pickledUserFiles[f])
         payload = {
             "modelname": modelname,
             "modelfiles": pickledUserFiles,

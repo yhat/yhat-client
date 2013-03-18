@@ -1,2 +1,2 @@
-skdeploy-client
+yhat-client
 ===============

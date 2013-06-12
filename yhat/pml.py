@@ -18,6 +18,16 @@ class BaseModel(object):
         for kw, arg in kwargs.iteritems():
             setattr(self, kw, arg)
 
+    def require(self):
+        """
+        Define what libraries and modules you want to include in your project
+        ====================================================================
+        def require(self):
+            from StringIO import StringIO
+            from string import letters
+        """
+        pass
+
     def transform(self, rawData):
         """
         Transform takes the raw data that's going to be sent to your yhat API and

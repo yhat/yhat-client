@@ -122,8 +122,8 @@ class Yhat(API):
             import_source = inspect.getsource(pml.require)
             imports = [line.strip() for line in import_source.split('\n') if "import" in line]
             filesource += "\n".join(imports) + "\n"
-            filesource = "#<end user imports>\n"
-            filesource = "\n"
+            filesource += "#<end user imports>\n"
+            filesource += "\n"
             filesource += "class %s(BaseModel):" % className + "\n"
             filesource += inspect.getsource(pml.transform)+ "\n"
             filesource += inspect.getsource(pml.predict)

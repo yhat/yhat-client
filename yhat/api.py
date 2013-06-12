@@ -118,6 +118,11 @@ class Yhat(API):
         print "uploading...",
         try:
             className = pml.__class__.__name__
+            filesource = "#<start user imports>\n"
+            import_source = inspect.getsource(pml.require)
+            imports = [line.strip() for line in import_source.split('\n') if "import" in line]
+            filesource += "\n".join(imports) + "\n"
+            filesource = "#<end user imports>\n"
             filesource = "\n"
             filesource += "class %s(BaseModel):" % className + "\n"
             filesource += inspect.getsource(pml.transform)+ "\n"
@@ -140,14 +145,4 @@ class Yhat(API):
         rsp = self.post("model", self.q, payload)
         print "done!"
         return rsp
-
-
-
-
-
-
-
-
-
-
 

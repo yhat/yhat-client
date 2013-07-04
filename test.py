@@ -19,4 +19,7 @@ mm = MyModel(clf=range(10), udfs=[hello])
 yh = Yhat("greg", "abcd1234")
 
 
-print yh._extract_source("model", mm)
+print yh._extract_source("model", mm, "MyModel")
+
+
+

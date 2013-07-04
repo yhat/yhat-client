@@ -112,7 +112,7 @@ class Yhat(API):
         rawResponse = self.raw_predict(model, version,  data)
         return rawResponse['prediction']
 
-    def _extract_source(self, modelname, pml):
+    def _extract_source(self, modelname, pml, className):
 
         filesource = "#<start user imports>\n"
         import_source = inspect.getsource(pml.require)
@@ -143,7 +143,7 @@ class Yhat(API):
         print "uploading...",
         try:
             className = pml.__class__.__name__
-            filesource = _extract_source(modelname, pml)
+            filesource = _extract_source(modelname, pml, className)
         except Exception, e:
             print
             print "Could not extract code. Either run script to compile a .pyc, or paste your code here."

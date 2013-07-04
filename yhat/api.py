@@ -127,7 +127,6 @@ class Yhat(API):
                     filesource += inspect.getsource(udf) + "\n"
         filesource += "#<end user functions>\n"
 
-
         filesource += "\n"
         filesource += "class %s(BaseModel):" % className + "\n"
         filesource += inspect.getsource(pml.transform)+ "\n"
@@ -143,7 +142,7 @@ class Yhat(API):
         print "uploading...",
         try:
             className = pml.__class__.__name__
-            filesource = _extract_source(modelname, pml, className)
+            filesource = self._extract_source(modelname, pml, className)
         except Exception, e:
             print
             print "Could not extract code. Either run script to compile a .pyc, or paste your code here."

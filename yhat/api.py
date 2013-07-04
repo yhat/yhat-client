@@ -4,6 +4,7 @@ import json
 import pickle
 import inspect
 import urllib2, urllib
+import types
 
 BASE_URI = "http://api.yhathq.com/"
 
@@ -111,6 +112,30 @@ class Yhat(API):
         rawResponse = self.raw_predict(model, version,  data)
         return rawResponse['prediction']
 
+    def _extract_source(self, modelname, pml):
+
+        filesource = "#<start user imports>\n"
+        import_source = inspect.getsource(pml.require)
+        imports = [line.strip() for line in import_source.split('\n') if "import" in line]
+        filesource += "\n".join(imports) + "\n"
+        filesource += "#<end user imports>\n\n"
+
+        filesource += "#<start user functions>\n"
+        if hasattr(pml, "udfs"):
+            for udf in pml.udfs:
+                if isinstance(udf, types.FunctionType):
+                    filesource += inspect.getsource(udf) + "\n"
+        filesource += "#<end user functions>\n"
+
+
+        filesource += "\n"
+        filesource += "class %s(BaseModel):" % className + "\n"
+        filesource += inspect.getsource(pml.transform)+ "\n"
+        filesource += inspect.getsource(pml.predict)
+
+        return filesource
+
+
     def upload(self, modelname, pml):
         """
         Uploads your model to the Yhat servers.
@@ -118,15 +143,7 @@ class Yhat(API):
         print "uploading...",
         try:
             className = pml.__class__.__name__
-            filesource = "#<start user imports>\n"
-            import_source = inspect.getsource(pml.require)
-            imports = [line.strip() for line in import_source.split('\n') if "import" in line]
-            filesource += "\n".join(imports) + "\n"
-            filesource += "#<end user imports>\n"
-            filesource += "\n"
-            filesource += "class %s(BaseModel):" % className + "\n"
-            filesource += inspect.getsource(pml.transform)+ "\n"
-            filesource += inspect.getsource(pml.predict)
+            filesource = _extract_source(modelname, pml)
         except Exception, e:
             print
             print "Could not extract code. Either run script to compile a .pyc, or paste your code here."

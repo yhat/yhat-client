@@ -28,6 +28,19 @@ class BaseModel(object):
         """
         pass
 
+    def user_functions(self):
+        """
+        Define any functions you want to include in your project
+        ====================================================================
+        def hello_world():
+            return "Hello World!"
+        ...
+
+        def user_functions(self):
+            return ["hello_word"]
+        """
+        pass
+
     def transform(self, rawData):
         """
         Transform takes the raw data that's going to be sent to your yhat API and

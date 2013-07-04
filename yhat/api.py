@@ -150,6 +150,8 @@ class Yhat(API):
         userFiles = vars(pml)
         pickledUserFiles = {}
         for f, uf in userFiles.iteritems():
+            if f=="udfs":
+                continue
             pickledUserFiles[f] = pickle.dumps(uf)
             self._check_obj_size(pickledUserFiles[f])
         payload = {

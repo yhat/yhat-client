@@ -134,6 +134,13 @@ class Yhat(API):
 
         return filesource
 
+    def deploy(self, modelname, pml):
+        """
+        Deploys your model to the Yhat servers.
+
+        Note: this will eventually replace Yhat.upload
+        """
+        return self.upload(modelname, pml)
 
     def upload(self, modelname, pml):
         """

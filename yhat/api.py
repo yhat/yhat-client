@@ -148,7 +148,7 @@ class Yhat(API):
         q['model'] = model
         q['version'] = version
         docs = document.document_data(example_data)
-        return self.post('document', q, docs)
+        return self.post('document', q, {"docs": docs})
 
     def deploy(self, modelname, pml):
         """

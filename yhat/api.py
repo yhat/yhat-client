@@ -1,3 +1,4 @@
+import document
 import sys
 import requests
 import json
@@ -133,6 +134,21 @@ class Yhat(API):
         filesource += inspect.getsource(pml.predict)
 
         return filesource
+
+    def document(self, model, version, example_data):
+        """
+        Automatically documents your model and creates a webpage where you 
+        can test your model.
+
+        model the name of your model
+        version the version of your model
+        example_data a pandas DataFrame with required columns to execute your model
+        """
+        q = self.q
+        q['model'] = model
+        q['version'] = version
+        docs = document.document_data(example_data)
+        return self.post('document', q, docs)
 
     def deploy(self, modelname, pml):
         """

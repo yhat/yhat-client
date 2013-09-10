@@ -2,7 +2,7 @@ import warnings
 from math import log
 
 try:
-    import numpy as np
+    import pandas as pd
 except Exception, e:
     warnings.warn("Warning: numpy required to auto-document models!")
 
@@ -21,8 +21,8 @@ def document_column(df, col):
     if isnumeric(df[col]):
         doc["dtype"] = "number"
         doc["step"] = 0
-        step = abs(max(df[col]) - min(df[col])) / 10 + 0.01
-        doc["step"] = 10**round(log(step, 10) - log(5.5, 10) + 0.5)
+        step = df[col].quantile(.50) - df[col].quantile(.25)
+        doc["step"] = 10**np.round(np.log(step) - math.log(5.5, 10) + 0.5)
         doc["palceholder"] = np.median(df[col])
     elif (len(np.unique(df[col])) / float(len(df))) < 0.25:
         doc["dtype"] = "factor"

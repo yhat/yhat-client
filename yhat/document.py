@@ -1,5 +1,5 @@
 import warnings
-from math import log
+import math
 
 try:
     import pandas as pd

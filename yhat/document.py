@@ -3,6 +3,7 @@ from math import log
 
 try:
     import pandas as pd
+    import numpy as np
 except Exception, e:
     warnings.warn("Warning: numpy required to auto-document models!")
 

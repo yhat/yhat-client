@@ -24,6 +24,7 @@ def document_column(df, col):
         doc["step"] = 0
         step = df[col].quantile(.50) - df[col].quantile(.25)
         doc["step"] = 10**np.round(np.log(step) - math.log(5.5, 10) + 0.5)
+        doc["step"] = 0.01
         doc["palceholder"] = np.median(df[col])
     elif (len(np.unique(df[col])) / float(len(df))) < 0.25:
         doc["dtype"] = "factor"

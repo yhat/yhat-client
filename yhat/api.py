@@ -103,7 +103,10 @@ class Yhat(API):
         q = self.q
         q['model'] = model
         q['version'] = version
-        return self.post('predict', q, data)
+        if self.base_uri!=BASE_URI:
+            return self.post('models/%s/' % model, q, data)
+        else:
+             return self.post('predict', q, data)
 
     def predict(self, model, version, data):
         """
@@ -111,13 +114,17 @@ class Yhat(API):
         prediction.
         """
         rawResponse = self.raw_predict(model, version,  data)
-        return rawResponse['prediction']
+        if 'prediction' in rawResponse:
+            return rawResponse['prediction']
+        else:
+            return rawResponse
 
     def _extract_source(self, modelname, pml, className):
 
         filesource = "#<start user imports>\n"
         import_source = inspect.getsource(pml.require)
         imports = [line.strip() for line in import_source.split('\n') if "import" in line]
+        imports = [i for i in imports if i.startswith("#")==False]
         filesource += "\n".join(imports) + "\n"
         filesource += "#<end user imports>\n\n"
 

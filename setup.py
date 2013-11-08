@@ -5,7 +5,7 @@ required = ['requests==0.14.2']
 setup(
     author='glamp',
     name='yhat',
-    version='0.2.0',
+    version='0.3.0',
     description='Official Python driver for the yhat api',
     #long_description=open('README.txt').read(),
     url='https://github.com/yhat/yhat-client',

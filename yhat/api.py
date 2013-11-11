@@ -85,7 +85,10 @@ class Yhat(API):
         self.q = {"username": self.username, "apikey": apikey}
 
     def _check_obj_size(self, obj):
-        if sys.getsizeof(obj) > 52428800:
+        if self.base_uri!=BASE_URI:
+            # not deploying to the cloud so models can be as big as you want
+            pass
+        elif sys.getsizeof(obj) > 52428800:
             raise Exception("Sorry, your file is too big for a free account.")
 
     def show_models(self):

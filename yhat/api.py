@@ -6,6 +6,7 @@ import pickle
 import inspect
 import urllib2, urllib
 import types
+import re
 
 BASE_URI = "http://api.yhathq.com/"
 
@@ -135,7 +136,11 @@ class Yhat(API):
         if hasattr(pml, "udfs"):
             for udf in pml.udfs:
                 if isinstance(udf, types.FunctionType):
-                    filesource += inspect.getsource(udf) + "\n"
+                    source = inspect.getsource(udf).split("\n")
+                    padding = re.search('[ ]+', source[0]).group(0)
+                    for line in source:
+                        filesource += line[len(padding):] + "\n"
+                    filesource += "\n"
         filesource += "#<end user functions>\n"
 
         filesource += "\n"

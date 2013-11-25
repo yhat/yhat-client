@@ -16,6 +16,8 @@ class BaseModel(object):
     """
     def __init__(self, **kwargs):
         for kw, arg in kwargs.iteritems():
+            if kw=="requirements":
+                arg = open(arg).read().strip()
             setattr(self, kw, arg)
 
     def require(self):
@@ -43,14 +45,14 @@ class BaseModel(object):
 
     def transform(self, rawData):
         """
-        Transform takes the raw data that's going to be sent to your yhat API and
-        converts it into the format required to be run through your model.
+        Transform takes the raw data that's going to be sent to your yhat API
+        and converts it into the format required to be run through your model.
         """
         return rawData
 
     def predict(self, transformedData):
         """
-        Predict executes your predictive model, formats the data into response, and
-        returns it.
+        Predict executes your predictive model, formats the data into response,
+        and returns it.
         """
         return self.clf.predict(transformedData)

@@ -41,7 +41,7 @@ class API(object):
 class Yhat(API):
     """
     Welecome to Yhat!
-    ------------------------------------------------------------------------------------------
+    ---------------------------------------------------------------------------
     There are 2 required functions which you must implement:
     - transform
     - predict
@@ -49,18 +49,19 @@ class Yhat(API):
     Transform takes the raw data that's going to be sent to your yhat API and
     converts it into the format required to be run through your model. In the
     example below (see SMS example), our transform function does the following:
-        1) converts the raw_data into a list. This is because our tfidf vectorizer
-           takes a list of raw text as its only argument
-        2) uses the tfidf vectorizer to transform the data and returns the results
-    ------------------------------------------------------------------------------------------
+        1) converts the raw_data into a list. This is because our tfidf
+           vectorizer takes a list of raw text as its only argument
+        2) uses the tfidf vectorizer to transform the data and returns the
+           results
+    ---------------------------------------------------------------------------
     Predict executes your predictive model, formats the data into response, and
     returns it. In the example below, our predict doees the following:
         1) calls the predict_proba function of our naive bayes classifier (clf)
-        2) creates a variable called first_prediction which is the first item in the
-           list of probabilities that is returend by predict_proba
+        2) creates a variable called first_prediction which is the first item in
+           the list of probabilities that is returend by predict_proba
         3) returns a dictionary witt the predicted probabilities
     
-    ------------------------------------------------------------------------------------------
+    ---------------------------------------------------------------------------
 
     By inheriting from BaseModel, your model recieves additional functionality
 
@@ -68,14 +69,15 @@ class Yhat(API):
 
     By default, numpy and pandas will be automatically imported as np and pd.
 
-    If you need to import libraries you may do so from within the transform or predict
-    functions. Currently we only support base Python libraries, sklearn, numpy, and pandas
+    If you need to import libraries you may do so from within the transform or
+    predict functions. Currently we only support base Python libraries, sklearn,
+    numpy, and pandas
 
         def transform(self, raw_data):
             import string
             punc_count = len([ch for ch in raw_data if ch in string.punctuation])
             ...
-    ------------------------------------------------------------------------------------------
+    ---------------------------------------------------------------------------
     """
 
     def __init__(self, username, apikey, uri=BASE_URI):
@@ -155,9 +157,10 @@ class Yhat(API):
         Automatically documents your model and creates a webpage where you 
         can test your model.
 
-        model the name of your model
-        version the version of your model
-        example_data a pandas DataFrame with required columns to execute your model
+        model - the name of your model
+        version - the version of your model
+        example_data - a pandas DataFrame with required columns to execute your
+                    model
         """
         q = self.q
         q['model'] = model
@@ -182,9 +185,7 @@ class Yhat(API):
             className = pml.__class__.__name__
             filesource = self._extract_source(modelname, pml, className)
         except Exception, e:
-            print
-            print "Could not extract code. Either run script to compile a .pyc, or paste your code here."
-            raw_input(":")
+            print "Could not extract code. Either re-run script."
         userFiles = vars(pml)
         pickledUserFiles = {}
         for f, uf in userFiles.iteritems():
@@ -196,7 +197,8 @@ class Yhat(API):
             "modelname": modelname,
             "modelfiles": pickledUserFiles,
             "code": filesource,
-            "className": className
+            "className": className,
+            "reqs": getattr(pml, "requirements", "")
         }
         rsp = self.post("model", self.q, payload)
         print "done!"

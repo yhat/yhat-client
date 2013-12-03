@@ -1,6 +1,7 @@
 import document
 import sys
 import requests
+import base64
 import json
 import pickle
 import inspect
@@ -21,6 +22,9 @@ class API(object):
             url = self.base_uri + endpoint + "?" + urllib.urlencode(params)
             req = urllib2.Request(url)
             req.add_header('Content-Type', 'application/json')
+            auth = '%s:%s' % (params['username'], params['apikey'])
+            base64string = base64.encodestring(auth).replace('\n', '')
+            req.add_header("Authorization", "Basic %s" % base64string)
             response = urllib2.urlopen(req)
             rsp = response.read()
             return json.loads(rsp)
@@ -32,6 +36,9 @@ class API(object):
             url = self.base_uri + endpoint + "?" + urllib.urlencode(params)
             req = urllib2.Request(url)
             req.add_header('Content-Type', 'application/json')
+            auth = '%s:%s' % (params['username'], params['apikey'])
+            base64string = base64.encodestring(auth).replace('\n', '')
+            req.add_header("Authorization", "Basic %s" % base64string)
             response = urllib2.urlopen(req, json.dumps(data))
             rsp = response.read()
             return json.loads(rsp)
@@ -141,7 +148,7 @@ class Yhat(API):
                     source = inspect.getsource(udf).split("\n")
                     padding = re.search('[ ]+', source[0]).group(0)
                     for line in source:
-                        filesource += line[len(padding):] + "\n"
+                        filesource += line[len(padding)-1:] + "\n"
                     filesource += "\n"
         filesource += "#<end user functions>\n"
 

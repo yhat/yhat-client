@@ -117,9 +117,10 @@ class Yhat(API):
         q['model'] = model
         q['version'] = version
         if self.base_uri!=BASE_URI:
-            return self.post('models/%s/' % model, q, data)
+            endpoint = "%s/models/%s/" % (self.username, model)
         else:
-             return self.post('predict', q, data)
+            endpoint = 'predict'
+        return self.post(endpoint, q, data)
 
     def predict(self, model, version, data):
         """
@@ -192,7 +193,7 @@ class Yhat(API):
             className = pml.__class__.__name__
             filesource = self._extract_source(modelname, pml, className)
         except Exception, e:
-            print "Could not extract code. Either re-run script."
+            print "Could not extract code."
         userFiles = vars(pml)
         pickledUserFiles = {}
         for f, uf in userFiles.iteritems():
@@ -207,7 +208,10 @@ class Yhat(API):
             "className": className,
             "reqs": getattr(pml, "requirements", "")
         }
-        rsp = self.post("model", self.q, payload)
+        if self.base_uri==BASE_URI:
+            rsp = self.post("model", self.q, payload)
+        else:
+            rsp = self.post("deployer/model", self.q, payload)
         print "done!"
         return rsp
 

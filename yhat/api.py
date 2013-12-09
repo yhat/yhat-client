@@ -112,13 +112,13 @@ class Yhat(API):
         Runs a prediction for the model specified and returns the same
         prediction you would see from the REST API
         """
-        data = {"data": data}
         q = self.q
         q['model'] = model
         q['version'] = version
         if self.base_uri!=BASE_URI:
             endpoint = "%s/models/%s/" % (self.username, model)
         else:
+            data = {"data": data}
             endpoint = 'predict'
         return self.post(endpoint, q, data)
 

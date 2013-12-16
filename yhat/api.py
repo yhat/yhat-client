@@ -93,6 +93,8 @@ class Yhat(API):
         self.base_uri = uri
         self.headers = {'Content-Type': 'application/json'}
         self.q = {"username": self.username, "apikey": apikey}
+        if self._authenticate()==False:
+            raise Exception("Incorrect username/apikey!")
 
     def _check_obj_size(self, obj):
         if self.base_uri!=BASE_URI:
@@ -100,6 +102,9 @@ class Yhat(API):
             pass
         elif sys.getsizeof(obj) > 52428800:
             raise Exception("Sorry, your file is too big for a free account.")
+    
+    def _authenticate(self):
+        return True
 
     def show_models(self):
         """

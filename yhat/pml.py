@@ -14,6 +14,7 @@ class Model(object):
             setattr(self, kw, arg)
 
 class BaseModel(Model):
+    __name__ = "BaseModel"
     """
     BaseModel is the standard Yhat model class that gives your model
     the functionality to run it as a RESTful API. Once you create your own
@@ -51,6 +52,7 @@ class BaseModel(Model):
         return self.predict(data)
 
 class StepModel(Model):
+    __name__ = "StepModel"
     """
     StepModel allows you to define steps as methods. Each step is numbered
     (i.e. step_1, step_2, step_3, etc.). Steps are executed in order with the 
@@ -74,6 +76,9 @@ class StepModel(Model):
     # three = mm.step_3(two)
     # print three
     """
+    def require(self):
+        pass
+
     def _get_steps(self):
         steps = []
         for name, step in inspect.getmembers(self, predicate=inspect.ismethod):

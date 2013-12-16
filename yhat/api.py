@@ -90,6 +90,8 @@ class Yhat(API):
     def __init__(self, username, apikey, uri=BASE_URI):
         self.username = username
         self.apikey = apikey
+        if uri.endswith("/")==False:
+            uri += "/"
         self.base_uri = uri
         self.headers = {'Content-Type': 'application/json'}
         self.q = {"username": self.username, "apikey": apikey}
@@ -139,11 +141,19 @@ class Yhat(API):
             return rawResponse
 
     def _extract_source(self, modelname, pml, className):
-
-        filesource = "#<start user imports>\n"
+        filesource = "#<start sys imports>\n"
+        filesource += "from yhat import %s\n" % pml.__name__ 
+        filesource += "import inspect\n"
+        filesource += "import re\n"
+        filesource += "#<end sys imports>\n"
+        filesource += "#<start user imports>\n"
         import_source = inspect.getsource(pml.require)
-        imports = [line.strip() for line in import_source.split('\n') if "import" in line]
+        imports = []
+        for line in import_source.split('\n'):
+            if "import" in line:
+                imports.append(line.strip()) 
         imports = [i for i in imports if i.startswith("#")==False]
+
         filesource += "\n".join(imports) + "\n"
         filesource += "#<end user imports>\n\n"
 
@@ -157,11 +167,11 @@ class Yhat(API):
                         filesource += line[len(padding)-1:] + "\n"
                     filesource += "\n"
         filesource += "#<end user functions>\n"
-
         filesource += "\n"
-        filesource += "class %s(BaseModel):" % className + "\n"
-        filesource += inspect.getsource(pml.transform)+ "\n"
-        filesource += inspect.getsource(pml.predict)
+        filesource += "class %s(%s):" % (className, pml.__name__) + "\n"
+
+        for name, step in inspect.getmembers(pml, predicate=inspect.ismethod):
+            filesource += inspect.getsource(step) + "\n"
 
         return filesource
 

@@ -12,5 +12,5 @@ class MyModel(StepModel):
 
 mm = MyModel()
 
-yh = Yhat("greg", "abcd1234", "http://localhost:3000/")
+yh = Yhat("greg", "abcd123", "http://localhost:3000/")
 yh.deploy("hello", mm)

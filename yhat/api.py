@@ -106,7 +106,13 @@ class Yhat(API):
             raise Exception("Sorry, your file is too big for a free account.")
     
     def _authenticate(self):
-        return True
+        response = self.post('verify', self.q, {})
+        authed = True
+        try: 
+            error = response["success"];
+        except Exception, e:
+            authed = False
+        return authed
 
     def show_models(self):
         """

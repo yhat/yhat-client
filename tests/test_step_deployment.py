@@ -12,5 +12,5 @@ class MyModel(StepModel):
 
 mm = MyModel()
 
-yh = Yhat("greg", "abcd123", "http://localhost:3000/")
-yh.deploy("hello", mm)
+yh = Yhat("greg", "fCVZiLJhS95cnxOrsp5e2VSkk0GfypZqeRCntTD1nHA", "http://cloud.yhathq.com/")
+yh.deploy("StepTestModel", mm)

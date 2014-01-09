@@ -89,7 +89,7 @@ class StepModel(Model):
                 except:
                     raise Exception("'%s' - step names must be integers" % name)
                 steps.append((order, name, step))
-        steps = sorted(steps, key=lambda x: x[0])
+        steps = sorted(steps, key=lambda x: int(x[0]))
         return steps
     
     def execute(self, data):

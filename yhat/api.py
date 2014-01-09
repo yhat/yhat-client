@@ -8,6 +8,8 @@ import inspect
 import urllib2, urllib
 import types
 import re
+import os
+import zlib
 
 BASE_URI = "http://api.yhathq.com/"
 
@@ -101,9 +103,12 @@ class Yhat(API):
     def _check_obj_size(self, obj):
         if self.base_uri!=BASE_URI:
             # not deploying to the cloud so models can be as big as you want
-            pass
+            if sys.getsizeof(obj) > 52428800:
+                return False
         elif sys.getsizeof(obj) > 52428800:
             raise Exception("Sorry, your file is too big for a free account.")
+
+        return True
     
     def _authenticate(self):
         response = self.post('verify', self.q, {})
@@ -197,6 +202,41 @@ class Yhat(API):
         docs = document.document_data(example_data)
         return self.post('document', q, {"docs": docs})
 
+    def deploy_to_file(self, modelname, pml):
+        """
+        Bundles a local version of your model that can be manually uploaded to
+        the server.
+
+        modelname - the name of your model
+        pml - instance of BaseModel or StepModel class
+        """
+        try:
+            className = pml.__class__.__name__
+            filesource = self._extract_source(modelname, pml, className)
+        except Exception, e:
+            print "Could not extract code."
+        userFiles = vars(pml)
+        pickledUserFiles = {}
+        for f, uf in userFiles.iteritems():
+            if f=="udfs":
+                continue
+            pickledUserFiles[f] = pickle.dumps(uf)
+        payload = {
+            "modelname": modelname,
+            "modelfiles": pickledUserFiles,
+            "code": filesource,
+            "className": className,
+            "reqs": getattr(pml, "requirements", "")
+        }
+
+        with open("%s.yhat" % modelname, "w") as f:
+            payload = json.dumps(payload)
+            filecontent = zlib.compress(payload)
+            f.write(filecontent)
+        
+        print "Model successfully bundled to file:"
+        print "\t%s/%s.yhat" % (os.getcwd(), modelname)
+
     def deploy(self, modelname, pml):
         """
         Deploys your model to the Yhat servers.
@@ -221,7 +261,8 @@ class Yhat(API):
             if f=="udfs":
                 continue
             pickledUserFiles[f] = pickle.dumps(uf)
-            self._check_obj_size(pickledUserFiles[f])
+            if self._check_obj_size(pickledUserFiles[f])==False:
+                return
         payload = {
             "modelname": modelname,
             "modelfiles": pickledUserFiles,

@@ -223,6 +223,8 @@ class Yhat(API):
                 continue
             pickledUserFiles[f] = pickle.dumps(uf)
         payload = {
+            "largefile": True,
+            "username": self.username,
             "language": "python",
             "modelName": modelname,
             "objects": pickledUserFiles,

@@ -223,8 +223,9 @@ class Yhat(API):
                 continue
             pickledUserFiles[f] = pickle.dumps(uf)
         payload = {
-            "modelname": modelname,
-            "modelfiles": pickledUserFiles,
+            "language": "python",
+            "modelName": modelname,
+            "objects": pickledUserFiles,
             "code": filesource,
             "className": className,
             "reqs": getattr(pml, "requirements", "")

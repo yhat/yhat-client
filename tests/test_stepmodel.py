@@ -1,5 +1,5 @@
 from yhat.pml import StepModel
-
+from yhat import Yhat
 
 class MyModel(StepModel):
     def step_1(self, data):
@@ -11,4 +11,6 @@ class MyModel(StepModel):
 
 mm = MyModel()
 
+yh = Yhat("greg", "abcd1234")
 print mm.execute("hello!")
+yh.deploy_to_file("newmodel", mm)

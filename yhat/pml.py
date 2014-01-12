@@ -37,14 +37,14 @@ class BaseModel(Model):
         Transform takes the raw data that's going to be sent to your yhat API
         and converts it into the format required to be run through your model.
         """
-        return rawData
+        pass
 
     def predict(self, transformedData):
         """
         Predict executes your predictive model, formats the data into response,
         and returns it.
         """
-        return self.clf.predict(transformedData)
+        pass
     
     def execute(self, data):
         self.require()

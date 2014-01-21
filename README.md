@@ -80,5 +80,12 @@ code?
 
 ### How we will make it more fun?
 
+### NOTES from AO
+- create projects based on business purpose / goal; type of problem (e.g. regression vs. classification or ranking); by primary algorithm used
+- can users create their own template structure
+	- can users share their templates with other users in their org or publically
+- yhat-cli should show full help
+- 
+
 
 

@@ -15,21 +15,6 @@ PROJECT_DIR = os.path.join(os.environ['HOME'], ".yhat/templates")
 
 
 def prompt_user():
-    # inputs = [
-    #     {"prompt": "Project Name: ", "variable": "name"},
-    #     {"prompt": "Description: ", "variable": "description"},
-    #     {"prompt": "GitHub username: ", "variable": "github_username"},
-    #     {"prompt": "Your name: ", "variable": "your_name"},
-    #     {"prompt": "Your email: ", "variable": "your_email"}
-    # ]
-
-    # user_input = {}
-    # for prompt in inputs:
-    #     user_input[prompt['variable']] = raw_input(Fore.CYAN + prompt['prompt'])
-
-    # return user_input
-
-
     if os.path.isdir(PROJECT_DIR):
         choices = [f[:-5] for f in os.listdir(PROJECT_DIR) if f.endswith(".json")]
     else:
@@ -38,12 +23,16 @@ def prompt_user():
     choices.append('*new project*')
     choices.append('*download template*')
 
-    print Fore.CYAN + "Templates".center(40)
-    print Fore.CYAN + "="*40
     choices_lookup = {}
+    print "" + Fore.CYAN
+    table = PrettyTable([Fore.CYAN + "", Fore.CYAN + "Template"])
     for i, choice in enumerate(choices):
-        print Fore.CYAN + " (%d) %s" % (i+1, choice.ljust(40))
         choices_lookup[str(i+1)] = choice
+        table.add_row([
+            Fore.CYAN + "(%d)" % (i+1),
+            Fore.CYAN + choice
+        ])
+    print table
     return choices_lookup.get(raw_input("(?) "))
 
 
@@ -62,7 +51,6 @@ if __name__=="__main__":
         else:
             table = PrettyTable(["Key", "Value"])
             for key, value in credentials.read().items():
-                # print Fore.CYAN + key.ljust(8), ":", value
                 table.add_row([key, value])
             print table
 

@@ -3,11 +3,13 @@ import shutil
 import json
 
 
-PROJECT_DIR = os.path.join(os.environ['HOME'], ".yhat/projects")
+PROJECT_DIR = os.path.join(os.environ['HOME'], ".yhat/templates")
 
 def setup(template_name, project_name):
-	if template_name=='*new project*':
-		return setup_new_project()
+    if template_name=='*new project*':
+        return setup_new_project()
+    elif template_name=="*download project*":
+        return find_template(project_name)
 	replacements = {
 		"project_name": project_name
 	}
@@ -27,3 +29,11 @@ def setup(template_name, project_name):
 
 def setup_new_project():
 	pass
+
+def find_template(query):
+    ALL_TEMPLATES = [
+        {"name": "something"}
+    ]
+    for template in ALL_TEMPLATES:
+        if re.find(query, json.dumps(template)):
+            yield template

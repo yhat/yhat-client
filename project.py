@@ -42,7 +42,7 @@ def setup(template_name, project_name):
         data_filepath = os.path.join(project_name, "data", datafile["name"])
         print " >>> %s" % datafile['name']
         processed = 0
-        pbar = ProgressBar(widgets=[Bar(), ' ', Percentage(), ETA()],
+        pbar = ProgressBar(widgets=[Bar(), ' ', ETA(), ' ', Percentage()],
                 maxval=int(filesize)).start()
         with open(data_filepath, "wb") as f:
             # add in progress bar here

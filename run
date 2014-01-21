@@ -1,0 +1,5 @@
+#!/bin/bash
+
+rm -rf logistic-regression
+python main.py
+ls

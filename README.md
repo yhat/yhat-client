@@ -85,7 +85,14 @@ code?
 - can users create their own template structure
 	- can users share their templates with other users in their org or publically
 - yhat-cli should show full help
-- 
 
-
+## TODO
+- wizard for new project/analysis
+- config an existing project and yhat deployment with client
+- standardize types of IO
+- figure out which types of io work the best
+    - DataFrame to DataFrame
+    - dictionary
+    - both?
+- standard way to handle null values -> "execution plan"
 

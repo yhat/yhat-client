@@ -1,9 +1,11 @@
-import os
-import shutil
-import json
-import urllib2
 import pip
-from progressbar import ProgressBar, Bar, ETA
+import shutil
+import urllib2
+import json
+import os
+
+from progressbar import ProgressBar, Bar, ETA, Percentage
+
 import credentials
 
 PROJECT_DIR = os.path.join(os.environ['HOME'], ".yhat/templates")
@@ -40,7 +42,7 @@ def setup(template_name, project_name):
         data_filepath = os.path.join(project_name, "data", datafile["name"])
         print " >>> %s" % datafile['name']
         processed = 0
-        pbar = ProgressBar(widgets=[Bar(), ' ', ETA()],
+        pbar = ProgressBar(widgets=[Bar(), ' ', Percentage(), ETA()],
                 maxval=int(filesize)).start()
         with open(data_filepath, "wb") as f:
             # add in progress bar here
@@ -62,7 +64,18 @@ def setup(template_name, project_name):
         print "%s not found!" % reqs_filepath
 
 def setup_new_project():
-    pass
+    inputs = [
+        {"prompt": "Project Name: ", "variable": "name"},
+        {"prompt": "Description: ", "variable": "description"},
+        {"prompt": "GitHub username: ", "variable": "github_username"},
+        {"prompt": "Your name: ", "variable": "your_name"},
+        {"prompt": "Your email: ", "variable": "your_email"}
+    ]
+    user_input = {}
+    for prompt in inputs:
+        user_input[prompt['variable']] = raw_input(Fore.CYAN + prompt['prompt'])
+    
+    return user_input
 
 def find_template(query):
     ALL_TEMPLATES = [

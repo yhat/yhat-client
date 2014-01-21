@@ -1,6 +1,7 @@
-import os
-import base64
 import json
+import base64
+import os
+
 
 def setup():
 	username = raw_input("Yhat username: ")
@@ -13,3 +14,4 @@ def setup():
 def read():
 	data = open(os.path.join(os.environ['HOME'], '.yhat', '.config')).read()
 	return json.loads(base64.decodestring(data))
+

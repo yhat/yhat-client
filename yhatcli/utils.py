@@ -19,4 +19,4 @@ def download_file(url, filename):
             processed += len(line)
             pbar.update(processed)
             f.write(line)
-
+    print

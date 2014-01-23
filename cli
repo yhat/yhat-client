@@ -46,7 +46,8 @@ if __name__=="__main__":
         print Fore.GREEN + result
         project.setup(result, result)
     elif sys.argv[1]=="fetch":
-        project.download(sys.argv[2])
+        print "Downloading template %s" % (Fore.YELLOW + os.path.basename(sys.argv[2]) + Fore.RESET + " ")
+        project.download_template(sys.argv[2])
     elif sys.argv[1]=="config":
         if len(sys.argv) > 2:
             if sys.argv[2]=="reset":

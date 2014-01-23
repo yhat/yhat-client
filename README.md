@@ -82,6 +82,7 @@ code?
 
 ### NOTES from AO
 - create projects based on business purpose / goal; type of problem (e.g. regression vs. classification or ranking); by primary algorithm used
+- projects could include an application
 - can users create their own template structure
 	- can users share their templates with other users in their org or publically
 - yhat-cli should show full help
@@ -95,4 +96,11 @@ code?
     - dictionary
     - both?
 - standard way to handle null values -> "execution plan"
+- automatically spin up and send your data to aws
+    - should include Rstudio/IPython Notebook
+    - should print off commands for accessing server and make it super obvious
+    how to use it
+- yhat aws configuration / manipulation
+    - pass it in a license key?
+
 

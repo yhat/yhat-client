@@ -1,10 +1,12 @@
 import json
 import pickle
-# code for <function pred at 0x104df1140>
+from sklearn.datasets.base import load_iris
+# code for <function pred at 0x1050aa140>
 def pred(data):
-    return clf.predict(iris.data)
+    return clf.predict(load_iris().data)
 
-pickles = json.load(open('data.json', 'rb'))
-for varname, pickled_value in pickles.items():
+pickles = json.load(open('pred.json', 'rb'))
+for varname, pickled_value in pickles.get('objects', {}).items():
     globals()[varname] = pickle.loads(pickled_value)
-
+    
+print pred(100)

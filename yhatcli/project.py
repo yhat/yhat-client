@@ -4,13 +4,33 @@ import urllib2
 import json
 import os
 
-from progressbar import ProgressBar, Bar, ETA, Percentage
-
+from utils import download_file
 import credentials
 
 PROJECT_DIR = os.path.join(os.environ['HOME'], ".yhat/templates")
 
 def setup(template_name, project_name):
+    """
+    ***THIS IS AN EXAMPLE OF A PANDAS DOCSTRING***
+    Return a DataFrame with the same shape as self and whose corresponding
+    entries are from self where cond is True and otherwise are from other.
+
+    Parameters
+    ----------
+    cond : boolean DataFrame or array
+    other : scalar or DataFrame
+    inplace : boolean, default False
+    Whether to perform the operation in place on the data
+    try_cast : boolean, default False
+        try to cast the result back to the input type (if possible),
+    raise_on_error : boolean, default True
+        Whether to raise on invalid data types (e.g. trying to where on
+        strings)
+
+    Returns
+    -------
+    wh : DataFrame
+    """
     if template_name=='*new project*':
         return setup_new_project()
     elif template_name=="*download project*":
@@ -37,20 +57,8 @@ def setup(template_name, project_name):
     print "Downloading data dependencies for project"
     print "="*80
     for datafile in config.get("data", []):
-        file_conn = urllib2.urlopen(datafile['source'])
-        filesize = file_conn.headers['content-length']
-        data_filepath = os.path.join(project_name, "data", datafile["name"])
         print " >>> %s" % datafile['name']
-        processed = 0
-        pbar = ProgressBar(widgets=[Bar(), ' ', ETA(), ' ', Percentage()],
-                maxval=int(filesize)).start()
-        with open(data_filepath, "wb") as f:
-            # add in progress bar here
-            for line in file_conn:
-                processed += len(line)
-                pbar.update(processed)
-                f.write(line)
-        print
+        download_file(datafile['source'], datafile['filename'])
 
     reqs_filepath = os.path.join(project_name, "reqs.txt")
     try:
@@ -84,3 +92,56 @@ def find_template(query):
     for template in ALL_TEMPLATES:
         if re.find(query, json.dumps(template)):
             yield template
+
+def download_template(template_source):
+    """
+    Downloads a template and saves it to the .yhat/templates directory
+
+    template_source - URL of the .json template file
+    """
+    if template_source.endswith(".json"):
+        filename = os.path.basename(template_source)
+        filename = os.path.join(os.environ['HOME'], '.yhat/templates', filename)
+        download_file(template_source, filename)
+
+def bundle(name, directory):
+    """
+    Grab each file and put it in a list with it's pathname (relative to 
+    directory) and it's contents. Create a list of each directory (and any
+    sub-directories). Create a list of data elements. These should have a 
+    name and a source (url for now).
+    """
+    
+    project_file = os.path.join(directory, name + ".json")
+    project = {
+        "name": name,
+        "dirs": [],
+        "files": [],
+        "data": []
+    }
+    for i, (dirname, subdirs, files) in enumerate(os.walk(directory)):
+        subdir = dirname.replace(directory, '').strip('/')
+        if subdir:
+            project["dirs"].append(subdir)
+        for f in files:
+            # TODO: make this more comprehensive; maybe a .gitignore?
+            if f.endswith(".pyc"):
+                continue
+            f = os.path.join(dirname, f)
+            # we don't want to bundle the bundle
+            if os.path.basename(f)==os.path.basename(project_file):
+                continue
+            elif dirname==os.path.join(directory, "data"):
+                # TODO: add option to upload to AWS/Dropbox
+                source = raw_input("Input source URL for %s: " % f)
+                f = f.replace(directory, '')
+                f = f.strip('/')
+                project["data"].append({"name": f, "source": source})
+            else:
+                content = open(f).read()
+                f = f.replace(directory, '')
+                f = f.strip('/')
+                project["files"].append({"name": f, "content": content})
+    with open(project_file, "wb") as f:
+        json.dump(project, f, indent=2) 
+

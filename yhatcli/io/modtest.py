@@ -1,10 +1,7 @@
-import pickle
-import json
 from requests import Session
 from sklearn.linear_model import LinearRegression
 from sklearn.svm import SVC
 from sklearn.datasets import load_iris
-
 
 def saywhat(i):
     print i
@@ -37,12 +34,22 @@ clf.fit(iris.data, iris.target)
 def pred(data):
     return clf.predict(iris.data)
 
-# print spider_function(goodbye, globals())
-# print spider_function(hello, globals())
+#####                             #####
+#####  This is the actual process #####
+#####                             #####
+
+import pickle
+import json
+
+print spider_function(goodbye, globals())
+print spider_function(hello, globals())
 source_code, pickles = spider_function(pred, globals())
-source_code = "import pickle\n" + source_code
+source_code = "import json\nimport pickle\n" + source_code
+source_code += """pickles = json.load(open('data.json', 'rb'))
+for varname, pickled_value in pickles.items():
+    globals()[varname] = pickle.loads(pickled_value)
+"""
 print source_code
 with open("data.json", "wb") as f:
     json.dump(pickles, f)
-
 

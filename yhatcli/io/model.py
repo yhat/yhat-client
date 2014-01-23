@@ -2,11 +2,13 @@ import pickle
 import ast
 import inspect
 import types
-import json
 
 
 def strip_function(src):
     """
+    Takes the source code of a function and dedents it so that it.
+
+    src - function code
     """
     src = src.split('\n')
     n = len(src[0]) - len(src[0].lstrip())
@@ -14,6 +16,10 @@ def strip_function(src):
 
 def get_naked_loads(function):
     """
+    Takes a reference to a function and determines which variables used in the 
+    function are not defined within the scope of the function.
+
+    function - a function
     """
     source = inspect.getsource(function)
     source = strip_function(source)
@@ -39,6 +45,13 @@ def get_naked_loads(function):
 
 def spider_function(function, allvars, pickles={}):
     """
+    Takes a function and global variables referenced in an environment and 
+    recursively finds dependencies required in order to execute the function. 
+    This includes references to classes, libraries, variables, functions, etc.
+
+    function - a function referenced in an environment
+    allvars - variables referenced from a seperate environment (globals())
+    pickles - holds the variables needed to execute the function
     """
     source = "# code for %s\n" % str(function)
     source += inspect.getsource(function) + '\n'
@@ -51,7 +64,9 @@ def spider_function(function, allvars, pickles={}):
                 ref = inspect.getmodule(obj).__name__
                 source = "from %s import %s\n%s" % (ref, varname, source)
             else:
-                source += spider_function(obj, allvars, pickles) + '\n'
+                new_source, new_pickles = spider_function(obj, allvars, pickles)
+                source += new_source + '\n'
+                pickles.update(new_pickles)
         elif inspect.isclass(obj):
             if allvars['__file__']!=vars(inspect.getmodule(obj))['__file__']:
                 ref = inspect.getmodule(obj).__name__
@@ -63,8 +78,9 @@ def spider_function(function, allvars, pickles={}):
                 for name, method in class_methods:
                     for subfunc in get_naked_loads(method):
                         if subfunc in allvars:
-                            source += spider_function(allvars[subfunc],
-                                    allvars, pickles)
+                            new_source, new_pickles = spider_function(allvars[subfunc], allvars, pickles)
+                            source += new_source
+                            pickles.update(new_pickles)
         else:
             if isinstance(obj, types.ModuleType):
                 ref = inspect.getmodule(obj).__name__

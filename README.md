@@ -103,4 +103,9 @@ code?
 - yhat aws configuration / manipulation
     - pass it in a license key?
 
+## Deployment
+- a single "execution plan" rather than predefined functions
+- different plans for different prefs
+
+
 

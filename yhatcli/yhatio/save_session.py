@@ -45,6 +45,11 @@ def _get_naked_loads(function):
             yield variable
 
 def _spider_function(function, session, pickles={}):
+    # TODO: decorator didn't work; should put all imports at the top (instead
+    # of relative top)
+    # TODO: some issues in regards to the order in which classes are defined
+    # and inherited from
+    # TODO: currently doesn't support "local modules"
     """
     Takes a function and global variables referenced in an environment and 
     recursively finds dependencies required in order to execute the function. 
@@ -54,6 +59,7 @@ def _spider_function(function, session, pickles={}):
     session - variables referenced from a seperate environment (globals())
     pickles - holds the variables needed to execute the function
     """
+    imports = []
     source = "# code for %s\n" % str(function)
     source += inspect.getsource(function) + '\n'
     for varname in _get_naked_loads(function):
@@ -63,15 +69,16 @@ def _spider_function(function, session, pickles={}):
         if hasattr(obj, '__call__'):
             if session['__file__']!=vars(inspect.getmodule(obj))['__file__']:
                 ref = inspect.getmodule(obj).__name__
-                source = "from %s import %s\n%s" % (ref, varname, source)
+                imports.append("from %s import %s" % (ref, varname))
             else:
-                new_source, new_pickles = _spider_function(obj, session, pickles)
+                new_imports, new_source, new_pickles = _spider_function(obj, session, pickles)
                 source += new_source + '\n'
+                imports += new_imports
                 pickles.update(new_pickles)
         elif inspect.isclass(obj):
             if session['__file__']!=vars(inspect.getmodule(obj))['__file__']:
                 ref = inspect.getmodule(obj).__name__
-                source = "import %s as %s\n%s" % (ref, varname, source)
+                imports.append("import %s as %s" % (ref, varname))
             else:
                 source += inspect.getsource(obj) + '\n'
                 class_methods = inspect.getmembers(obj,
@@ -79,18 +86,19 @@ def _spider_function(function, session, pickles={}):
                 for name, method in class_methods:
                     for subfunc in _get_naked_loads(method):
                         if subfunc in session:
-                            new_source, new_pickles = _spider_function(
+                            new_imports, new_source, new_pickles = _spider_function(
                                     session[subfunc], session, pickles
-                                    )
+                                )
                             source += new_source
+                            imports += new_imports
                             pickles.update(new_pickles)
         else:
             if isinstance(obj, types.ModuleType):
                 ref = inspect.getmodule(obj).__name__
-                source = "import %s as %s\n%s" % (ref, varname, source)
+                imports.append("import %s as %s" % (ref, varname))
                 continue
             pickles[varname] = pickle.dumps(obj)
-    return source, pickles
+    return imports, source, pickles
 
 def save_function(filename, function, session):
     """
@@ -99,8 +107,10 @@ def save_function(filename, function, session):
     function - name of the function we're saving
     session - globals() from the user's environment
     """
-    source_code, pickles = _spider_function(function, session)
-    source_code = "import json\nimport pickle\n" + source_code
+    imports, source_code, pickles = _spider_function(function, session)
+    imports.append("import json")
+    imports.append("import pickle")
+    source_code = "\n".join(imports) + "\n\n\n" + source_code
     source_code += """pickles = json.load(open('%s', 'rb'))
 for varname, pickled_value in pickles.get('objects', {}).items():
     globals()[varname] = pickle.loads(pickled_value)

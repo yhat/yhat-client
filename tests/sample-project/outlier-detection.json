@@ -1,0 +1,50 @@
+{
+  "dirs": [
+    "data", 
+    "lib", 
+    "plots", 
+    "plots/subdir", 
+    "tests"
+  ], 
+  "files": [
+    {
+      "content": "# Python Beer Recommender\n\n- replace {USERNAME} and {APIKEY} with your credentials\n- run `python recommender.py`\n- enter `y` to deploy\n", 
+      "name": "README.md"
+    }, 
+    {
+      "content": "", 
+      "name": "reqs.txt"
+    }, 
+    {
+      "content": "from load_data import training, training_no_price\nfrom sklearn.feature_extraction import DictVectorizer\n\n\ndv = DictVectorizer()\ndv.fit(training.T.to_dict().values())\nprint dv.feature_names_\n\n\n\n", 
+      "name": "lib/clean_data.py"
+    }, 
+    {
+      "content": "from yhat import BaseModel, Yhat\nfrom fit import dv, LR, trainingErrs\nfrom load_data import testing\nimport numpy as np\n\nclass PricingModel(BaseModel):\n    def transform(self, doc):\n        \"\"\"\n        Maps input dict (from json post) into numpy array\n        delegates to DictVectorizer self.dv\n        \"\"\"\n        return self.dv.transform(doc)\n    def predict(self, x):\n        \"\"\"\n        Evaluate model on array\n        delegates to LinearRegression self.lr\n        returns a dict (will be json encoded) suppling \n        \"predictedPrice\", \"suspectedOutlier\", \"x\", \"threshold\" \n        where \"x\" is the input vector and \"threshold\" is determined \n        whether or not a listing is a suspected outlier.\n        \"\"\"\n        doc = self.dv.inverse_transform(x)[0] \n        predicted = self.lr.predict(x)[0]\n        err = abs(predicted - doc['price'])\n        return {'predictedPrice': predicted, \n                'x': doc, \n                'suspectedOutlier': 1 if (err > self.threshold) else 0,\n                'threshold': self.threshold}\n\n\npm = PricingModel(dv=dv, lr=LR, threshold=np.percentile(trainingErrs, 95))\nprint pm.execute(testing.T.to_dict()[0])\n\nif raw_input(\"Deploy? (y/N): \").lower()==\"y\":\n    username = \"greg\"\n    apikey = \"abcd1234\"\n    yh = Yhat(username, apikey, \"http://cloud.yhathq.com/\")\n    print yh.deploy(model_name, fitted_model)", 
+      "name": "lib/deploy.py"
+    }, 
+    {
+      "content": "from sklearn.linear_model import LinearRegression\nfrom clean_data import training, training_no_price, dv\n\nLR = LinearRegression().fit(dv.transform(training_no_price.T.to_dict().values()), training.price)\n\ntrainingErrs = abs(LR.predict(dv.transform(training.T.to_dict().values())) - training.price)", 
+      "name": "lib/fit.py"
+    }, 
+    {
+      "content": "import pandas as pd\n\ntraining = pd.read_csv('data/accord_sedan_training.csv')\ntesting = pd.read_csv('data/accord_sedan_testing.csv')\n\ntraining_no_price = training.drop(['price'], 1)\n", 
+      "name": "lib/load_data.py"
+    }, 
+    {
+      "content": "import pandas as pd\nimport numpy as np\nimport sys\n\ndf = pd.read_csv(\"data/beer_reviews.csv\")\ndf.head()\n\n\nbeer_1, beer_2 = \"Dale's Pale Ale\", \"Fat Tire Amber Ale\"\n\nbeer_1_reviewers = df[df.beer_name==beer_1].review_profilename.unique()\nbeer_2_reviewers = df[df.beer_name==beer_2].review_profilename.unique()\ncommon_reviewers = set(beer_1_reviewers).intersection(beer_2_reviewers)\nprint \"Users in the sameset: %d\" % len(common_reviewers)\nlist(common_reviewers)[:10]\n\ndef get_beer_reviews(beer, common_users):\n    mask = (df.review_profilename.isin(common_users)) & (df.beer_name==beer)\n    reviews = df[mask].sort('review_profilename')\n    reviews = reviews[reviews.review_profilename.duplicated()==False]\n    return reviews\n\nbeer_1_reviews = get_beer_reviews(beer_1, common_reviewers)\nbeer_2_reviews = get_beer_reviews(beer_2, common_reviewers)\n\ncols = ['beer_name', 'review_profilename', 'review_overall', 'review_aroma', \n        'review_palate', 'review_taste']\nbeer_2_reviews[cols].head()\n\n\n# choose your own way to calculate distance\nfrom sklearn.metrics.pairwise import euclidean_distances\nfrom sklearn.metrics.pairwise import manhattan_distances\nfrom scipy.stats.stats import pearsonr\n\n\nALL_FEATURES = ['review_overall', 'review_aroma', 'review_palate', 'review_taste']\ndef calculate_similarity(beer1, beer2):\n    # find common reviewers\n    beer_1_reviewers = df[df.beer_name==beer1].review_profilename.unique()\n    beer_2_reviewers = df[df.beer_name==beer2].review_profilename.unique()\n    common_reviewers = set(beer_1_reviewers).intersection(beer_2_reviewers)\n\n    # get reviews\n    beer_1_reviews = get_beer_reviews(beer1, common_reviewers)\n    beer_2_reviews = get_beer_reviews(beer2, common_reviewers)\n    dists = []\n    for f in ALL_FEATURES:\n        dists.append(euclidean_distances(beer_1_reviews[f], beer_2_reviews[f])[0][0])\n    \n    return dists\n\ncalculate_similarity(beer_1, beer_2)\n\n# get a list of all the beers we have\nbeers = df.beer_name.unique().tolist()\n\nsimple_distances = []\nfor beer1 in beers:\n    print \"\\ttraining\", beer1\n    for beer2 in beers:\n        if beer1 != beer2:\n            row = [beer1, beer2] + calculate_similarity(beer1, beer2)\n            simple_distances.append(row)\n\ncols = [\"beer1\", \"beer2\", \"overall_dist\", \"aroma_dist\", \"palate_dist\", \"taste_dist\"]\nsimple_distances = pd.DataFrame(simple_distances, columns=cols)\nsimple_distances.tail()\n\n\ndef calc_distance(dists, beer1, beer2, weights):\n    mask = (dists.beer1==beer1) & (dists.beer2==beer2)\n    row = dists[mask]\n    row = row[['overall_dist', 'aroma_dist', 'palate_dist', 'taste_dist']]\n    dist = weights * row\n    return dist.sum(axis=1).tolist()[0]\n\ndef normalize_dists(dists):\n    newdists = []\n    dist_min = min(row[2] for row in dists)\n    dist_max = max(row[2] for row in dists)\n    for (b1, b2, dist) in dists:\n        dist = (dist - dist_min) / (dist_max - dist_min)\n        dist = 100 * (1 - round(dist, 2))\n        newdists.append((b1, b2, dist))\n\n    return newdists\n\nweights = [2, 1, 1, 1]\n\n\nfrom yhat import Yhat, BaseModel\n\nclass BeerRec(BaseModel):\n    \n    def transform(self, raw_data):\n        beer = raw_data['beer']\n        weights = raw_data.get(\"weights\", [1, 1, 1, 1])\n        # normalize the weights so they sum to 1.0\n        weights = [float(w) / sum(weights) for w in weights]\n        print \"making recs for: \" + beer\n        return (beer, weights)\n        \n    def predict(self, data):\n        beer, weights = data\n        results = []\n        for beer_cmp in self.beers:\n            if beer!=beer_cmp:\n                dist = calc_distance(self.simple_distances, beer, beer_cmp, weights)\n                results.append((beer, beer_cmp, dist))\n        dists = sorted(results, key=lambda x: x[2])\n        # return dists\n        return normalize_dists(dists)\n\nyh = Yhat({USERNAME}, {APIKEY})\nmyBeerModel = BeerRec(simple_distances=simple_distances, beers=beers, \n                udfs=[calc_distance, normalize_dists])\n\nif raw_input(\"Deploy? (y/N)\")==\"y\":\n    print yh.deploy(\"BeerRec\", myBeerModel)\n\nprint yh.predict(\"BeerRec\", None, {\"beer\": \"Coors Light\"})\n\n\n\n\n", 
+      "name": "lib/recommender.py"
+    }
+  ], 
+  "data": [
+    {
+      "source": "1", 
+      "name": "data/accord_sedan_testing.csv"
+    }, 
+    {
+      "source": "1", 
+      "name": "data/accord_sedan_training.csv"
+    }
+  ], 
+  "name": "outlier-detection"
+}

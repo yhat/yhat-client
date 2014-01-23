@@ -6,8 +6,8 @@ from colorama import init
 from colorama import Fore, Back, Style
 from prettytable import PrettyTable
 
-import project
-import credentials
+from yhatcli import project
+from yhatcli import credentials
 
 init()
 
@@ -15,10 +15,11 @@ PROJECT_DIR = os.path.join(os.environ['HOME'], ".yhat/templates")
 
 
 def prompt_user():
+    choices = []
     if os.path.isdir(PROJECT_DIR):
-        choices = [f[:-5] for f in os.listdir(PROJECT_DIR) if f.endswith(".json")]
-    else:
-        choices = []
+        for f in os.listdir(PROJECT_DIR):
+            if f.endswith(".json"):
+                choices.append(f[:-5])
 
     choices.append('*new project*')
     choices.append('*download template*')
@@ -41,16 +42,24 @@ if __name__=="__main__":
         result = prompt_user()
         while result is None:
             result = prompt_user()
-
+        
         print Fore.GREEN + result
         project.setup(result, result)
+    elif sys.argv[1]=="fetch":
+        project.download(sys.argv[2])
     elif sys.argv[1]=="config":
         if len(sys.argv) > 2:
             if sys.argv[2]=="reset":
+                # save the user's credentials in a dotfile
                 credentials.setup()
         else:
+            # print out the user's saved config
             table = PrettyTable(["Key", "Value"])
             for key, value in credentials.read().items():
                 table.add_row([key, value])
             print table
 
+    elif sys.argv[1]=="bundle":
+        project_name = sys.argv[2]
+        directory = sys.argv[3]
+        project.bundle(project_name, directory)

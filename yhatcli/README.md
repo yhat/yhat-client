@@ -4,6 +4,17 @@
 ## Making Predictions
 
 ### `df` to `df`
+Specify `df` to `df` by decorating `execute` with the following:
+```python
+from yhat.io import preprocess
+# ...
+# ...
+@preprocess(in_type=pd.DataFrame, out_type=pd.DataFrame)
+def execute(self, data)
+# ...
+# ...
+```
+
 #### Input
 ```js
 // making 1 prediction with an API call
@@ -27,6 +38,16 @@ Data will come back with columns as keys and values as lists of values.
 ```
 
 ### `df` to `dict`
+```python
+from yhat.io import preprocess
+# ...
+# ...
+@preprocess(in_type=pd.DataFrame, out_type=dict)
+def execute(self, data)
+# ...
+# ...
+```
+
 #### Input
 ```js
 // making 1 prediction with an API call
@@ -62,6 +83,16 @@ output format (so long as it is a valid Python dictionary.
 This is the most "free form" means of input and output. The user can send in any
 valid dictionary, process it how they like, and then return any valid dictionary
 .
+```python
+from yhat.io import preprocess
+# ...
+# ...
+@preprocess(in_type=dict, out_type=dict)
+def execute(self, data)
+# ...
+# ...
+```
+
 #### Input
 ```js
 // this is valid

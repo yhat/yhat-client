@@ -12,4 +12,5 @@ setup(
         description="plotting in the terminal",
 #        long_description=open("README.txt").read(),
         scripts=['bin/hist', 'bin/scatter'],
+    install_requires=required
 )

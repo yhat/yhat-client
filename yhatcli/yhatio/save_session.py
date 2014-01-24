@@ -36,6 +36,9 @@ def _get_naked_loads(function):
             elif isinstance(thingvars['ctx'], ast.Load):
                 if 'id' in thingvars:
                     loaded.add(thingvars['id'])
+                    # variable = thingvars['id']
+                    # if variable not in params and variable not in created:
+                        # yield variable
             elif isinstance(thingvars['ctx'], ast.Store):
                 if 'id' in thingvars:
                     created.add(thingvars['id'])
@@ -51,7 +54,6 @@ def _spider_function(function, session, pickles={}):
     # TODO: some issues in regards to the order in which classes are defined
     # and inherited from
     # TODO: currently doesn't support "local modules"
-    # TODO: check for recursive functions
     """
     Takes a function and global variables referenced in an environment and 
     recursively finds dependencies required in order to execute the function. 

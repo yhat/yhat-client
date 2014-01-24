@@ -41,15 +41,17 @@ def _get_naked_loads(function):
                     created.add(thingvars['id'])
     
     for variable in loaded:
+        # TODO: if created but loaded before that as something else
         if variable not in params and variable not in created:
             yield variable
 
+SEEN = set()
 def _spider_function(function, session, pickles={}):
-    # TODO: decorator didn't work; should put all imports at the top (instead
-    # of relative top)
+    # TODO: need to grab variables passed as kwargs to decorators
     # TODO: some issues in regards to the order in which classes are defined
     # and inherited from
     # TODO: currently doesn't support "local modules"
+    # TODO: check for recursive functions
     """
     Takes a function and global variables referenced in an environment and 
     recursively finds dependencies required in order to execute the function. 
@@ -59,6 +61,9 @@ def _spider_function(function, session, pickles={}):
     session - variables referenced from a seperate environment (globals())
     pickles - holds the variables needed to execute the function
     """
+    if '_objects_seen' not in pickles:
+        pickles['_objects_seen'] = []
+    pickles['_objects_seen'].append(str(function))
     imports = []
     source = "# code for %s\n" % str(function)
     source += inspect.getsource(function) + '\n'
@@ -71,6 +76,9 @@ def _spider_function(function, session, pickles={}):
                 ref = inspect.getmodule(obj).__name__
                 imports.append("from %s import %s" % (ref, varname))
             else:
+                # check if we've already seen it
+                if str(obj) in pickles['_objects_seen']:
+                    continue
                 new_imports, new_source, new_pickles = _spider_function(obj, session, pickles)
                 source += new_source + '\n'
                 imports += new_imports
@@ -86,6 +94,9 @@ def _spider_function(function, session, pickles={}):
                 for name, method in class_methods:
                     for subfunc in _get_naked_loads(method):
                         if subfunc in session:
+                            # check if we've already seen it
+                            if str(obj) in pickles['_objects_seen']:
+                                continue
                             new_imports, new_source, new_pickles = _spider_function(
                                     session[subfunc], session, pickles
                                 )

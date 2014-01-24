@@ -1,15 +1,16 @@
-### <Analysis START> ###
 from sklearn.linear_model import LogisticRegression
 from sklearn.datasets import load_iris
 import pandas as pd
 import json
+import warnings
+warnings.simplefilter(action = "ignore")
 
-# this is your new "BaseModel"
-from yhatio.models import YhatModel
-# these define you IO standards
+# these define your IO specs
 from yhatio.input_and_output import df_to_df, df_to_dict, dict_to_dict
 # i'm thinking the above get consolidated into this...
 from yhatio.input_and_output import preprocess
+# this is your new "BaseModel"
+from yhatio.models import YhatModel
 
 clf = LogisticRegression()
 x = pd.DataFrame({
@@ -19,9 +20,22 @@ x = pd.DataFrame({
 })
 clf.fit(x[['x', 'z']], x['y'])
 
+def fib(x):
+    if x==0:
+        return 1
+    elif x==1:
+        return 1
+    return fib(x-1) + fib(x-2)
+
 def predict(df):
+    y = MyOtherClass()
+    print y.hello("from the predict function")
     pred = clf.predict(df)
+    x = fib(4)
     return pred
+
+def predict_with_dict(df):
+    pred = clf.predict(df)
     return {"pred": pred}
 
 ### <Analysis END> ###
@@ -35,16 +49,20 @@ features = [
 ]
 
 
+class MyOtherClass:
+    def hello(self, x):
+        return "hello: %s" % str(x)
+
 ### <DEPLOYMENT START> ###
+# @preprocess(in_type=dict, out_type=pd.DataFrame, null_handler=features)
 class MyModel(YhatModel):
-    #@preprocess(in_type=dict, out_type=pd.DataFrame, null_handler=features)
-    @preprocess(out_type=pd.DataFrame, null_handler=features)
+    @preprocess(out_type=pd.DataFrame)
     def execute(self, data):
         return predict(data)
 
-# push to server would be here
-# from yhatio.save_session import save_function
-# save_function("mm.json", MyModel, globals())
+# "push" to server would be here
+from yhatio.save_session import save_function
+save_function("mymodel.json", MyModel, globals())
 # then would push mm.json to the server
 ### <DEPLOYMENT END> ###
 
@@ -53,7 +71,6 @@ data = {"x": 1, "z": None}
 
 
 if __name__ == '__main__':
-    import warnings
-    warnings.simplefilter(action = "ignore")
-    MyModel().run(json.dumps({"x": 1, "z": 2}))
+    testcase = json.dumps({"x": 1, "z": 2})
+    MyModel().run(testcase)
 

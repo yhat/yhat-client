@@ -58,7 +58,7 @@ def setup(template_name, project_name):
     print "="*80
     for datafile in config.get("data", []):
         print " >>> %s" % datafile['name']
-        download_file(datafile['source'], datafile['filename'])
+        download_file(datafile['source'], datafile['name'])
 
     reqs_filepath = os.path.join(project_name, "reqs.txt")
     try:

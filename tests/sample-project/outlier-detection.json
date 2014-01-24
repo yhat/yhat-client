@@ -38,11 +38,11 @@
   ], 
   "data": [
     {
-      "source": "1", 
+      "source": "s3://abcd1234/sedan.csv", 
       "name": "data/accord_sedan_testing.csv"
     }, 
     {
-      "source": "1", 
+      "source": "s3://abcd1234/sedan_training.csv", 
       "name": "data/accord_sedan_training.csv"
     }
   ], 

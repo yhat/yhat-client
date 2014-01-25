@@ -65,7 +65,6 @@ def _get_naked_loads(function):
         if variable not in params and variable not in created:
             yield variable
 
-SEEN = set()
 def _spider_function(function, session, pickles={}):
     # TODO: need to grab variables passed as kwargs to decorators
     # TODO: some issues in regards to the order in which classes are defined

@@ -11,25 +11,16 @@ PROJECT_DIR = os.path.join(os.environ['HOME'], ".yhat/templates")
 
 def setup(template_name, project_name):
     """
-    ***THIS IS AN EXAMPLE OF A PANDAS DOCSTRING***
     Return a DataFrame with the same shape as self and whose corresponding
     entries are from self where cond is True and otherwise are from other.
 
     Parameters
     ----------
-    cond : boolean DataFrame or array
-    other : scalar or DataFrame
-    inplace : boolean, default False
-    Whether to perform the operation in place on the data
-    try_cast : boolean, default False
-        try to cast the result back to the input type (if possible),
-    raise_on_error : boolean, default True
-        Whether to raise on invalid data types (e.g. trying to where on
-        strings)
-
-    Returns
-    -------
-    wh : DataFrame
+    template_name: string
+        name of the template. this is the name of a pre-designed template
+    project_name: string
+        name of the project. this will be the name of the directory created on 
+        your local machine
     """
     if template_name=='*new project*':
         return setup_new_project()
@@ -72,6 +63,9 @@ def setup(template_name, project_name):
         print "%s not found!" % reqs_filepath
 
 def setup_new_project():
+    """
+    # NOT IMPLEMENTED
+    """
     inputs = [
         {"prompt": "Project Name: ", "variable": "name"},
         {"prompt": "Description: ", "variable": "description"},
@@ -86,6 +80,20 @@ def setup_new_project():
     return user_input
 
 def find_template(query):
+    """
+    Looks through the index of Yhat templates. If any exist, they are yielded
+    in a generator.
+
+    Parameters
+    ----------
+    query: string
+        search parameter
+
+    Returns
+    -------
+    templates: generator
+        any matching template(s)
+    """
     ALL_TEMPLATES = [
         {"name": "something"}
     ]
@@ -97,7 +105,8 @@ def download_template(template_source):
     """
     Downloads a template and saves it to the .yhat/templates directory
 
-    template_source - URL of the .json template file
+    template_source: string
+        URL of the .json template file
     """
     if template_source.endswith(".json"):
         filename = os.path.basename(template_source)
@@ -110,6 +119,14 @@ def bundle(name, directory):
     directory) and it's contents. Create a list of each directory (and any
     sub-directories). Create a list of data elements. These should have a 
     name and a source (url for now).
+
+
+    Parameters
+    ----------
+    name: string
+        the name of the project being bundled
+    directory: string
+        location of the project
     """
     
     project_file = os.path.join(directory, name + ".json")

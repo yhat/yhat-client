@@ -6,8 +6,10 @@ def download_file(url, filename):
     """
     Downloads a file and displays a progress bar on the screen.
 
-    url - URL of the file's source
-    filename - location where the downloaded file should be saved
+    url: string
+        URL of the file's source
+    filename: string
+        location where the downloaded file should be saved
     """
     file_conn = urllib2.urlopen(url)
     filesize = file_conn.headers['content-length']

@@ -9,7 +9,15 @@ def _strip_function_source(src):
     """
     Takes the source code of a function and dedents it so that it.
 
-    src - function code
+    Parameters
+    ----------
+    src: string
+        function code
+
+    Returns
+    -------
+    source: string
+        source code of the same function, but "dedented"
     """
     src = src.split('\n')
     n = len(src[0]) - len(src[0].lstrip())
@@ -20,7 +28,16 @@ def _get_naked_loads(function):
     Takes a reference to a function and determines which variables used in the 
     function are not defined within the scope of the function.
 
-    function - a function
+    Parameters
+    ----------
+    function: function
+
+    Returns
+    -------
+    variables: generator
+        returns the variables in a function that are not:
+            1) passed in as parameters 
+            2) created within the scope of the function
     """
     source = inspect.getsource(function)
     source = _strip_function_source(source)
@@ -59,9 +76,23 @@ def _spider_function(function, session, pickles={}):
     recursively finds dependencies required in order to execute the function. 
     This includes references to classes, libraries, variables, functions, etc.
 
-    function - a function referenced in an environment
-    session - variables referenced from a seperate environment (globals())
-    pickles - holds the variables needed to execute the function
+    Parameters
+    ----------
+    function: function
+        a function referenced in an environment
+    session: dictionary
+        variables referenced from a seperate environment; i.e. globals()
+    pickles: dictionary
+        holds the variables needed to execute the function
+
+    Returns
+    -------
+    imports: list
+        list of import statements required for the function to execute
+    source: string
+        source code of the function
+    pickles: dictionary
+        dictionary of variable names and their values as pickled strings
     """
     if '_objects_seen' not in pickles:
         pickles['_objects_seen'] = []
@@ -115,10 +146,17 @@ def _spider_function(function, session, pickles={}):
 
 def save_function(filename, function, session):
     """
+    Saves a user's session and all dependencies to a big 'ole JSON object with
+    accompanying pickles for any variable.
 
-    filename - name of the outputted JSON file with pickles and code
-    function - name of the function we're saving
-    session - globals() from the user's environment
+    Parameters
+    ----------
+    filename: string
+        name of the outputted JSON file with pickles and code
+    function: function
+        function we're saving
+    session: dictionary
+        globals() from the user's environment
     """
     imports, source_code, pickles = _spider_function(function, session)
     imports.append("import json")
@@ -134,4 +172,6 @@ for varname, pickled_value in pickles.get('objects', {}).items():
     }
     with open(filename, "wb") as f:
         json.dump(pickles, f)
+    # TODO: we might just want this to return the object
+    # return pickles
 

@@ -7,6 +7,18 @@ except:
     warnings.warn("Could not import pandas")
 
 def make_df(data):
+    """
+    Takes an arbitrary data structure and tries to convert it into a data frame
+
+    Parameters
+    ----------
+    data: object
+        data to be converted into data frame
+
+    Returns
+    -------
+    data: data frame
+    """
     if isinstance(data, pd.DataFrame):
         return data
     elif isinstance(data, dict):
@@ -20,6 +32,17 @@ def make_df(data):
 
 
 def parse_json(somejson):
+    """
+    Attempts to parse JSON and return a serialized object
+
+    Parameters
+    ----------
+    somejson: object
+
+    Returns
+    -------
+    object: dictionary or list
+    """
     try:
         return json.loads(somejson)
     except Exception, e:
@@ -80,33 +103,24 @@ class dict_to_dict(object):
             msg = msg % str(type(result))
             raise Exception(msg)
 
-
 def handle_nulls(features, data):
-    data = make_df(data)
-    for feature in features:
-        name = feature["name"]
-        strategy = feature["na_filler"]
-        if hasattr(strategy, '__call__')==False:
-            strategy_func = lambda x: strategy
-        else:
-            strategy_func = strategy
-        data[name] = data.apply(strategy_func, axis=1)
-    return data
+    """
+    Helper function for indicating how null values should be handled during
+    production.
 
+    Parameters
+    ----------
+    features: list
+        a list of features that contains the name and imputation strategy for 
+        each
+    data: list, dictionary, data frame
+        data to be imputed
 
-import pandas as pd
-
-def make_df(data):
-    if isinstance(data, dict):
-        key = data.keys()[0]
-        if isinstance(data[key], list):
-            pass
-        else:
-            data = {k: [v] for k,v in data.items()}
-    data = pd.DataFrame(data)
-    return data
-
-def handle_nulls(features, data):
+    Returns
+    -------
+    data: data frame
+        data frame with no null/NA/missing values
+    """
     data = make_df(data)
     for feature in features:
         name = feature["name"]
@@ -123,6 +137,26 @@ def handle_nulls(features, data):
 
 
 def preprocess(func=None, **options):
+    """
+    Decorator for defining the following:
+        1) data type for incoming data
+        2) data type for returned data
+        3) how to handle null values
+
+    Parameters
+    ----------
+    func: function
+        function being decorated
+    in_type: dictionary or data frame
+        indicates what the input data type should be
+    out_type: dictionary or data frame
+        indicates what the returned data type should be
+
+    Returns
+    -------
+    partial/inner: function
+        a function
+    """
     if func != None:
         # We received the function on this call, so we can define
         # and return the inner function

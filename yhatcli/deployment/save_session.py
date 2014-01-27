@@ -143,15 +143,13 @@ def _spider_function(function, session, pickles={}):
             pickles[varname] = pickle.dumps(obj)
     return imports, source, pickles
 
-def save_function(filename, function, session):
+def save_function(function, session):
     """
     Saves a user's session and all dependencies to a big 'ole JSON object with
     accompanying pickles for any variable.
 
     Parameters
     ----------
-    filename: string
-        name of the outputted JSON file with pickles and code
     function: function
         function we're saving
     session: dictionary
@@ -161,16 +159,12 @@ def save_function(filename, function, session):
     imports.append("import json")
     imports.append("import pickle")
     source_code = "\n".join(imports) + "\n\n\n" + source_code
-    source_code += """pickles = json.load(open('%s', 'rb'))
-for varname, pickled_value in pickles.get('objects', {}).items():
-    globals()[varname] = pickle.loads(pickled_value)
-    """ % filename
     pickles = {
         "objects": pickles,
         "code": source_code
     }
-    with open(filename, "wb") as f:
-        json.dump(pickles, f)
-    # TODO: we might just want this to return the object
-    # return pickles
+
+    if "_objects_seen" in pickles["objects"]:
+        del pickles["objects"]["_objects_seen"]
+    return pickles
 

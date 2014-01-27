@@ -11,5 +11,6 @@ setup(
         packages=find_packages(),
         description="plotting in the terminal",
 #        long_description=open("README.txt").read(),
-    install_requires=[]
+        install_requires=[],
+        scripts=['bin/yhat-cli']
 )

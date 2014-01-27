@@ -2,7 +2,7 @@ from distutils.core import setup
 from setuptools import find_packages
 
 setup(
-        name="yhat",
+        name="yhatnewcli",
         version="0.6.0",
         author="Greg Lamp",
         author_email="greg@yhathq.com",

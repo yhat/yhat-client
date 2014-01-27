@@ -1,0 +1,31 @@
+<!doctype html>
+
+<html>
+  <head>
+    <title>Yhat | Dev</title>
+    <script src="http://code.jquery.com/jquery-1.11.0.js"></script>
+  </head>
+
+<body>
+  <h2>Yhat Dev Server</h2>
+    <textarea id="thejson" cols="175" rows="40"></textarea><br>
+  <button id="score">Submit</button>
+</body>
+<script type="text/javascript">
+  $("#score").click(function(e) {
+      var data = JSON.parse($("#thejson").val());
+      $.ajax({
+        type: "POST",
+        url: "/",
+        contentType: "application/json;charset=utf-8",
+        data: JSON.stringify(data),
+        success: function(d) {
+            $("#thejson").val(JSON.stringify(d, null, 2));
+        },
+        dataType: "json"
+      });
+
+      return false;
+  });
+</script>
+</html>

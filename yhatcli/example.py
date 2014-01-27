@@ -72,5 +72,6 @@ data = {"x": 1, "z": None}
 
 if __name__ == '__main__':
     testcase = json.dumps({"x": 1, "z": 2})
-    MyModel().run(testcase)
+    # MyModel().run(testcase)
+    MyModel().serve()
 

@@ -231,7 +231,9 @@ class Yhat(API):
     
     def predict_ws(self, data):
         """
-        
+
+        Parameters
+        ----------
         data: dictionary or data frame
             data required to make a single prediction. this can be a dict or
             a dataframe

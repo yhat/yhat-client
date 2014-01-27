@@ -1,4 +1,5 @@
 import sys
+import warnings
 import base64
 import json
 import pickle
@@ -19,8 +20,7 @@ from deployment.save_session import save_function
 try:
     import pandas as pd
 except:
-    print "Could not import pandas"
-    pass
+    warnings.warn("Could not import pandas")
 
 BASE_URI = "http://api.yhathq.com/"
 

@@ -1,10 +1,15 @@
 import sys
+import warnings
 import json
 import inspect
 import pickle
 
 from flask import Flask, request, render_template, jsonify
-import pandas as pd
+
+try:
+    import pandas as pd
+except:
+    warnings.warn("Could not import pandas")
 
 from colorama import init
 from colorama import Fore, Back, Style

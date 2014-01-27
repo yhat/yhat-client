@@ -5,7 +5,8 @@ import os
 
 def setup():
     """
-    Prompts the user for their credentials and the saves them to a Yhat "dot" file.
+    Prompts the user for their credentials and the saves them to a Yhat "dot"
+    file.
     """
     username = raw_input("Yhat username: ")
     apikey = raw_input("Yhat apikey: ")

@@ -24,17 +24,14 @@ class YhatModel(object):
 
     Parameters
     ----------
-    requirements: string
-        path to requirements.txt
     filename: string
         filename of saved model
     """
-    def __init__(self, requirements="", filename=None):
+    def __init__(self, filename=None):
         if filename is not None:
             pickles = json.load(open(filename, 'rb'))
             for varname, pickled_value in pickles.get('objects', {}).items():
                 globals()[varname] = pickle.loads(pickled_value)
-        self.requirements = requirements
 
     def execution_plan(self, data):
         return self.execute(data)

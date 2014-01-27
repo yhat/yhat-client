@@ -2,7 +2,7 @@ from distutils.core import setup
 from setuptools import find_packages
 
 setup(
-        name="yhatnewcli",
+        name="yhatcli",
         version="0.6.0",
         author="Greg Lamp",
         author_email="greg@yhathq.com",
@@ -11,6 +11,5 @@ setup(
         packages=find_packages(),
         description="plotting in the terminal",
 #        long_description=open("README.txt").read(),
-        scripts=['bin/hist', 'bin/scatter'],
-    install_requires=required
+    install_requires=[]
 )

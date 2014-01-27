@@ -1,5 +1,6 @@
 from yhat import StepModel
 from yhat import Yhat
+from yhat import credentials
 
 
 class MyModel(StepModel):
@@ -12,5 +13,7 @@ class MyModel(StepModel):
 
 mm = MyModel()
 
-yh = Yhat("greg", "fCVZiLJhS95cnxOrsp5e2VSkk0GfypZqeRCntTD1nHA", "http://cloud.yhathq.com/")
+
+creds = credentials.read()
+yh = Yhat(creds['username'], creds['apikey'], "http://localhost:8080/")
 yh.deploy("StepTestModel", mm)

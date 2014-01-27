@@ -1,16 +1,20 @@
 # Yhat Python Client
 
-### Quickstart
+## Quickstart
 
-### Usage
+## Overview
 
-### Overview
+## Usage
 
-### Examples
+### Formatting Your Model
 
-### Misc
+### Handling Input and Output
 
-### Dependencies
+## Examples
+
+## Misc
+
+## Dependencies
 
 *Required*
 - progressbar

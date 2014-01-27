@@ -9,8 +9,12 @@ import uuid
 import zlib
 import re
 import os
+from colorama import init
+from colorama import Fore
 
-from yhatio.save_session import save_function
+init()
+
+from deployment.save_session import save_function
 
 try:
     import pandas as pd
@@ -152,6 +156,8 @@ class Yhat(API):
 
     def _check_obj_size(self, obj):
         """
+        Checks if an object is greater than 50 MB
+
         Parameters
         ----------
         obj: object
@@ -159,6 +165,7 @@ class Yhat(API):
 
         Returns
         -------
+        boolean
         """
         if self.base_uri!=BASE_URI:
             # not deploying to the cloud so models can be as big as you want
@@ -282,6 +289,28 @@ need to connect to the server first. try running "connect_to_socket"
             name of the model you want to connect to
         """
         self.ws = self.handshake(model)
+
+    def _extract_model(self, name, model, session):
+        """
+        Extracts source code and any objects required to deploy the model.
+
+        Parameters
+        ----------
+        name: string
+            name of your model
+        model: YhatModel
+            an instance of a Yhat model
+        session: globals()
+            your Python's session variables (i.e. "globals()")
+        """
+        bundle = save_function(model, session)
+        bundle["largefile"] = True
+        bundle["username"] = self.username
+        bundle["language"] = "python"
+        bundle["modelname"] = name
+        bundle["className"] = model.__name__
+        bundle["reqs"] = getattr(model, "requirements", "")
+        return bundle
     
     def deploy(self, name, model, session, sure=False):
         """
@@ -307,17 +336,47 @@ need to connect to the server first. try running "connect_to_socket"
             if sure.lower()!="y":
                 print "Deployment canceled"
                 sys.exit()
-        # we're going to write the model out to a file and then transfer it
-        filename = ".%s.yhat" % name
-        bundle = save_function(filename, model, session)
+        bundle = self._extract_model(name, model, session)
         if self._check_obj_size(bundle)==False:
-            # we're not going to deploy; model is too big
-            pass
+            # we're not going to deploy; model is too big, but let's give the 
+            # user the option to upload it manually
+            print "Model is to large to deploy over HTTP"
+            should_we_deploy = raw_input("Would you like to upload manually? (Y/n): ")
+            if should_we_deploy.lower()=="y" or should_we_deploy=="":
+                self.deploy_to_file(name, model, session)
         else:
             # upload the model to the server
             # TODO: upload w/ a progress bar
             return self.post("deployer/model", self.q, bundle)
 
+    def deploy_to_file(self, name, model, session, compress=True):
+        """
+        Bundles a local version of your model that can be manually uploaded to
+        the server.
+
+        Parameters
+        ----------
+        name: string
+            name of your model
+        model: YhatModel
+            an instance of a Yhat model
+        session: globals()
+            your Python's session variables (i.e. "globals()")
+        """
+        bundle = self._extract_model(name, model, session)
+        with open("%s.yhat" % name, "w") as f:
+            bundle = json.dumps(bundle)
+            if compress==True:
+                bundle = zlib.compress(bundle)
+            f.write(bundle)
+
+        print "Model successfully bundled to file:"
+        print "\t%s/%s.yhat" % (os.getcwd(), name)
+        msg = "To deploy, visit %s and upload %s."
+        upload_url = os.path.join(self.base_uri, "model", "upload")
+        msg = msg % (upload_url, "%s.yhat" % name)
+        print Fore.CYAN + msg
+        print Fore.RESET
 
 if __name__=="__main__":
     import pandas as pd

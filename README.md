@@ -6,6 +6,8 @@
 
 ## Usage
 
+### Installation
+
 ### Formatting Your Model
 
 ### Handling Input and Output

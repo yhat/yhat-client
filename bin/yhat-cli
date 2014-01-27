@@ -64,3 +64,4 @@ if __name__=="__main__":
         project_name = sys.argv[2]
         directory = sys.argv[3]
         project.bundle(project_name, directory)
+

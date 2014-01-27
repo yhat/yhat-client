@@ -38,5 +38,5 @@ def pred(data):
 #####  This is the actual process #####
 #####                             #####
 
-save_function("pred.json", pred, globals())
-save_function("goodbye.json", goodbye, globals())
+save_function(pred, globals())
+save_function(goodbye, globals())

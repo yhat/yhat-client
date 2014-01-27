@@ -6,8 +6,8 @@ from colorama import init
 from colorama import Fore, Back, Style
 from prettytable import PrettyTable
 
-from yhatcli import project
-from yhatcli import credentials
+from yhat import project
+from yhat import credentials
 
 init()
 

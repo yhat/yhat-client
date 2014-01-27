@@ -20,7 +20,7 @@ setup(
     ),
     install_requires=[
         "colorama==0.2.5",
-        "progressbar==2.3",
+        "progressbar==2.2",
         "Flask==0.10.1",
         "websocket-client==0.12.0",
         "prettytable==0.7.2"

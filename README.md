@@ -12,6 +12,7 @@
 
 ### Dependencies
 
+*Required*
 - progressbar
 - pip
 - Flask

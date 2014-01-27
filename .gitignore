@@ -1,7 +1,3 @@
-<<<<<<< HEAD
-*.pyc
-*.swp
-=======
 *.py[cod]
 venv
 # C extensions
@@ -40,4 +36,3 @@ nosetests.xml
 
 *.swp
 *.swo
->>>>>>> 677fa361db22d91d858da63e2cb973bc5a4ca53b

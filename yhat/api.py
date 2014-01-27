@@ -183,9 +183,9 @@ class Yhat(API):
         authed: boolean
             verifies your API credentials are valid
         """
-        response = self.post('verify', self.q, {})
         authed = True
         try: 
+            response = self.post('verify', self.q, {})
             error = response["success"];
         except Exception, e:
             authed = False
@@ -309,7 +309,8 @@ need to connect to the server first. try running "connect_to_socket"
         bundle["language"] = "python"
         bundle["modelname"] = name
         bundle["className"] = model.__name__
-        bundle["reqs"] = getattr(model, "requirements", "")
+        bundle["reqs"] = getattr(model, "REQUIREMENTS", "")
+        bundle["reqs"] = bundle["reqs"].strip()
         return bundle
     
     def deploy(self, name, model, session, sure=False):

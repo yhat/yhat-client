@@ -6,11 +6,12 @@ import warnings
 warnings.simplefilter(action = "ignore")
 
 # these define your IO specs
-from yhatio.input_and_output import df_to_df, df_to_dict, dict_to_dict
+from deployment.input_and_output import df_to_df, df_to_dict, dict_to_dict
 # i'm thinking the above get consolidated into this...
-from yhatio.input_and_output import preprocess
+from deployment.input_and_output import preprocess
 # this is your new "BaseModel"
-from yhatio.models import YhatModel
+from deployment.models import YhatModel
+
 
 clf = LogisticRegression()
 x = pd.DataFrame({
@@ -61,17 +62,13 @@ class MyModel(YhatModel):
         return predict(data)
 
 # "push" to server would be here
-from yhatio.save_session import save_function
-save_function("mymodel.json", MyModel, globals())
-# then would push mm.json to the server
-### <DEPLOYMENT END> ###
-
 
 data = {"x": 1, "z": None}
 
 
 if __name__ == '__main__':
     testcase = json.dumps({"x": 1, "z": 2})
-    # MyModel().run(testcase)
+    MyModel().run(testcase)
     MyModel().serve()
+    from api import Yhat
 

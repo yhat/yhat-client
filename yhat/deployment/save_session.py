@@ -16,9 +16,8 @@ def _in_directory(filepath, directory):
     return os.path.commonprefix([filepath, directory]) == directory
 
 def _is_on_syspath(filepath):
-    thisdir = os.path.dirname(os.path.realpath(__file__))
     for libpath in sys.path:
-        if libpath==thisdir:
+        if libpath==os.getcwd():
             continue
         elif libpath!="":
             if _in_directory(filepath, libpath)==True:
@@ -124,6 +123,7 @@ def _spider_function(function, session, pickles={}):
             continue
         obj = session[varname]
         if hasattr(obj, '__call__'):
+            # if it's a pre-installed library, just import it
             if _is_on_syspath(vars(inspect.getmodule(obj))['__file__']):
                 ref = inspect.getmodule(obj).__name__
                 imports.append("from %s import %s" % (ref, varname))
@@ -136,7 +136,8 @@ def _spider_function(function, session, pickles={}):
                 imports += new_imports
                 pickles.update(new_pickles)
         elif inspect.isclass(obj):
-            if session['__file__']!=vars(inspect.getmodule(obj))['__file__']:
+            # if session['__file__']!=vars(inspect.getmodule(obj))['__file__']:
+            if _is_on_syspath(vars(inspect.getmodule(obj))['__file__']):
                 ref = inspect.getmodule(obj).__name__
                 imports.append("import %s as %s" % (ref, varname))
             else:
@@ -176,6 +177,8 @@ def save_function(function, session):
         globals() from the user's environment
     """
     imports, source_code, pickles = _spider_function(function, session)
+    # de-dup and order the imports
+    imports = sorted(list(set(imports)))
     imports.append("import json")
     imports.append("import pickle")
     source_code = "\n".join(imports) + "\n\n\n" + source_code

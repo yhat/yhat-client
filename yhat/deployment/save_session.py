@@ -3,7 +3,27 @@ import ast
 import inspect
 import types
 import json
+import sys
+import os
 
+
+def _in_directory(filepath, directory):
+    #make both absolute    
+    directory = os.path.realpath(directory)
+    filepath = os.path.realpath(filepath)
+    #return true, if the common prefix of both is equal to directory
+    #e.g. /a/b/c/d.rst and directory is /a/b, the common prefix is /a/b
+    return os.path.commonprefix([filepath, directory]) == directory
+
+def _is_on_syspath(filepath):
+    thisdir = os.path.dirname(os.path.realpath(__file__))
+    for libpath in sys.path:
+        if libpath==thisdir:
+            continue
+        elif libpath!="":
+            if _in_directory(filepath, libpath)==True:
+                return True
+    return False
 
 def _strip_function_source(src):
     """
@@ -104,7 +124,7 @@ def _spider_function(function, session, pickles={}):
             continue
         obj = session[varname]
         if hasattr(obj, '__call__'):
-            if session['__file__']!=vars(inspect.getmodule(obj))['__file__']:
+            if _is_on_syspath(vars(inspect.getmodule(obj))['__file__']):
                 ref = inspect.getmodule(obj).__name__
                 imports.append("from %s import %s" % (ref, varname))
             else:

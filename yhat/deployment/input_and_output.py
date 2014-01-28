@@ -145,12 +145,12 @@ def preprocess(func=None, **options):
 
     Parameters
     ----------
-    func: function
-        function being decorated
-    in_type: dictionary or data frame
+    in_type: (optional), dictionary or data frame
         indicates what the input data type should be
-    out_type: dictionary or data frame
+    out_type: (optional), dictionary or data frame
         indicates what the returned data type should be
+    null_handler:(optional), list of dicts
+        tells Yhat how to handle null values
 
     Returns
     -------

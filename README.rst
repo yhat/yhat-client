@@ -28,10 +28,19 @@ Misc
 Dependencies
 ------------
 
-*Required* - progressbar - pip - Flask - colorama - websocket-client -
-prettytable
+*Required*
 
-*Highly suggested* - pandas - sklearn
+-  progressbar
+-  pip
+-  Flask
+-  colorama
+-  websocket-client
+-  prettytable
+
+*Highly suggested*
+
+-  pandas
+-  sklearn
 
 |Analytics|
 

@@ -1,6 +1,6 @@
 # Yhat Python Client
 This is the connection to the Yhat API. If you'd like to read more, [visit our 
-docs](http://docs.yhathq.com/)
+docs](http://docs.yhathq.com/).
 
 ## [Quickstart](http://docs.yhathq.com/python/tutorial)
 You can download the example [here](https://s3.amazonaws.com/yhat-examples/beer-recommender.zip)
@@ -11,7 +11,7 @@ $ git clone git@github.com:yhat/yhat-examples.git
 $ cd beer-recommender
 ```
 
-Insert your APIKEY and USERNEM and run the script.
+Insert your APIKEY and USERNAME and run the script.
 ```bash
 $ python recommender.py
 Deploy? (y/N): y

@@ -5,6 +5,7 @@ import types
 import json
 import sys
 import os
+import dill
 
 
 def _in_directory(filepath, directory):
@@ -16,6 +17,8 @@ def _in_directory(filepath, directory):
     return os.path.commonprefix([filepath, directory]) == directory
 
 def _is_on_syspath(filepath):
+    if filepath is None:
+        return False
     for libpath in sys.path:
         if libpath==os.getcwd():
             continue
@@ -23,6 +26,37 @@ def _is_on_syspath(filepath):
             if _in_directory(filepath, libpath)==True:
                 return True
     return False
+
+def _get_source(func):
+    """
+    Gets the source of a function and handles cases when user is in an 
+    interactive session
+
+    func: function
+        a function who's source we want
+    """
+    try:
+        return inspect.getsource(func)
+    except:
+        if inspect.isclass(func):
+            source = ""
+            source += "class %s(%s):" % (func.__name__, func.__base__.__name__)
+            source += "\n"
+            for name, method in inspect.getmembers(func, predicate=inspect.ismethod):
+                if hasattr(method, '__wrapped_func__'):
+                    wrapped_source = dill.source.getsource(method.__wrapped_func__)
+                    wrapped_source = wrapped_source.split('\n')
+                    nchar = len(wrapped_source[1]) - len(wrapped_source[1].lstrip())
+                    wrapped_source[0] = " "*nchar + wrapped_source[0]
+                    wrapped_source = "\n".join(wrapped_source)
+                    wrapped_source = "\n" + wrapped_source + "\n"
+                    source += wrapped_source
+                else:
+                    source += inspect.getsource(method) + "\n"
+        else:
+            return inspect.getsource(func) + "\n"
+        return source
+
 
 def _strip_function_source(src):
     """
@@ -58,7 +92,7 @@ def _get_naked_loads(function):
             1) passed in as parameters 
             2) created within the scope of the function
     """
-    source = inspect.getsource(function)
+    source = _get_source(function)
     source = _strip_function_source(source)
     tree = ast.parse(source)
     params = set()
@@ -117,14 +151,15 @@ def _spider_function(function, session, pickles={}):
     pickles['_objects_seen'].append(str(function))
     imports = []
     source = "# code for %s\n" % str(function)
-    source += inspect.getsource(function) + '\n'
+    source += _get_source(function) + '\n'
     for varname in _get_naked_loads(function):
         if varname not in session:
             continue
         obj = session[varname]
         if hasattr(obj, '__call__'):
             # if it's a pre-installed library, just import it
-            if _is_on_syspath(vars(inspect.getmodule(obj))['__file__']):
+            object_file = vars(inspect.getmodule(obj)).get('__file__')
+            if _is_on_syspath(object_file):
                 ref = inspect.getmodule(obj).__name__
                 imports.append("from %s import %s" % (ref, varname))
             else:
@@ -136,12 +171,12 @@ def _spider_function(function, session, pickles={}):
                 imports += new_imports
                 pickles.update(new_pickles)
         elif inspect.isclass(obj):
-            # if session['__file__']!=vars(inspect.getmodule(obj))['__file__']:
-            if _is_on_syspath(vars(inspect.getmodule(obj))['__file__']):
+            object_file = vars(inspect.getmodule(obj)).get('__file__')
+            if _is_on_syspath(object_file):
                 ref = inspect.getmodule(obj).__name__
                 imports.append("import %s as %s" % (ref, varname))
             else:
-                source += inspect.getsource(obj) + '\n'
+                source += _get_source(obj) + '\n'
                 class_methods = inspect.getmembers(obj,
                                             predicate=inspect.ismethod)
                 for name, method in class_methods:

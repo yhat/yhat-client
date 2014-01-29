@@ -173,6 +173,7 @@ def preprocess(func=None, **options):
             if out_type==pd.DataFrame:
                 data = make_df(data)
             return data
+        inner.__wrapped_func__ = func
    
         return inner
   

@@ -1,22 +1,23 @@
-import sys
-import warnings
-import json
 import inspect
+import json
 import pickle
+import sys
+import os
+import warnings
 
 from flask import Flask, request, render_template, jsonify
-
-try:
-    import pandas as pd
-except:
-    warnings.warn("Could not import pandas")
-
 from colorama import init
 from colorama import Fore, Back, Style
 
 from input_and_output import df_to_df, parse_json, preprocess
 
 init()
+
+try:
+    import pandas as pd
+except:
+    warnings.warn("Could not import pandas")
+
 
 class YhatModel(object):
     """
@@ -60,7 +61,8 @@ class YhatModel(object):
         Creates a test server on port 5000 for testing purposes. This is a way to test
         your model before you deploy it to production.
         """
-        app = Flask(__name__)
+        template_folder = os.path.join(os.getcwd(), "templates")
+        app = Flask(__name__, template_folder=template_folder)
         @app.route("/", methods=['GET', 'POST'])
         def testserver():
             if request.method=="GET":

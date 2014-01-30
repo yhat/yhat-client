@@ -389,8 +389,10 @@ if __name__=="__main__":
     print yh._convert_to_json({"x": 1})
     print yh._convert_to_json(df)
 
-    yh = Yhat("greg", "fCVZiLJhS95cnxOrsp5e2VSkk0GfypZqeRCntTD1nHA",
-            "http://localhost:8080/")
+    from yhat import credentials
+    creds = credentials.read()
+
+    yh = Yhat(creds['username'], creds['apikey'], "http://localhost:8080/")
 
     print yh.predict("mymodel", {"beer": "Coors Light"})
     yh.connect_to_socket("mymodel")

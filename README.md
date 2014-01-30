@@ -190,6 +190,7 @@ def execute(self, data)
 - colorama
 - websocket-client
 - prettytable
+- dill
 
 *Highly suggested*
 

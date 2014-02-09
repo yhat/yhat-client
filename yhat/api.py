@@ -15,7 +15,8 @@ from colorama import Fore
 
 init()
 
-from deployment.save_session import save_function
+from deployment.models import YhatModel
+from deployment.save_session import save_function, _get_source
 
 try:
     import pandas as pd
@@ -303,6 +304,12 @@ need to connect to the server first. try running "connect_to_socket"
         session: globals()
             your Python's session variables (i.e. "globals()")
         """
+        if _get_source(YhatModel.execute)==_get_source(model.execute):
+            msg = "'execute' method was not implemented. If you believe that you did"
+            msg += "implement the 'execute' method, check to make sure there isn't an "
+            msg += "indentation error."
+            raise Exception(msg)
+
         bundle = save_function(model, session)
         bundle["largefile"] = True
         bundle["username"] = self.username

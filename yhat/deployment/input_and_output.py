@@ -140,12 +140,15 @@ def preprocess(func=None, **options):
     """
     Decorator for defining the following:
         1) data type for incoming data
-        2) how to handle null values
+        2) data type for returned data
+        3) how to handle null values
 
     Parameters
     ----------
-    datatype: (optional), dictionary or data frame
+    in_type: (optional), dictionary or data frame
         indicates what the input data type should be
+    out_type: (optional), dictionary or data frame
+        indicates what the returned data type should be
     null_handler:(optional), list of dicts
         tells Yhat how to handle null values
 
@@ -154,52 +157,30 @@ def preprocess(func=None, **options):
     partial/inner: function
         a function
     """
-
-    if func!=None:
-        def inner(*args, **kwargs):
-            # do stuff before function call
-            datatype = options.get('datatype', pd.DataFrame)
+    if func != None:
+        # We received the function on this call, so we can define
+        # and return the inner function
+        def inner(*args, **kwargs):        
+            in_type = options.get('in_type', pd.DataFrame)
+            out_type = options.get('out_type', pd.DataFrame)
             null_handler = options.get('null_handler', None)
-            data = args[0]
-            if datatype==pd.DataFrame:
+            data = args[1]
+            if in_type==pd.DataFrame:
                 data = make_df(data)
             if null_handler:
                 data = handle_nulls(null_handler, data)
-            return func(args[0], data)
-        inner.__wrapped_func__ = func
-        return inner
-    else:
-        def partial_inner(func):
-            return preprocess(func, **options)
-        return partial_inner
-
-def postprocess(func=None, **options):
-    """
-    Decorator for defining the following:
-        1) data type for outgoing data
-
-    Parameters
-    ----------
-    datatype: (optional), dictionary or data frame
-        indicates what the input data type should be
-
-    Returns
-    -------
-    partial/inner: function
-        a function
-    """
-    if func!=None:
-        def inner(*args, **kwargs):
-            data = func(args[0])
-            # do stuff after function call
-            datatype = options.get("datatype", pd.DataFrame)
-            if datatype==pd.DataFrame:
+            data = func(args[0], data)
+            if out_type==pd.DataFrame:
                 data = make_df(data)
-            return data 
+            return data
         inner.__wrapped_func__ = func
+   
         return inner
+  
     else:
+        # We didn't receive the function on this call, so the return value
+        # of this call will receive it, and we're getting the options now.
         def partial_inner(func):
-            return postprocess(func, **options)
+            return preprocess(func, **options)   
         return partial_inner
- 
+

@@ -310,6 +310,7 @@ need to connect to the server first. try running "connect_to_socket"
             msg += "indentation error."
             raise Exception(msg)
 
+        
         bundle = save_function(model, session)
         bundle["largefile"] = True
         bundle["username"] = self.username
@@ -317,6 +318,10 @@ need to connect to the server first. try running "connect_to_socket"
         bundle["modelname"] = name
         bundle["className"] = model.__name__
         bundle["reqs"] = getattr(model, "REQUIREMENTS", "")
+        # make sure we freeze Yhat so we're sure we're using the right version
+        # this makes it a lot easier to upgrade the client
+        import yhat
+        bundle["reqs"] += '\n' + "yhat==" + yhat.__version__
         bundle["reqs"] = bundle["reqs"].strip()
         return bundle
     

@@ -7,4 +7,4 @@ from .deployment.input_and_output import preprocess
 # client
 from .api import Yhat
 
-
+__version__ = "0.6.4"

@@ -1,10 +1,9 @@
 from distutils.core import setup
 from setuptools import find_packages
-from yhat import __version__
 
 setup(
     name="yhat",
-    version=__version__,
+    version="0.6.6",
     author="Greg Lamp",
     author_email="greg@yhathq.com",
     url="https://github.com/yhat/yhat-client",

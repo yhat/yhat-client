@@ -5,7 +5,11 @@ import types
 import json
 import sys
 import os
-import dill
+
+try:
+    import dill
+except:
+    pass
 
 
 def _in_directory(filepath, directory):

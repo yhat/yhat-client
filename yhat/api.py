@@ -142,7 +142,7 @@ class Yhat(API):
     uri: string
         your Yhat server URL (i.e. http://cloud.yhathq.com/)
     """
-    def __init__(self, username, apikey, uri=BASE_URI):
+    def __init__(self, username, apikey, uri):
         self.username = username
         self.apikey = apikey
         if uri.endswith("/")==False:

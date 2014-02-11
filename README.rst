@@ -233,6 +233,7 @@ Dependencies
 -  colorama
 -  websocket-client
 -  prettytable
+-  dill
 
 *Highly suggested*
 

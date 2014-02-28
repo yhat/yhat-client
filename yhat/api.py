@@ -345,7 +345,7 @@ need to connect to the server first. try running "connect_to_socket"
         """
         # first let's check and make sure the user actually wants to deploy
         # a new version
-        if not re.match("[A-Za-z0-9_]+", name):
+        if not re.match("^[A-Za-z0-9_]+$", name):
             raise Exception("Model name must only contain: [A-Za-z0-9_]")
         if sure==False:
             sure = raw_input("Are you sure you want to deploy? (y/N): ")
@@ -379,7 +379,7 @@ need to connect to the server first. try running "connect_to_socket"
         session: globals()
             your Python's session variables (i.e. "globals()")
         """
-        if not re.match("[A-Za-z0-9_]+", name):
+        if not re.match("^[A-Za-z0-9_]+$", name):
             raise Exception("Model name must only contain: [A-Za-z0-9_]")
         bundle = self._extract_model(name, model, session)
         with open("%s.yhat" % name, "w") as f:

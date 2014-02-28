@@ -103,6 +103,7 @@ read our help here: {URL}.""".format(URL="http://docs.yhathq.com/help/json")
             return json.loads(rsp)
         except Exception, e:
             raise e
+            print "Message: %s" % str(rsp)
     
     def handshake(self, model_name):
         """
@@ -344,6 +345,8 @@ need to connect to the server first. try running "connect_to_socket"
         """
         # first let's check and make sure the user actually wants to deploy
         # a new version
+        if not re.match("[A-Za-z0-9_]+", name):
+            raise Exception("Model name must only contain: [A-Za-z0-9_]")
         if sure==False:
             sure = raw_input("Are you sure you want to deploy? (y/N): ")
             if sure.lower()!="y":

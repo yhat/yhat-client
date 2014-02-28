@@ -379,6 +379,8 @@ need to connect to the server first. try running "connect_to_socket"
         session: globals()
             your Python's session variables (i.e. "globals()")
         """
+        if not re.match("[A-Za-z0-9_]+", name):
+            raise Exception("Model name must only contain: [A-Za-z0-9_]")
         bundle = self._extract_model(name, model, session)
         with open("%s.yhat" % name, "w") as f:
             bundle = json.dumps(bundle)

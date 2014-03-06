@@ -100,7 +100,13 @@ read our help here: {URL}.""".format(URL="http://docs.yhathq.com/help/json")
                 print msg
             response = urllib2.urlopen(req, data)
             rsp = response.read()
-            return json.loads(rsp)
+            try:
+                return json.loads(rsp)
+            except ValueError:
+                msg = """
+        Could not unpack response values. Please visit "http://cloud.yhathq.com"
+        to make sure your model is online and not still building."""
+                raise Exception(msg)
         except Exception, e:
             raise e
             print "Message: %s" % str(rsp)

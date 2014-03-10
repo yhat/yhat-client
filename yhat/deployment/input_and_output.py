@@ -19,14 +19,6 @@ def make_df(data):
     -------
     data: data frame
     """
-    if isinstance(data, pd.DataFrame):
-        return data
-    elif isinstance(data, dict):
-        key = data.keys()[0]
-        if isinstance(data[key], list):
-            pass
-        else:
-            data = {k: [v] for k,v in data.items()}
     data = pd.DataFrame(data)
     return data
 

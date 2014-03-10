@@ -214,7 +214,7 @@ class Yhat(API):
             same data, but compatible with JSON
         """
         if isinstance(data, pd.DataFrame):
-            data = data.to_dict('list')
+            data = json.loads(data.to_json())
         return data
 
     def predict(self, model, data):

@@ -331,7 +331,7 @@ need to connect to the server first. try running "connect_to_socket"
         # this makes it a lot easier to upgrade the client
         import yhat
         bundle["reqs"] += '\n' + "yhat==" + yhat.__version__
-        bundle["reqs"] = bundle["reqs"].strip()
+        bundle["reqs"] = bundle["reqs"].strip().replace('"', '').replace("'", "")
         return bundle
     
     def deploy(self, name, model, session, sure=False):

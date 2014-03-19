@@ -154,8 +154,11 @@ def _spider_function(function, session, pickles={}):
         pickles['_objects_seen'] = []
     pickles['_objects_seen'].append(str(function))
     imports = []
-    source = "# code for %s\n" % str(function)
-    source += _get_source(function) + '\n'
+    source = "# code for %s\n" % (str(function)) 
+    if isinstance(function, types.ModuleType):
+        pass
+    else:
+        source += _get_source(function) + '\n'
     for varname in _get_naked_loads(function):
         if varname not in session:
             continue
@@ -178,7 +181,7 @@ def _spider_function(function, session, pickles={}):
             object_file = vars(inspect.getmodule(obj)).get('__file__')
             if _is_on_syspath(object_file):
                 ref = inspect.getmodule(obj).__name__
-                imports.append("import %s as %s" % (ref, varname))
+                imports.append("from %s import %s as %s" % (ref, varname, varname))
             else:
                 source += _get_source(obj) + '\n'
                 class_methods = inspect.getmembers(obj,

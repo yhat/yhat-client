@@ -124,8 +124,14 @@ def _get_naked_loads(function):
             yield variable
 
 def _extract_module(module_name, modules={}):
-    module = sys.modules[module_name]
-    if _is_on_syspath(module.__file__)==False:
+    module = sys.modules.get(module_name)
+    # check if we've already seen it
+    if module in modules or module is None:
+        pass
+    # make sure it's not a built in module
+    elif hasattr(module, "__file__")==False:
+        pass
+    elif _is_on_syspath(module.__file__)==False:
         module_py = module.__file__.replace(".pyc", ".py")
         module_source = open(module_py, 'rb').read()
         parent_dir = module_py.replace(os.getcwd(), '').lstrip('/')
@@ -137,9 +143,12 @@ def _extract_module(module_name, modules={}):
         }
         tree = ast.parse(module_source)
         for thing in ast.walk(tree):
-            thingvars = vars(thing)
             if hasattr(thing, "module"):
                 modules.update(_extract_module(thing.module))
+            elif isinstance(thing, (ast.Import, ast.ImportFrom)):
+                for imp in thing.names:
+                    if imp.name!="*":
+                        modules.update(_extract_module(imp.name))
     return modules
 
 
@@ -177,7 +186,7 @@ def _spider_function(function, session, pickles={}):
         pass
     else:
         source += _get_source(function) + '\n'
-
+    
     for varname in _get_naked_loads(function):
         if varname not in session:
             continue

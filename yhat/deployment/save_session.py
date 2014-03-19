@@ -129,6 +129,7 @@ def _extract_module(module_name, modules={}):
         module_py = module.__file__.replace(".pyc", ".py")
         module_source = open(module_py, 'rb').read()
         parent_dir = module_py.replace(os.getcwd(), '').lstrip('/')
+        parent_dir = os.path.dirname(parent_dir)
         modules[module] = {
             "parent_dir": parent_dir,
             "name": os.path.basename(module_py),

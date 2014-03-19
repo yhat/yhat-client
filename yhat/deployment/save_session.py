@@ -5,6 +5,7 @@ import types
 import json
 import sys
 import os
+import pprint as pp
 
 try:
     import dill
@@ -122,11 +123,26 @@ def _get_naked_loads(function):
         if variable not in params and variable not in created:
             yield variable
 
+def _extract_module(module_name, modules={}):
+    module = sys.modules[module_name]
+    if _is_on_syspath(module.__file__)==False:
+        module_py = module.__file__.replace(".pyc", ".py")
+        module_source = open(module_py, 'rb').read()
+        parent_dir = module_py.replace(os.getcwd(), '').lstrip('/')
+        modules[module] = {
+            "parent_dir": parent_dir,
+            "name": os.path.basename(module_py),
+            "source": module_source
+        }
+        tree = ast.parse(module_source)
+        for thing in ast.walk(tree):
+            thingvars = vars(thing)
+            if hasattr(thing, "module"):
+                modules.update(_extract_module(thing.module))
+    return modules
+
+
 def _spider_function(function, session, pickles={}):
-    # TODO: need to grab variables passed as kwargs to decorators
-    # TODO: some issues in regards to the order in which classes are defined
-    # and inherited from
-    # TODO: currently doesn't support "local modules"
     """
     Takes a function and global variables referenced in an environment and 
     recursively finds dependencies required in order to execute the function. 
@@ -154,57 +170,40 @@ def _spider_function(function, session, pickles={}):
         pickles['_objects_seen'] = []
     pickles['_objects_seen'].append(str(function))
     imports = []
+    modules = {}
     source = "# code for %s\n" % (str(function)) 
     if isinstance(function, types.ModuleType):
         pass
     else:
         source += _get_source(function) + '\n'
+
     for varname in _get_naked_loads(function):
         if varname not in session:
             continue
         obj = session[varname]
-        if hasattr(obj, '__call__'):
-            # if it's a pre-installed library, just import it
-            object_file = vars(inspect.getmodule(obj)).get('__file__')
-            if _is_on_syspath(object_file):
-                ref = inspect.getmodule(obj).__name__
-                imports.append("from %s import %s" % (ref, varname))
-            else:
-                # check if we've already seen it
-                if str(obj) in pickles['_objects_seen']:
-                    continue
-                new_imports, new_source, new_pickles = _spider_function(obj, session, pickles)
+        if hasattr(obj, "__module__"):
+            if obj.__module__=="__main__":
+                new_imports, new_source, new_pickles, new_modules = _spider_function(obj, session, pickles)
                 source += new_source + '\n'
                 imports += new_imports
                 pickles.update(new_pickles)
-        elif inspect.isclass(obj):
-            object_file = vars(inspect.getmodule(obj)).get('__file__')
-            if _is_on_syspath(object_file):
-                ref = inspect.getmodule(obj).__name__
-                imports.append("from %s import %s as %s" % (ref, varname, varname))
+                modules.update(new_modules )
             else:
-                source += _get_source(obj) + '\n'
-                class_methods = inspect.getmembers(obj,
-                                            predicate=inspect.ismethod)
-                for name, method in class_methods:
-                    for subfunc in _get_naked_loads(method):
-                        if subfunc in session:
-                            # check if we've already seen it
-                            if str(obj) in pickles['_objects_seen']:
-                                continue
-                            new_imports, new_source, new_pickles = _spider_function(
-                                    session[subfunc], session, pickles
-                                )
-                            source += new_source
-                            imports += new_imports
-                            pickles.update(new_pickles)
-        else:
-            if isinstance(obj, types.ModuleType):
+                modules.update(_extract_module(obj.__module__))
                 ref = inspect.getmodule(obj).__name__
-                imports.append("import %s as %s" % (ref, varname))
-                continue
+                if hasattr(obj, "func_name") and obj.func_name!=varname:
+                    imports.append("from %s import %s as %s" % (ref, obj.func_name, varname))
+                else:
+                    imports.append("from %s import %s" % (ref, varname))
+        elif isinstance(obj, types.ModuleType):
+            modules.update(_extract_module(obj.__name__))
+            if obj.__name__!=varname:
+                imports.append("import %s as %s" % (obj.__name__, varname))
+            else:
+                imports.append("import %s" % (varname))
+        else:
             pickles[varname] = pickle.dumps(obj)
-    return imports, source, pickles
+    return imports, source, pickles, modules
 
 def save_function(function, session):
     """
@@ -218,7 +217,7 @@ def save_function(function, session):
     session: dictionary
         globals() from the user's environment
     """
-    imports, source_code, pickles = _spider_function(function, session)
+    imports, source_code, pickles, modules = _spider_function(function, session)
     # de-dup and order the imports
     imports = sorted(list(set(imports)))
     imports.append("import json")
@@ -226,7 +225,8 @@ def save_function(function, session):
     source_code = "\n".join(imports) + "\n\n\n" + source_code
     pickles = {
         "objects": pickles,
-        "code": source_code
+        "code": source_code,
+        "modules": modules.values()
     }
 
     if "_objects_seen" in pickles["objects"]:

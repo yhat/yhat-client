@@ -18,5 +18,3 @@ class Example(YhatModel):
 
 from first import x
 
-yh = Yhat("greg", "fCVZiLJhS95cnxOrsp5e2VSkk0GfypZqeRCntTD1nHA", "http://sandbox.yhathq.com/")
-yh.deploy_to_file("Example", Example, globals())

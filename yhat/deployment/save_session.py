@@ -182,7 +182,10 @@ def _spider_function(function, session, pickles={}):
         if varname not in session:
             continue
         obj = session[varname]
-        if hasattr(obj, "__module__"):
+        # checking to see if this is an instance of an object
+        if hasattr(obj, "__name__")==False:
+            pickles[varname] = pickle.dumps(obj)
+        elif hasattr(obj, "__module__"):
             if obj.__module__=="__main__":
                 new_imports, new_source, new_pickles, new_modules = _spider_function(obj, session, pickles)
                 source += new_source + '\n'
@@ -203,6 +206,7 @@ def _spider_function(function, session, pickles={}):
             else:
                 imports.append("import %s" % (varname))
         else:
+            # catch all. if all else fails, pickle it
             pickles[varname] = pickle.dumps(obj)
     return imports, source, pickles, modules
 

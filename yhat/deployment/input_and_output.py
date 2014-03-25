@@ -1,5 +1,6 @@
 import warnings
 import json
+from collections import OrderedDict
 
 try:
     import pandas as pd
@@ -176,27 +177,6 @@ def preprocess(func=None, **options):
             return preprocess(func, **options)   
         return partial_inner
 
-    
-def replace_nan(json_obj,parent=None,key=None):
-    """In place replacement of null values (like NaN) with None
-
-    json_obj: loaded json object
-
-    parent: parent of json object
-
-    key: key of json object for the parent
-    """
-    if type(json_obj) is dict:
-        for k,v in json_obj.iteritems():
-            replace_nan(v,parent=json_obj,key=k)
-    elif type(json_obj) is list:
-        for i,v in enumerate(json_obj):
-            replace_nan(v,parent=json_obj,key=i)
-    else:
-        if pd.isnull(json_obj):
-            parent[key] = None
-
-
 def df_to_json(df):
     """
     Convert Pandas DataFrame to Yhat compatable json
@@ -213,12 +193,13 @@ def df_to_json(df):
         pd
     except NameError:
         raise ImportError("df_to_json() requires pandas")
-    if type(df) is not pd.DataFrame:
+    if not isinstance(df,pd.DataFrame):
         raise ValueError("'df' parameter must be a pandas DataFrame")
     if df.index.name:
         msg = "index values are NOT maintained through jsonifification," + \
                 " consider resetting index";
         warnings.warn(msg)
-    df_dict = df.astype(object).to_dict('list')
-    replace_nan(df_dict)
-    return json.dumps(df_dict)
+    df_values = df.transpose().to_json(orient='values',date_format='iso')
+    df_values = json.loads(df_values)
+    df_values = OrderedDict(zip(df.columns,df_values))
+    return json.dumps(df_values)

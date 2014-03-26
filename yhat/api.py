@@ -95,8 +95,9 @@ class API(object):
             except Exception, e:
                 msg = """Whoops. The data you're trying to send could not be 
 converted into JSON. If the data you're attempting to send includes a numpy 
-array, try casting it to a list (x.tolist()). If you're still having trouble, 
-read our help here: {URL}.""".format(URL="http://docs.yhathq.com/help/json")
+array, try casting it to a list (x.tolist()), or consider structuring your data
+as a pandas DataFrame. If you're still having trouble, please contact: 
+{URL}.""".format(URL="support@yhathq.com")
                 print msg
             response = urllib2.urlopen(req, data)
             rsp = response.read()
@@ -214,9 +215,13 @@ class Yhat(API):
             same data, but compatible with JSON
         """
         if isinstance(data, pd.DataFrame):
-            # Typecasting ensures proper jsonification
-            data = data.astype(object)
-            data = data.to_dict('list')
+            data_values = data.transpose().to_json(orient='values',data_format='iso')
+            data_values = json.loads(data_values)
+            try:
+                from collections import OrderedDict
+                data = OrderedDict(zip(data.columns,data_values))
+            except ImportError:
+                data = dict(zip(data.columns,data_values))
         return data
 
     def predict(self, model, data):

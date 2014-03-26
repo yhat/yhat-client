@@ -1,6 +1,5 @@
 import warnings
 import json
-from collections import OrderedDict
 
 try:
     import pandas as pd
@@ -201,5 +200,9 @@ def df_to_json(df):
         warnings.warn(msg)
     df_values = df.transpose().to_json(orient='values',date_format='iso')
     df_values = json.loads(df_values)
-    df_values = OrderedDict(zip(df.columns,df_values))
+    try:
+        from collections import OrderedDict
+        df_values = OrderedDict(zip(df.columns,df_values))
+    except ImportError:
+        df_values = dict(zip(df.columns,df_values))
     return json.dumps(df_values)

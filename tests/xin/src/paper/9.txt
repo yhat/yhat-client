@@ -1,0 +1,418 @@
+As a part of their program to develop hydraulic hybrid vehicles, the Environmental Protection Agency’s (EPA) NVFEL tests high pressure hydraulic equipment and is seeking to improve the safety guidelines regarding this type of equipment. Currently, this equipment is placed behind clear plastic shields, as seen in Figure 1, which act as safety shields in the event of equipment failure due to over pressurization. Equipment failure would result in projectiles such as bolts, flailing hoses, and hydraulic fluid being sprayed throughout the room. This can damage other equipment, and could be fatal to any technicians present. Therefore, a test rig is required to impact test a sample of the shield material to simulate conditions of equipment failure. According to our customer requirements the test rig must simulate real conditions and multiple platforms. This means the set-up must achieve different forces upon impact to simulate the range of different foreign objects that could potentially impact the shield, and the test rig needs to be able to impact test various sized shield specimens. In addition, the test rig needs to be safe and easy to use. Upon success, the EPA NVFEL program will no longer arbitrarily choose the material and thickness used to construct their safety shields. Our test rig provides them with a standard of testing that will safely determine the material and thickness that needs to be used to construct their safety shields.
+
+Figure here
+Figure 1: Current safety shielding used to confine hydraulic equipment
+
+Project Requirements and Engineering Specifications
+The test rig must be able to accurately simulate the real world situations that occur at the NVFEL. This includes projectiles, such as valves, that are ejected from the pump and flailing hoses that can cause injury if not contained. In order to protect the lives of people and equipment that is in the room, shields must be built that are able to withstand these types of forces. The testing rig allows the EPA to test shields made out of different materials and to make sure they can withstand these forces before they are actually placed around the pumps in their facility.
+
+Engineering Targets The fluids running through the pumps flow at an average of 200 gpm and have an operating pressure of 7000 psi and occasional bursts of up to 14,000 psi have been observed. The temperatures of the fluids reach a maximum of 65°C; therefore, materials chosen for the shield must be able to withstand this temperature. Many different sizes of fittings and hoses are connected to these devices; these hoses range in size from 0.25 to 2 in. As a result of the high operating pressures, these hoses can break and become very dangerous. Also, pieces of broken equipment such as shrapnel, fittings, and valves can come loose and be ejected from the pump with a very high velocity. Many mechanical parts enclosed by the shields emit a large amount of heat. We must be able to simulate a temperature range of 25°C to 65°C in order to mimic operating conditions. These project requirements are equally important because they must be met to ensure safe equipment operation.
+
+The Quality Function Deployment (QFD) can be seen in Appendix A. The Customer Attributes represent the customer specifications in the product. Also included is the Importance of the Attribute; 1 being the lowest and 5 being the highest. The Engineering Characteristics are the quantifiable measures for product performance. These are quantities you can measure in a lab pertaining to our product to be designed.
+
+By looking at the QFD, the customer attributes with the highest demanded weight are: test rig simulates real conditions and is safe to use. The main aspect of simulating real conditions is that the user can vary the velocity of the projectile being fire – the most important engineering characteristic. This is done by varying the pressure in the pressure chamber; the higher the pressure, the faster the velocity of the projectile. Other aspects relating to simulating real conditions are that the test rig must be able to accelerate different sizes and masses of projectiles. To keep the user and equipment around the rig safe, an enclosure was used that contained the whole system. An engineering characteristic with less demanded weight is the mass of the test rig. This is because the test rig will likely be placed in a separate room.
+
+There are very few competitive products out there that are similar to ours. These types of pneumatic guns are built very differently based on the conditions that the user wants to simulate. The same concept is usually used; however, higher pressures may exist to fire projectiles at higher velocities.
+
+Functional Decomposition
+Figure here
+Figure 2: Functional decomposition.
+
+Concept Generation
+Pendulum Concept Design One of the design concepts we looked into were different types of pendulums. Some of the benefits of using a pendulum are that it is a very controlled motion so it’s very safe to use and ammunition is unnecessary, so it’s cheaper to operate under long-term use. Some of the disadvantages, however, were that it is extremely difficult to simulate failure conditions in terms of high velocity impact, size, and shape of the projectile or hose. We found that in order to simulate the force of a bolt or screw the pendulum would have to weigh 100 kg and travel at 27 mph. Even if the pendulum could create the necessary force, the weight and counterweight wouldn’t do an accurate job of simulating a projectile or flailing hose because it would be a very large object that could only hit with one size, weight, and shape and not provide the range of tests we’re seeking. We are also looking to test one impact at a time, and with the pendulum weighing so much and traveling at such high speeds, it would be very hard to stop after one stroke because of the momentum. It would also cause some vibrations within the machine and the casing if continuously hit. The basic pendulum is manufactured by creating a strong base, supports on each side, a rod that acts as a rotational axis for the weights, a weight and counterweight, and some kind of propulsion system.
+
+Pendulum Design Concept 1: As shown in the figure in Appendix E [1], this pendulum is much larger than the required scope of this project. It is used for high impact steel testing. It is a motorized pendulum which would be necessary when trying to obtain the high velocities that we need for this testing. This was the most feasible options in terms of pendulums; however, it would be very expensive and hard to control the output in terms of velocity. The setup would need to be much smaller than the one shown in Appendix E and this would make it hard to have properly shaped weights that fit inside the supports.
+
+Pendulum Design Concept 2: Similar to the figure shown in Appendix E, this pendulum would have a spring mechanism in place of the motor. The advantage to using a spring is that it’s much cheaper than a motor; however, the spring must be extremely compressed to reach the velocity and force that we need. With this spring constant, it would be extremely hard to find or create a device to load and hold the spring because of the amount of stored energy.
+
+Pendulum Design Concept 3: The final design concept we came up with was similar to the figure shown in Appendix E, except this pendulum would have a pneumatic device in place of the motor. This would give us the speed we were looking for; however, it would be very hard to control the weights from flying off from the force of the initial burst. The other problem with this design was that we decided if we were going to make some type of pneumatic device we might as well just make a gun because it would be much cheaper and safer.
+
+Impact Testers Concept Design Purchasing an impact tester to simulate conditions of equipment failure would be extremely expensive. Also, imitating such technology would expand beyond our budget, and would also be too complicated to construct within the timeline of our project. Having the capability to control the amount of energy put into the impact is vital to the success of our simulation, and would not be very accurate with this device. In order to measure the acceleration of the weight, an accelerometer would need to be placed on the weight, further increasing the cost of the project. If lower grade materials were used, friction could be increased, decreasing the acceleration, and therefore decreasing the amount of force from the impact. Purchasing higher grade materials would result in higher costs. Appendix E [2] shows a Dynatup® 9200 Series Impact Test Machine, which is an example of an impact tester we would model our project off of.
+
+Impact Tester Design Concepts 4 and 5: In order to create the speeds needed to simulate failure conditions, either a pneumatic or hydraulic chamber would need to be implemented into the design. If an air chamber was found meeting the requirements for pressure (~14,000 psi) it would be too heavy and overly large for our implementations. Ignoring size and availability constraints, finding a compressor which is capable of building up to such pressures is equally expensive and difficult to find. Since working pressures may not be reached quickly enough, we would need to use surge tanks (air tanks), also capable of holding the necessary pressure, which would also increase our design cost. An alternative to surge tanks or air tanks is using multiple compressors, but this would not solve the financial issues.
+
+Dart Impact Test (ASTM D1709) Concept 6: Dart impact testers, such as the one seen in Appendix E [3], operate according to ASTM D1709 and are generally used to test the impact strength or toughness of plastic film or sheet material. The basic testing procedure involves dropping darts of different masses from a specified height. The objective of the test is to determine the energy with which 50% of tested specimens would break. The problem with this method is that its testing range does not reach the higher impact energies we would need to simulate. In other words, the mass of the darts and their final speed do not reach the levels we would need to accurately simulate a projectile from a hydraulic pump. Furthermore, purchasing a tester would be beyond the scope of our budget.
+
+Rail Gun Design Concept 7: A rail gun is a projectile accelerator that uses electromagnetic forces to accelerate the projectile along a set of rails. As seen in Appendix E [4], this works by creating a large voltage between two rails and placing an armature between them with a set of brushes that will conduct current between the rails. The current will create a magnetic field in each rail that will propel the armature and projectile forward. By using a large voltage source the desired speeds could be achieved.
+
+In order to develop a working prototype the main manufacturing challenges would be to manufacture the rails. Most of the other components (power source, electrical connections and armature) would need to be purchased off the shelf. Our main budget concern would be the power source, which would probably be expensive given the amount of voltage that would be required to operate the gun and our budgetary constraints.
+
+The main problem with the rail gun concept is that the rails are difficult to maintain. This is because of two reasons: friction between the armature brushes and the rails wears the rails down fairly quickly and there would also be a very strong repulsion force between the two rails because of the opposing magnetic fields. This would result in only being able to use the gun a limited amount of times before having to replace the rails and could affect the overall use of the gun as part of a test rig.
+
+Coil Gun Design Concept 8: A coil gun is a projectile accelerator that employs the same principles as the rail gun but with a different setup. As seen in Appendix E, electromagnetic coils are connected to capacitor banks (that can discharge energy quickly) and these will create a magnetic field to propel a ferromagnetic projectile. Each set of coils is turned on in sequence and turned off once the projectile passes and the next set turns on. When they are turned on the coils produce a strong magnetic field which attracts the projectile and by turning it off when the projectile has passed the projectile keeps the momentum it has gained and is shot out of the gun. Another advantage of this design is that it eliminates the need for rails and basically all parts that would wear down due to friction in the rail gun. This is because the projectile effectively floats in between the coils as a result of the magnetic field.
+
+If our team were to pursue this concept there would be several challenges when building a prototype. The main challenge would be to synchronize the discharges of the capacitor banks in order to get the proper timing of turning on each magnetic field. Also, if we wanted to fire at different speeds this would create the challenge of having to synchronize for different projectile velocities. The electrical equipment necessary to do this would probably exceed our budget. Other components, such as coils or capacitor banks, would probably not be very expensive or difficult to put together. Hence, the main difficult of this concept lies in designing a controller for the capacitor timing and being able to adjust this to account for different projectile speeds.
+
+Pneumatic Gun Concepts A pneumatic gun can be used to accelerate different projectiles to very high velocities. However, a pneumatic gun can be built or constructed a few different ways. Below is a brief description of the various types of pneumatic guns we will consider building for our project. A sketch of a pneumatic gun is shown in Appendix E.
+
+Pneumatic Gun Design Concept 9: The main idea behind this design concept is the variation of using hydrogen, nitrogen, or helium as the compressible gas. In order for the projectile to have the desired velocity, we will need a compressed gas for the test rig. Helium, hydrogen, and nitrogen are all non-liquefied gases that are possible options for our pneumatic gun. Concerning safety, helium and nitrogen are non-toxic and non-flammable. Hydrogen, on the other hand, is flammable and will most likely not be used. Typical applications like ours use nitrogen as the compressed gas because of its abundance. The team talked to Amit Salvi, a graduate student in the Aerospace Department, and he also agreed that nitrogen would be the best gas to use.
+
+Pneumatic Gun Design Concept 10: A pneumatic gun with different size and shape barrels could simulate various objects impacting a surface. For this concept, we would have several different barrels that would vary in length and muzzle or bullet diameter. The variation in the length of the barrel would allow our pneumatic gun to achieve higher velocities and accuracy with an increase in the length. The variation in the muzzle diameter would allow us to accelerate larger projectiles in order to achieve a higher force concentration upon impact. We also would try to incorporate a barrel that would accelerate a cubic bullet. This cubic bullet would simulate the impact of a sharp object and give us an opportunity to analyze the effects of scratches on an impacted shield. The incorporation of these different barrels would allow our group to simulate the majority of the objects that would impact the hydraulic shield.
+
+Pneumatic Gun Design Concept 11: A pneumatic gun that could accelerate foreign objects would give a real-life simulation of the impact testing. For this design we would use a single barrel with a relatively large muzzle diameter. Then a cast would be made for different foreign objects such as, a screw, a hose, and a collection of shrapnel. This cast would be in the shape of a cylinder and made from a lightweight rigid material such as Styrofoam. This cast would be split in half and the foreign object would be placed inside the mold in the center of the cast. The cast with the foreign object enclosed would be the projectile accelerated by the pneumatic gun. Once the pneumatic gun is fired and the cast exits the end of the barrel, the foreign object would continue on and impact the shield while the Styrofoam cast will have flown off the foreign object because of its lightweight and small density. The use of this Styrofoam cast would allow us to impact a shield with the actual material; hence this would be an actual recreation of a hydraulic engine failure.
+
+Pneumatic Gun Design Concept 12: Once the pneumatic gun setup is complete, it will be very hard to take apart; this is especially true of the barrel. In order to test different projectiles, it would be very hard to remove the barrel and insert a barrel of a different shape or dimension. Therefore, the user of the rig has 2 options. He can use a sphere of a ½ inch diameter or a ½ inch diameter cylinder with variable lengths. The variable lengths of the cylinder will allow the user to simulate a light or a heavier bolt. The impact force can also be increased or decreased based on the mass of the projectile used.
+
+Concept Selection Process
+The concept selection process was very important when considering different ideas we could use to meet our specific customer specifications and engineering requirements. For our project we have brainstormed four different concepts that could be used to meet our customer specifications and engineering requirements. In order to select a single concept for our project we weighed the advantages and disadvantages of each concept, and we also incorporated the feasibility of constructing these different concepts in the time and budget allotted for this given project. The discussion below shows our different concept ideas with their advantages and disadvantages, and the feasibility of constructing these different concepts.
+
+The first concept is a pendulum that would impact a given hydraulic shield. This concept is by far the easiest to construct and would also be one of the least expensive. The pendulum could also incorporate different heads to impact the shield which could simulate the different foreign object projectiles that actually impact the shield in real-life testing at the EPA. However, in order to meet our engineering requirements such as force upon impact the pendulum would have to travel extremely fast and would have to carry a large mass. Since this mass would have to be very large, around 100 kilograms, there would be an extremely large torque and twist on the shaft of the pendulum which could limit the life of this concept. Rebound after impact is another obstacle that would have to be overcome since stopping a large mass would be difficult. On the other hand, this concept would be very easy to construct and would be relatively inexpensive since there would be no mechanical motors of electronics involved.
+
+The second concept is a drop impact tester. This device would be similar to the machinery used to test fatigue on automobile seats. We could orient our device so that it would impact the shield using gravity instead of fighting against the force of gravity. Also, we have a good knowledge of linking mechanisms from our previous courses here at the university. This mechanism would also have a great life span since it would only have translational motion and would use a hydraulic or pneumatic cylinder to supply the driving power. However, this concept would be manufactured in-house meaning we would do most of the fabrication in lab which could be time consuming. Also, to meet the necessary force upon impact we would have to somehow incorporate a system of hydraulic or pneumatic cylinders to power this device which could prove to be difficult to design and get to work properly in the given time. To construct this device we would spend ample time in the lab fabricating the necessary links and parts. If there are any unexpected delays or problems with the device we could find ourselves in a time crunch and possibly miss the design expo which would be unacceptable.
+
+The third concept is a rail gun or a coil gun. Both of these projectile accelerators can easily achieve the necessary velocities to simulate the correct force upon impact. Also the life span of the gun itself would be very long since it uses a lot of electrical components and hardly any mechanical components. However, the actual rails of the gun itself would have to be constantly re-machined after every shot which would not only be time consuming but very inefficient. Also, there are a lot of different electrical components needed to construct a rail or coil gun, which our group is unfortunately not well versed in this area. Since this is a gun safety is a factor since there is always a chance that something could go wrong. This concept would be relatively expensive since most of the electrical components would have to be purchased. This could also be difficult given different shipping times in our given time restraint.
+
+The fourth and final concept is a pneumatic gun or a compressed-gas gun. This projectile accelerator could also easily achieve the necessary velocities to simulate the correct force upon impact. Since a pneumatic gun uses gas to drive the projectile the life span would be very long on this device and would only require a refill of the gas once it is depleted. Also, this device could accelerate different size projectiles which could simulate the different foreign objects that actually impact the hydraulic shield. However, we have no prior knowledge of this concept so extensive research is needed. Safety is a factor since this is a gun and problem can arise. Also, most of the parts needed to construct this device would be purchased so it would be relatively expensive and could have problems receiving the parts in time. But, this concept would be relatively easy to build since there are only a couple of different parts to be purchased, and there is a working pneumatic gun on campus so we are able to gain access to this device to better understand the path we should take when constructing a pneumatic gun.
+
+In regards to our customer requirements and engineering specifications we believed the fourth concept regarding the pneumatic gun was the best concept choice. It would be relatively easy to manufacture and could simulate different projectiles impacting a hydraulic shield. After calculating the necessary force upon impact we discovered a pneumatic gun can very easily accomplish this. Also, the fact that there is an actual pneumatic gun on campus we can access and actually see in action was a big factor in our decision. The ease of manufacturing and all the available resources made the pneumatic gun concept stand out from the rest of our concepts.
+
+Alpha Design Concept
+Our Alpha Design is shown in Appendix E pneumatic gun section. The pressurized fluid that enables the pneumatic gun to fire projectiles at significantly high velocities comes from the nitrogen cylinder which is located outside of the enclosure of the test rig. An air line connects the nitrogen cylinder to a regulator valve. On the other side of the regulator valve is a double-ended pressure cylinder, which is rated up to 5000 psi. Therefore, the user must use the regulator valve cautiously to make sure that no more than this pressure is let into the pressure cylinder. Once the desired amount is in, the regulator valve must be shut off.
+
+The amount of pressure in the pressure chamber correlates to the velocity of the projectile. Once the construction of the test rig was complete, a calibration graph of pressure versus velocity was produced to enable the user to fire the projectile with a specific velocity. On the other end of the pressure chamber is a two-port, closed solenoid valve. This electromechanical valve is controlled by running or stopping an electrical current through a solenoid, which is a coil of wire, thus changing the state of the valve. It acts like a light switch except that it allows the pressurized fluid in the pressure chamber to escape in a very short period of time (approximately 50 ms). We used a 12V battery to power the valve. A switch was used to let the pressurized fluid into the barrel.
+
+Prior to this, the projectile needs to be placed in the barrel, as close to the solenoid valve as possible. Then, firing can occur. The components of the pneumatic gun fit together with threaded ends.
+
+Engineering Design Parameter Analysis
+Barrel Material and Dimensions In terms of material selection, the main criterion employed were cost, strength, toughness, and machinability. Strength and toughness are needed so the barrel can handle the large stresses and forces during firing. Machinability was needed since we threaded one end of the barrel to be attached to the solenoid valve. The material selected was 304 seamless stainless steel. This was the material with the highest strength, corrosion resistance, and machinability, while allowing us to stay within our budget. Our final decision was also based on recommendations from Terry Larrow [12] and Bob Coury,[13] faculty from the University of Michigan who are experienced working with steel.
+
+A 0.051 m diameter barrel with an inner diameter of 0.013 m was used in our pneumatic gun setup. The barrel must have a sufficient wall thickness to handle the necessary high firing pressures without rupturing. We used equations for thick-walled pressure vessels (Eqns. 6-8, obtained from [12]) to relate pressure and wall thickness to the barrel stress. Using these equations we have calculated all the maximum stresses, which are shown in Table 1, below. We determined with a wall thickness of 0.019 m the maximum stress (hoop stress) is 14.05 MPa. Since the yield strength of 304 stainless steel is 205 MPa, a safety factor of 14 was being employed, which is sufficient to avoid failure.
+
+Table here
+Table 1: Barrel Stresses
+
+Projectile Material and Size Selection The material for projectiles was AISI 316 stainless steel. This material was selected for its cost and availability. Furthermore, the material is ideal for applications where severe corrosion exists, such as the friction and impact forces that will be experienced by the projectiles [14]. Our projectiles are half-inch diameter cylinders with rounded and pointed ends. One of the main design drivers for selecting these shapes is that at very high speeds air resistance plays a large role in how fast the projectiles will be able to travel. Hence, it is desirable to have a shape which minimizes drag.
+
+Velocity Measurement System The velocity measurement system was made using two photodiodes connected to a voltage supply and an oscilloscope. The alternative to this design was to use a high-speed camera; however this option is very expensive. The photodiodes were connected as shown in Figure 3, below. On the test rig, the photodiodes were placed a distance (d) of 5.08 cm apart above the opening of the barrel. This will ensure that when the projectile passes below the photodiodes, a signal will be generated (due to the change in light detected by the photodiodes). The oscilloscope will be connected to the Vout terminal in each photodiode circuit, and will be used to measure the time difference (∆t) between when each photodiode generates the signal. Thus the velocity of the projectile (v) is the distance divided by the time difference.
+
+Figure here
+Figure 3: Velocity measurement system circuit diagram.
+
+In order to use the circuit to generate a signal, both photodiodes must operate within saturation mode. To ensure this, the voltage source (Vcc) used was 24VDC and the resistance (RL) used was 5kΩ [15]. The time difference (∆t) at the expected speeds should be on the order of 200μm for the highest possible speeds; the rise time and fall time of each photodiode is on the order of 5ns so it can be assumed that a digital signal can be produced. Each photodiode used has a wavelength (λ) sensitivity of 400-1100 nm; this encompasses the range of visible light. To ensure a strong signal, emergency flashlights were placed on the bottom of the testing enclosure aimed directly at the photodiodes. A picture of the setup can be seen in Figure 4 below.
+
+Figure here
+Figure 4: Setup of velocity measurement system
+
+Enclosure In order to ensure safe testing, we designed a test rig enclosure to contain any ricochet that may come from the impact of the bullet against the test specimen. One of the main design considerations for this enclosure is the possible magnitude of the ricochet velocity. In order to estimate this velocity, we used Equation 1 below, in which Cr is the coefficient of restitution, V2, V1 and V2f, V1f are the initial and final velocities of the projectile and test specimen respectively. We can use a coefficient of restitution of Cr = 0.597 for steel balls [5] and assume that the velocity of the test specimen is zero before and after the collision, thus arriving at Equation 2, below. This is a very high ricochet velocity, however this is the absolute worst case scenario since the analysis does not take into account the energy absorbed by the target holder and the target, which is significant. The enclosure is built of ½ inch plywood and lexan, to contain any impacts from ricocheting projectiles.
+
+Formula here
+(Equation 1)
+
+Formula here
+(Equation 2)
+
+Target Holder One of the main parameters determined for the target holder was the distance at which to hold the target from the barrel opening. We have designed a multi-position target holder that can hold test specimens at 4, 6, and 12 inches from the opening of the barrel. This simulates real conditions in the EPA lab, at which test shields are placed anywhere from 2 to 12 inches away from the hydraulic equipment. Thus, it is necessary to be able to test the shields at different distances to determine if this is an important design factor when constructing safety shields.
+
+Summary of Design Analysis In order to determine material and manufacturing process selection, we used CES software. When performing material selection analysis we learned to chose a material based off a high yield strength and minimal cost while ensuring availability with businesses. The two materials we compared for this analysis were AISI 304 Stainless Steel, which we used, and AISI 301 Stainless Steel. From the manufacturing process selection we learned that there were many different alternative processes that we could have used. Most of these processes were low cost but found to be very labor intensive. After reviewing our design for assembly we learned that with a few of the changes we implemented since our original design, we lowered the part count and decreased assembly time which, therefore, lowers overall labor costs. We also made further suggestions to reduce part count as can be seen in Appendix C. We analyzed our design for environmental sustainability using SimaPro software. From this we learned that using 304 as opposed to 301 Stainless Steel had a larger impact on human health and a much larger impact on resources. We concluded that since we only made one prototype the impact would be insignificant unless mass produced. We also performed a design for safety analysis using DesignSafe Software. Since our project is very dangerous, we learned that we handled all of the safety issues in the correct manner. We had a written test procedure for firing projectiles and had a certified safety inspector sign off on our project before it could be tested.
+
+Final Design and Prototype Description
+Our final design of the pneumatic gun has been presented at the Design Expo. For our situation, the prototype and the final design are the same since our sponsors do not require more than one product. Our prototype has been presented to them, and will continuously be used to perform necessary impact tests.
+
+In order to meet the engineering requirements, we focused on making sure our prototype could simulate real conditions and multiple platforms in a safe and controlled environment. In order to simulate the real conditions we made sure we could achieve different velocities simply by varying the pressure. This is plausible since an increase/decrease in pressure would cause an increase/decrease in force on the projectile, thus increasing/decreasing the velocity. We also incorporated a test shield holder that is capable of holding various sized shields at various distances from the end of the barrel. This simulates the multiple platforms by allowing the user to test different sized shields at different distances from the barrel.
+
+Our prototype consists of three components: the pneumatic gun, the test shield holder, and a testing enclosure. All of the parts needed to construct our prototype are listed in the bill of materials in Appendix A.
+
+The test shield holder is a 4x4 foot piece of plywood. This piece of plywood has an aluminum frame that is adjustable. This aluminum frame has slots to slide the testing material into.
+
+The constructed testing enclosure, shown in Figure 5 on page 15, resembles a large box. The box is six feet tall and has a base of two feet by four feet and is constructed mainly of plywood. One side of this enclosure was cut out and replaced with a removable pane of lexan glass. This was done for observation purposes, and for the user to access and change the size and position of the shield being tested. On the opposite side of the box, a part of the plywood was cut for an additional window. This window created more light in the box for the photodiodes, and also made the shield inside the box more visible while testing. Slots were placed on the top and bottom that allow the user to place the holder at the appropriate distances from the barrel. To use this enclosure the user must first attach the shield to the test shield holder. Next, the holder will be placed in the slots at the desired distance. Then the user must be sure to replace the lexan shield to the side of the enclosure and lock the mechanism in order to ensure the safety of the users. Once this is complete, the pneumatic gun can be prepped and fired.
+
+Figure here
+Figure here
+Figure 5: Testing Enclosure Side Views.
+
+In order to construct the pneumatic gun we needed a barrel, solenoid valve, pressure chamber, nitrogen tank, and necessary connectors. We started by connecting the barrel to the solenoid valve. To do this we threaded the inside of a portion of the barrel on a single side. We then connected the barrel to the solenoid valve using a male-male connector, which is a fully threaded pipe able to withstand high pressures. The solenoid valve was connected to the pressure chamber with an elbow connector. Both the solenoid valve and pressure chamber were pre-threaded so no machining was necessary. On the other end of the pressure chamber we connected a pressure regulator valve. This regulator valve was connected to a high pressure hose which was then connected to the nitrogen tank. We incorporated a bleed valve between the nitrogen tank and the pressure gauge with regulator valve to depressurize the system. This was a safety precaution in the event of a projectile becoming lodged in the barrel. We mounted the gun to the testing enclosure using hinges. The pneumatic gun, shown in Figure 6 on page 16, has aluminum legs as supports. To operate the pneumatic gun, the user will start by placing the projectile as far in the barrel as possible. Then, the user will open the valve on the nitrogen tank. While the regulator valve is open, the user must watch the pressure gauge and close this valve once the desired pressure is reached on the digital pressure transducer. After achieving the desired pressure and closing the regulator valve, the pneumatic gun is ready to be fired. To fire the gun the user will have to press the necessary safety buttons on the control panel. These safety buttons consist of an emergency button and two switches. The valve in the solenoid valve will open once it is supplied with the voltage, thus accelerating the projectile.
+
+Figure here
+Figure 6: Components of Pneumatic Gun.
+
+Fabrication Plan
+The most significant part of our prototype is the pneumatic gun element. This allows the projectiles to be fired at velocities that are similar to the failure velocities of projectiles ejected in the EPA lab. Our fabrication plans do not differ from our prototype and our final design. Our product will not likely be mass produced because it is a very specific product that needs to be manufactured based on the requirements of each and individual customer.
+
+The barrel of the pneumatic gun was custom built by A1 Alloys. They used gun drilling to create the hole that will hold and launch the projectiles. The inside surface finish of the barrel is extremely important because if it does not have a high tolerance, friction between it and the projectile will cause it to slow down and not achieve the required velocities. Gun drilling provided us with a good surface finish at an affordable price. With a larger budget, we would have gotten the barrel honed, providing the best surface finish along with the best accuracy for the inner diameter, however our budget did not allow us to do this. In order for the barrel to connect to the solenoid valve, we put threads on one side of it. This was done in with the help of Terry Larrow, a faculty member at the University of Michigan. A drill press with a half inch tap was used to create the threads.
+
+The solenoid valve was purchased from Clark Cooper. It is connected on one end to the barrel and on the other end to the pressure cylinder. The 2 connections were made by using ½" extra thick wall black steel threaded pipe nipples. These fittings were used because of their ability to be used in a high pressure system with nitrogen as the fluid. Pipe thread sealant was used on all connections that have fluid flowing through them to minimize leakage.
+
+On the end of the pressure chamber, supplied by our sponsor, a pressure gauge with a regulator valve was used to control the amount of pressure built up in the chamber. This device was connected to the nitrogen tank (supplied by sponsor) using a ¼" high pressure hose. The high pressure hose was also supplied by our sponsor. Our hose is rated up to 5000 psi and has male end fittings to connect to the nitrogen tank on one end and the pressure gauge with regulator valve on the other end.
+
+The barrel, solenoid valve, and pressure chamber are secured to the wood base using u-bolts. The barrel was also fastened down to the supports to minimize the vibrations that occur when the projectiles are shot. A lexan shield was placed around the entire gun setup to increase safety.
+
+The test shield holder was constructed using ½ inch plywood (4 feet x 4 feet). The test shield holder allows our sponsor to test sheets between 12 inches x 12 inches and 47 inches x 47 inches by using the aluminum supports provided to us by our sponsors.
+
+The projectiles which are fired into the test material must to be contained to prevent damage to workers or other equipment. Therefore, an enclosure constructed of lexan, plywood, and steel slots was assembled. The steel slots allow the different shields to be tested at different distances from the barrel.
+
+Validation Results
+The challenge our team was faced with consisted of simulating conditions of hydraulic equipment failure at the EPA. Validating our design consisted of proving that the conditions were accurately simulated.
+
+One condition to be replicated was the velocity of the projectiles necessary to create the same amount of impact force as in EPA equipment failure. We performed three tests in which we fired projectiles at different pressures and measured the velocity. Due to time constraints, only three tests were performed. The projectiles used for this test were 18 g cylinders with pointed ends. Hence, for cylinders that are heavier or without pointed ends the velocity will most likely be lower.
+
+The results of our testing can be seen in Figure 7 on page 18. The velocity was measured as described in the engineering design parameter analysis section. The pressure was measured with a pressure transducer. The source of the large error in pressure came from significant pressure loss due to leaks between the pressure accumulator and solenoid valve. Since it took time between setting the pressure (closing the pressurization valve) and moving into the control room, there was a significant pressure drop, accounting for most of the error.
+
+Figure here
+Figure 7: Calibration Curve
+
+As can be seen by the velocities achieved in Figure 7 above, our maximum target velocity of 232 m/s was achieved. This velocity is the absolute maximum that could be achieved in the case of a pump failure and hence fulfills the testing needs of our sponsor.
+
+Another required specification was to replicate various sized and weighted projectiles which would impact the test shields. This has been done by using cylindrical shaped ammunition, with 0.5 inch diameter for our pneumatic gun. Our sponsor has received validation that this specification was met when they were supplied with the different sizes. More specifically, we have supplied our sponsor with a 0.5 inch rod which can be cut to any size that is desired for testing.
+
+An additional specification met was being able to impact the test shields at various distances from the barrel of gun. This has been done by designing our testing fixture to have various positions at which the shields can be mounted, allowing the user to vary the distance between the barrel of the gun and the shield. Impact testing different sized shields was also a requirement. This specification has been met by designing a plywood test holder which has adjustable aluminum framing.
+
+Information Sources
+Impact and ballistic testing is a common safety procedure employed when designing any sort of shield. The term shield in this context is broad and can represent a number of items such as, bullet proof vests, vehicle windshields, satellite shields, and in our case debris and shrapnel shields. The impact testing is done to ensure safety when using the equipment.
+
+Figure here
+Figure 8: Current National Institute of Justice Test Set-up [6]
+
+Currently there are no designs patented or for sale that can perform the necessary impact testing to meet our criteria. However, many private organizations and universities have built test rigs to perform high speed impact testing on certain shields.
+
+The National Institute of Justice: Law Enforcement and Correction Standards and Testing Program uses a set-up, shown in Figure 8 above, to test personal body armor worn by police officers and marines [6]. In this test rig all test weapons are ANSI/SAAMI unvented velocity test barrels. These weapons are powder-less guns that use an electronic firing system. They fire extremely fast at 1700 rounds per minute, can fire different sized ammunition, up to .50 caliber, and produce large velocities up to 900 m/s [6]. The body armor being tested is placed a distance from the test weapon. To simulate this body armor on a human, it is backed with clay and then fired upon. For the body armor to pass inspection it must be fired upon six times per side and must have no perforation through the side by the bullet or by any shrapnel, it must also have no depression depths greater than 0.044 m [6].
+
+The Hypervelocity Impact Technology Facility (HITF) uses a test rig to test debris shields for the international space station [7]. This set-up uses a two-stage light gas gun which uses pressurized hydrogen gas to fire projectiles extremely fast, up to 9000 m/s, see Figure 9a [7]. The shield being tested is placed at the end of the barrel and prepared for impact. After impact several observations and calculations are performed to quantify the effectiveness of the shield being tested, see Figure 9b [7].
+
+Figure here
+Figure here
+Figure 9a and 9b: Two-Stage Light Gas Gun and Shield after Testing [7] respectively.
+
+The University of Dayton Research Institute (UDRI) performs foreign object impact testing. This impact testing is done in their physics lab and tests foreign object impact on aircraft structure of engine components [8]. In the UDRI impact testing they use a Styrofoam cast to accelerate the foreign objects, in their case it is birds [8]. This would be very similar to one of our variations of the pneumatic gun discussed in the appendix. The only unknown factor would be in the construction of the cast itself. UDRI has no information on the manufacturing aspects of these Styrofoam casts. Therefore, we believe the incorporation of a CNC mill would be necessary to fabricate the required casts.
+
+Figure here
+Figure 10: FOD Testing of F-15 Windshield
+
+The Southwest Research Institute (SWRI) performs impact testing with the set-up shown in Figure 11a [9]. This test rig uses an inhibited shaped charge launcher to propel projectiles of different masses ranging from 0.5 to 1.35 g at satellite shields. The shape charge is a metal lined explosive cavity that generates a long, plastically deforming jet of material that can travel up to 11,000 m/s, see Figure 11b [9]. This set-up also uses a target chamber that is a vacuum in order to simulate outer space environments [9].
+
+Figure here
+Figure here
+Figures 11a and 11b: SWRI Impact Test Set-up [8] and Shaped Charge with Inhibitor [9] respectively.
+
+Impact testing is also performed at the University of California Berkeley ballistics laboratory built by Werner Goldsmith [10]. In this lab they test Zylon fabric, which is an extremely strong fabric, placed in airplane engines in order to contain shrapnel should equipment break. To test this fabric as well as others they instituted the use of a custom built powder gas-gun, shown below in Figures 12a and 12b on page 21 [10]. This powder gas-gun is capable of accelerating projectiles at velocities of over 400 m/s. The set-up is very similar to the other in which the test specimen is placed a distance away from the end of the barrel. After impact observations a statistical analysis is performed in order to make improvements on the fabric design [10].
+
+Figure here
+Figure here
+Figures 12a and 12b: Berkeley’s Custom Powder Gun and View of the Breech [10] respectively.
+
+All of these impact testing facilities all use some sort of projectile accelerator. This is a simple gun in some cases, and in others it is a complex light gas-gun. For our project we will plan to use the simplest form of a projectile accelerator possible in order to simulate the necessary velocities and shape/size of the projectiles. All of these impact testing facilities also use some sort of testing chamber or procedure of how and where to place the test specimen. In our project, we will most likely encounter ricochets and unexpected flight patterns of the projectiles. Therefore, we will need to incorporate an enclosed test chamber at an appropriate distance from the barrel of the projectile accelerator. In order to achieve this we will have to perform extensive research in the mechanics, dynamics, and operation of different types of projectile accelerators. We plan to look into the feasibility of rail-guns, coil-guns, and pneumatic gas-guns. The major obstacles in this process will be the need to fire different size/shape objects at different speeds, and the time restriction to manufacture the projectile accelerator. Once manufactured, we will be able to study the projectile accelerators properties such as velocity and force, and determine where and how we will place the test chamber. Once this is complete, the test rig can be used to test the shrapnel shields provided to us by the EPA.
+
+The University of Michigan performs impact testing to test the strength of different composites. We believed we could use different size and shape barrels to simulate different foreign objects impacting the hydraulic shield. After interviewing Professor Waas, a graduate student Amit Salvi, and Terry Larrow the technician who constructed the gun we came to the conclusion that using different size and shape barrels would be expensive and inefficient [11][12][13]. The use of different size and length barrels was explained to us by Amit. He informed us that the different diameters of the muzzle were not necessary since we could just use a single size and then vary the length of the projectile, which would be a cylinder, in order to achieve our necessary force. He also explained that the velocity of the projectile is dependent on the length of the barrel and that using a single long barrel would be our best bet [12]. The idea to use a barrel that could accelerate cubic projectiles is not possible. Terry explained that the friction caused from a cubic projectile and the stress concentrations in the corners would be too great and would not even work [13]. This information steers our pneumatic gun concept away from the idea of using different size and shape barrels, and points us towards a pneumatic gun concept that uses different size projectiles instead.
+
+After using kinematic equations and finding out the required pressures that correspond to our customer’s desires, we went online to find manufacturers for the products we need to fabricate the pneumatic gun. Specially, we are looking to find companies that carry solenoid valves and pressure cylinders. Clark Cooper is a manufacturer of process control products. They have a wide variety of solenoid valves that have high enough operating pressures to suit our needs. We have sent a quote for a solenoid valve and are currently waiting to hear back. Unlike solenoid valves that are carried by many companies, a pressure cylinder that would suit our needs is only available at two companies. This is due to the fact that our pressure cylinder will need a maximum operating pressure of approximately 1500 psi. Hoke, (CIRCOR Instrumentation Technologies) and Hydrospin are the two companies that can provide us with the required specifications for the pressure cylinder. We are currently waiting to hear back from them with a quote.
+
+We talked to Terry Larrow and he said that purchasing steel tubing for the barrel might not be sufficient enough because the tolerance of the inside diameter might not be high enough. We are in contact with a few suppliers to get an idea as to the tolerance of their tubes. We are also going to get a quote from Freeman Manufacturing for a custom made barrel that is 2 feet long, has a ½ inch inside diameter, and a 2 inch outside diameter. Mr. Larrow said that a custom made tool will definitely have a high enough tolerance to suit our needs. The rest of the materials for the pneumatic gun setup can be purchased off-the-shelf from a store.
+
+Engineering Analysis
+There were various specifications for this project considering the broad scope of it. The purpose was to simulate the movement of various sizes and shapes of hoses and projectiles. The pressure range is assumed to be anywhere between 7,000 and 14,000 psi and can reach temperatures of up to 65°C. The hoses can range from approximately 0.25 to 2 in diameters with metal casings on the end. Other projectiles include screws and bolts which could come out as equipment shrapnel. A typical bolt that is used in a pump or engine that is being tested at the EPA has a diameter of 0.5 in (0.0127 m) and a length of 1 in (0.0254 m). This specimen has a mass of approximately 0.0526 kg. Using kinematic and dynamic equations (Eqn. 3-5) shown below, if the pump is pressurized at 7000 psi and 14000 psi and fails, the bolt will have an estimated velocity of 116 m/s and 232 m/s respectively. The calculations for the data stated can be shown in the table below.
+
+Formula here
+(Equation 3)
+
+Formula here
+(Equation 4)
+
+Formula here
+(Equation 5)
+
+Table here
+Table 2: Calculations table
+
+After taking into account the velocity required of the projectiles and the required pressures, a 0.610 m barrel was used in our pneumatic gun setup which had a 0.013 m inner diameter. The dimensions of the outer diameter of the barrel are significant because high pressure will exist in the barrel and if the wall thickness is not sufficient, it could rupture. Using equations for thick-walled pressure vessels (Eqns. 6-8, obtained from [17]) that relate pressure and wall thickness to the material stress, the outer diameter has been determined to be 0.051 m. This ensures that the stress within the material wall is at least a safety factor of ten times less than the material yield stress.
+
+Formula here
+(Equation 6)
+
+Formula here
+(Equation 7)
+
+Formula here
+(Equation 8)
+
+In the stress equations shown above, ri is the inner radius, r0 is the outer radius and p is the pressure. Equation 6 is for hoop stress, Equation7 is for axial stress and Equation 8 is for radial stress. The variable r is the radius at which the stress is evaluated. In our case, it was evaluated at point of maximum point in each case.
+
+Cylinders with 0.013 m diameter, will be loaded into the barrel and tested as projectiles. If different sizes are used for the testing of the cylinders, you can simulate different weights of projectiles.
+
+The velocity of the projectiles was calculated through dynamics and controls. It is controlled by the pressure set in the pressure chamber just before the gun barrel; this will be done by the user of the rig. Once the pressure chamber is pressurized, a solenoid valve is controlled by a trigger that will release the built up pressure into the barrel, accelerating the projectile. Because the velocity of the projectile is significant in determining whether the setup accurately simulates real world testing, we used a velocity measurement system. Two photodiodes connected to an oscilloscope were focused in the path of the moving projectile and the distance between the two was noted. Once the projectile is fired, it moves past the first, and then the second photodiode. The time interval that it takes the projectile to move past both photodiodes, along with the distance between the two, can be used in kinematic equations to find the projectile velocity. Once we calibrated the pneumatic gun, we provided our sponsor with a projectile velocity vs. pressure calibration curve.
+
+The greatest and most important driver for this project is the safety of the workers that operate near the test equipment. The workers at the EPA have worked around these dangerous conditions on a daily basis without any protection for some time. They have constructed shields around various engines and pumps; however, the question is whether or not these are adequate. Creating a controlled test rig that can simulate the same settings as the different machines they work with is necessary in order to standardize the shields. This can be used to find the right size, thickness, material, shape of the casing, and spacing for the fasteners.
+
+Discussion of Design Critique
+As with any design, there are many weaknesses and strengths. With our final project finished, the team believes that the strengths greatly outnumber the weaknesses. The most significant strength of our test fixture is that it meets the most significant customer requirement of simulating real conditions and multiple platforms. The fixture allows the EPA to test various velocities of different projectiles to model many of the same conditions that exist in their labs. Also, with the enclosure and the shield enclosing the pneumatic gun component, the test rig is safe and if used in accordance with our Testing Procedure (shown in Appendix F) will not harm people or equipment in the testing room.
+
+Furthermore, with our enclosure, the user is able to test various size shields because of the aluminum supports. The slots allow the user to test shields at a distance of 2 inches from the barrel to a maximum distance of 18 inches from the barrel. To minimize the force exerted on the test shield holder constructed of wood, we made the aluminum supports run the whole height of the holder so the force is distributed along the whole length, rather than just at the ends. This will prevent the wood from bowing and possibly breaking.
+
+One of the weaknesses that was noticed included the solenoid valve. We noticed that if we pressurized the system over 500 psi, the solenoid would leak. The team realized later that the solenoid valve should be oriented in the horizontal direction, rather than the vertical direction (our design). However, because our design is so versatile, this can easily be changed. Another complication that arose due to the wrong orientation was that the solenoid valve did not close after it was fired, even though it is supposed to be a normally closed valve. Given a larger budget, we could have constructed the enclosure using a different material rather than plywood, allowing the enclosure to last longer. Also, as shown in the Engineering Change for the projectiles, the spheres could have been ordered using a smaller diameter than the barrel itself. This would have allowed us to test spheres and see what kind of impact forces they would exert on the lexan material.
+
+Recommendations
+After finishing our prototype and testing the design there are a few recommendations we would like to address. The first and most important recommendation involves with the solenoid valve. We experienced a substantial leak between the solenoid valve and the pressure chamber. Currently, these two components screw together using simple pipe threaded connectors. We would suggest finding a better connector piece that has higher tolerances, or replacing the current solenoid valve with one that uses welded connections. Also, the solenoid valve tended to stay open even after the voltage supplied to it was discontinued. This was due to the orientation of the solenoid valve. After looking over the specifications on the valve we discovered that the valve needed to be oriented in a vertical fashion instead of the horizontal orientation we used. This can be remedied by simply using elbow connectors to mount the valve vertically. Another possibility is if the valve is replaced due to the leak, we suggest purchasing a valve that does not need a specific orientation.
+
+Our second recommendation is in regards to the projectiles. Since our barrel had such high tolerances, the half inch spheres we ordered would not fit in the barrel. This can be fixed in two different ways. The first and more expensive would to have the barrel sent out and honed to slightly increase the inner diameter so the half inch spheres would then fit inside the barrel. Another option is to continue grinding down the half inch rod we supplied so that projectiles can be cut from this rod. We recommend this second option even though it is more time consuming because it is significantly less expensive than having the barrel honed. Our final recommendation also deals with the projectiles. We recommend trying to actually fire foreign objects. As long as these foreign objects such as a screws or shrapnel can fit inside the barrel with a relatively close tolerance, it can be fired as a projectile. If this was done, our prototype would actually recreate engine failure with total accuracy in a safe and controlled environment. If these recommendations are taken into account we believe the accuracy of our prototype would significantly increase. This would allow the EPA to have a concrete system for setting their safety standards of the shrapnel containment shields.
+
+Conclusions
+The purpose of this project was to create a device that would simulate failure conditions of testing equipment in the NVFEL.Failure of these devices could be deadly; therefore it is very important that safety standards are created for the protection of the workers. In order to standardize these safety requirements, a significant amount of testing was necessary. Our device allows the EPA to standardize the type of material, thickness, surface area, and support system required for the shielding used to enclose their hydraulic equipment.
+
+After performing literature and market research, we generated several concepts of projectile accelerators to be used on the test rig. We researched four main types of accelerators: pendulums, drop impact testers, electromagnetic devices, and pneumatic guns. After considering all our options we generated an alpha design based on a pneumatic gun concept. We chose this concept because it presents the best balance of cost, reliability, manufacturability and ease of use while meeting all the customer requirements.
+
+Our alpha design is setup as follows: a nitrogen tank is connected to a pressurization chamber (through a pressure regulator), which is in turn connected to a solenoid valve that outlets to a barrel. The projectile is placed in the barrel, and when the solenoid valve is activated the projectile will be fired. In order to manufacture our alpha design prototype we needed to machine the barrel and supports, all other parts (solenoid valve, pressurization chamber, nitrogen tank, pressure regulator and solenoid valve controller) will either be purchased, or supplied by our sponsor. The main design variables were the length and thickness of the barrel; the length will affect the overall projectile velocity and the thickness must meet a minimum requirement since the barrel is essentially a thick walled pressure vessel when it is pressurized. Since the rest of the components were already manufactured there is not a significant amount of design work that needed to be performed.
+
+Our pneumatic gun can safely impact test the safety shields used by the EPA. The design can fire projectiles that have different lengths, masses, and shapes. These differences can be used to simulate different foreign objects that would actually impact the shield at the EPA upon equipment failure. These projectiles can also be fired at different velocities by varying the pressure. We also incorporated a way to change the distance between the end of the barrel and the point of impact on the shield. All of these features allow the EPA to accurately simulate hydraulic engine failure in a safe and controlled environment. The total cost of our prototype was $ 1500.00. Since our Mechanical Engineering 450 class only supplied us with $400, the EPA provided the additional funding needed to complete this project.
+
+Acknowledgements
+We would graciously like to thank the EPA, specifically Steve Mayotte, and Andy Moskalik for all of their help and support! We also extend thanks to Dr. Dinda and Professor Skerlos for their guidance as Mechanical Engineering 450 instructors. We would like to thank Terry Larrow and Amit Salvi for their knowledgeable contributions to this project.
+
+References
+[1]	"Double Pendulum Dynamic Tear", Motorized pendulum, MPM Technologies, http://www. mpmtechnologies.com/Double-PendulumDT.htm.
+[2]	"Drop Weight Testers for Impact Drop Tests", Instron, 825 University Ave, Norwood, MA, 2008, http://www.instron.us/wa/products/impact/dropweight_compare.aspx.
+[3]	"Impact Resistance of Plastic Film by the Free-Falling Dart Method", Intertek Plastics Technology Laboratories, 2008, http://www.ptli.com/testlopedia/tests/Drop_Dart_D1709.asp.
+[4]	Kolm, H., Fine, K., Williams, F., Mongeau, P., "Electromagnetic Guns, Launchers and Reaction Engines", 1980, http://www.coilgun.info/theory/electroguns.htm.
+[5]	Bennett, Jamin and Meepagala, Ruwan, "Coefficients of Restitution", The Physics Factbook, 2006. http://hypertextbook.com/facts/2006/restitution.shtml.
+[6]	Higgins, Kathleen M. "Ballistics Resistance of Personal Body Armor." National Institute of Justice Law Enforcement and Correction Standards and Testing Program. June 2001. U.S. Department of Justice. Accessed 20 January 2008. http://www.nlectc.org/pdffiles/0101.04RevA.pdf
+[7]	"Hypervelocity Impact Tests." Hypervelocity Impact Technology Facility Main Menu. Hypervelocity Impact Technology Facility. Accessed 20 January 2008. http://hitf.jsc.nasa.gov/hitfpub/main/index.html
+[8]	Poormon, Kevin L. "Foreign Object Damage Studies." University of Dayton Research Institute What We Do. 2007. University of Dayton Research Institute. http://www.udri.udayton.edu/NR/exeres/5D5403EC-0135-43F0-A7A5-5C39E4D8E6E5.htm
+[9]	Grosch, Donald J. Inhibited Shape Charge Launcher Testing of Spacecraft Shield Designs. September 1996. Southwest Research Institute. Accessed 20 January 2008. http://ntrs.nasa.gov/archive/nasa/casi.ntrs.nasa.gov/19970027381_1997 044631.pdf
+[10]	Pescovitz, David. "Protecting Planes with Fabric." Lab Notes: Research from Berkeley College of Engineering. 2004. University of California Berkeley. Accessed 20 January 2008. http://www.coe.berkeley.edu/labnotes/0904/ fabric.html
+[11] Waas, Anthony. Email interview. 4 February 2008.
+[12]	Salvi, Amit. Personal interview. 8 February and 12 February 2008.
+[13]	ME Workshop Tech
+[14]	"Small Parts Incorporated", Stainless Steel Balls Type 316, 2008, http://www.smallparts.com /products/descriptions/bnmx.cfm?Source=GG&cpgn=Wire&grp=Nickel%20Silver&strg=German%20Silver%20Wire&gclid=CIja2K_D_pECFQ7GGgodHDmo9Q.
+[15]	"Application Note AN-3005: Design Fundamentals for Phototransistor Circuits", Fairchild Semiconductor Corporation, 2002. http://www.fairchildsemi.com/pf/QS/ QSD2030.html.
+[16] Larrow, Terry. Personal interview. 12 February and 14 February 2008.
+[17]	Choi, S., POSTECH Haptics and Virtual Reality Lab, http://hvr.postech.ac.kr/wiki/wiki.php/ DeformableObjectRendering?action=download&value=DeformableObjectRendering%2Fvessels.pdf.
+Appendix A: Bill of Materials
+
+Table here
+Appendix B: Engineering Change Notices
+
+Figure here
+Figure here
+Appendix B continued: Engineering Change Notices
+
+Figure here
+Figure here
+Appendix B continued: Engineering Change Notices
+
+Figure here
+Figure here
+Appendix C: Design Analysis Assignment
+
+Material Selection
+
+The two major components of our pneumatic gun we will be analyzing for material selection will be the barrel of the gun, and the projectiles.
+
+The function of the barrel is to house the projectiles while they are accelerated to the desired speed. The barrel must be long enough to allow the projectile to reach the necessary speed provided by the pressure. It also must have a 0.5 inch inner diameter in order to launch a 0.5 inch diameter projectile and simulate equipment failure conditions, since this is the size of a typical bolt used in EPA pumps. The thickness of the barrel was designed to be 1.75 inches, since insufficient wall thickness may cause the barrel to rupture under high pressures. The thickness was determined using thick walled pressure vessel equations, shown in Eq. 6 – 8 on page 21.
+
+In terms of material, the barrel must have a smooth surface finish on the inside so projectiles don’t get lodged in the barrel upon firing. Also, a rough surface finish would create high friction between the barrel and the projectile, reducing the speed. The cost of the barrel material must be within our allowable budget. The material used to construct the barrel also must have large yield strength to prevent the barrel from rupturing under high pressures.
+
+Utilizing CES software, we narrowed down material choices for the barrel by minimizing price while maximizing yield strength within our calculated safety factor. While doing this, the top five stainless steels generated by CES were AISI 409, AISI 429, AISI 430FR, AISI 410S, and AISI 304.
+
+Our final choice for the material of the barrel was AISI 304 stainless seamless steel. This material was chosen based on its availability and affordability from A1 Alloys. We were able to have the inner diameter of the barrel drilled to a high tolerance, have the piece cut down to a 2 foot length, and have the product shipped to us in an acceptable amount of time, all while staying inside our budget. The barrel was manufactured with a tolerance of ± 0.005 in for the inner diameter. Honing the barrel would have generated a better tolerance, however this process was not affordable with our given budget.
+
+The function of the projectiles is to simulate bolts sheared off of hydraulic pumps in the event of equipment failure. In order to correctly simulate bolts, the projectiles must have a diameter of 0.5 inches, which is the size of a typical bolt used in the EPA lab. The length of the projectiles must have the ability to be varied, so different weighted projectiles can be simulated and tested in order to impact the test shields with various forces. The projectiles must be able to simulate both sharp and blunt impacts to the shielding.
+
+In terms of material, the projectiles must be similar to the material of bolts used in the EPA lab, which will give more accurate impact test results. The projectiles must be made of material which is affordable given our budget.
+
+The material chosen to create the projectiles was rods of stainless steel. These rods were chosen based off of their inexpensive price and availability at Home Depot. The rods were cut down into small cylinders, some with blunt ends, and others with sharp ends which were generated using a 45o angle bit on a lathe.
+
+Appendix C continued: Design Analysis Assignment
+
+Design for Assembly
+
+In the world of manufacturing, the assembly of a variety of products entails large costs and a large amount of labor. In order to minimize these 2 parameters, we’ve completed a Design for Assembly (DFA) Analysis to try to reduce the number of parts and simplify the assembly of the remaining parts of our Pneumatic Gun. We’ve used the Boothroyd-Dewhurst method for the Design for Assembly because it is the most widely used in Industry. The system being analyzed is shown in the figure below. The DFA charts used to calculate the assembly efficiency of our Pneumatic Gun are shown on pages 35 and 36. They include the manual handling and insertion estimated times. After doing a thorough analysis, the design efficiency of our final design was found to be 0.285. The analysis can be seen in the table on page 34. For the design efficiency, we assumed that each part takes 3 seconds to assemble.
+
+Figure here
+Pneumatic Gun System being Analyzed for DFA Figure
+
+Appendix C continued: Design Analysis Assignment
+
+Table here
+Design for Assembly Analysis for Pneumatic Gun System Table
+
+Redesigning the System
+
+The shaded gray cells in the DFA figure are the components of the system that have been redesigned or altered to increase the design efficiency. The pressure cylinder was connected to the solenoid valve by a 90 degree elbow and a male to female nipple connector. The male to female nipple connector can be removed from the system all together if we had just used a larger elbow. The base that the barrel rests on can also be removed and instead, the whole base that the whole system sits on can be altered to allow the barrel to nest properly. Another change that can be made is to reduce the screw count from 10 to 8 because the down force that is created from the U-bolts would be sufficient enough to keep the barrel base secure. After consulting our sponsors, we were told that we could reduce the number of U-bolts used in our system. Instead of using 2 U-bolts on each end to keep the pressure cylinder secure, we could use 1 in the middle because the pressure cylinder is made using steel mesh and it would be strong enough to keep it from collapsing. With the reduction of 2 U-bolt, this eliminates 4 nuts and washers from being used. With the redesign, we’ve improved the design efficiency to 0.355.
+
+Appendix C continued: Design Analysis Assignment
+
+Table here
+Redesign for Assembly Analysis for Pneumatic Gun System Table
+
+Appendix C continued: Design Analysis Assignment
+
+Figure here
+Appendix C continued: Design Analysis Assignment
+
+Figure here
+Appendix C continued: Design Analysis Assignment
+
+Environmental Sustainability
+
+AISI 304 Stainless Steel has a bigger environmental impact based on the following graphs. As shown in the total emissions graph, it generates more emissions in raw, air, waste, and especially water than AISI 301 Stainless Steel. Based on the characterization graph, 304 generates a much higher percentage of resp. inorganics, climate change, acidification, and minerals, and a reasonably higher percentage of ozone layer. However, 304 has a lower percentage of ecotoxicity than 301. Based on the normalization graph, 304 had a larger impact on human health and a significantly larger impact on resources. The single point score graph shows the same results with 304 having a score of 41 for resources while the score for 301 was 9.04 points. Overall, AISI 304 Stainless Steel had a much larger environmental impact than AISI 301 Stainless Steel. Knowing what we know now about material selection, we would definitely consider using 301 Stainless Steel, or possibly even another steel with less environmental impact. For our project, material selection was done out of availability and happens to be an arbitrary steel. If we could choose a material with somewhat similar properties that has a reduced environmental footprint, we would definitely do so. However, in the bigger picture, we aren’t mass producing our prototype so the difference in material doesn’t have that large of an environmental impact.
+
+Figure here
+Graph of total emissions
+
+Figure here
+Graph of characterization
+
+Figure here
+Graph of single point score
+
+Figure here
+Graph of normalization
+
+Appendix C continued: Design Analysis Assignment
+
+Design for Safety
+
+Meeting the necessary safety requirements was a top priority for our final design. Our sponsors explicitly mentioned that our prototype had to be extremely safe otherwise they would not allow any type testing. Thus, we were sure to design our prototype to have sufficient safety factors since it must be manually pressurized.
+
+During the design process we made sure to incorporate the necessary engineering equations to help produce a final product that was impervious to failure. We started with the design of the barrel. Utilizing thick-walled pressure vessel equations we designed the barrel to have a safety factor of approximately 14. We then found a solenoid valve that could safely operate under pressures of up to 5000 psi. We also constructed the pressure chamber using fittings and hoses that could also withstand pressures up to 5000 psi. The barrel, solenoid, and pressure chamber fit together using simple pipe threads. To ensure these fittings were tightly secured we applied Lock Tight Swack to the threads to help seal the connections. After the barrel, solenoid, and pressure chamber were connected we secure the set-up to a two by eight inch plank of wood using several U bolts made of steel. Once the gun was securely fastened to the plank of wood we enclosed the structure with a shield. This shield was made of two quarter inch thick pieces of lexan. This gave the shield a total thickness of one-half inch and the material it was constructed of is a high strength polycarbonate. This shield was clear to allow for observation and was also incorporated to contain any ejected pieces if the gun was to fail. We then constructed the testing enclosure using one-half inch thick plywood. Since the plywood would never take a direct impact from the gun we calculated the ricochet effect and found that the plywood was more than sufficient in containing any rebounding projectiles. We also stacked several pieces of lexan behind the impacted shield. This stack of lexan is about eight inches thick and was placed behind the impacted shield to ensure that a projectile would not penetrate the impact shield and continue on and exit through the back of the testing enclosure. With all of these feature incorporated into our design we were sure our final product was safe in every aspect.
+
+Since safety was one of our top priorities we wanted to double check our final design. We did this by having a safety inspector at the EPA come and personally evaluate our prototype. We also wrote up a list of testing procedures that would allow us to inspect our design once it is pressurized. This inspector was more than satisfied with our design and testing procedures and made only a single comment. The inspector’s restriction was that the gun cannot be fired while someone is in the room. We assured him this would not happen and showed him that the valve is opened using a 5 V DC supply. This source was inside of the observation room that is enclosed behind six inch thick bullet-proof glass. Also this voltage supply has three safety switches that must be triggered before any current is released to the solenoid valve. After this was made clear to the inspector he was more than happy to sign-off on our prototype and allow us to begin testing.
+
+After testing, we again inspected our prototype and found that it operated perfectly besides one small leak which did not present itself as a possible source of failure. Since safety was a major factor in our design process we were sure to over design our prototype to withstand pressures up to 5000 psi. This is more than sufficient since the EPA will most likely be testing in the pressure ranges less than 2000 psi. Using all of these design features we were able to produce a prototype and testing procedure that was completely safe to operate.
+
+Appendix C continued: Design Analysis Assignment
+
+Manufacturing Process Selection
+
+A probable real world production volume for our design would be on the order of 100 units. Our design meets very specific needs and would probably not need to be manufactured on a very large scale. There would probably be very few labs that would have need for the kind of tester we have designed. Also, client safety would be a large concern and proper measures would need to be implemented to make sure that the gun is not being used incorrectly.
+
+The two components that we will describe how to manufacture are: the barrel and the projectiles. The barrel will be made of AISI 304 stainless steel. There are two parts related to the manufacturing of this part: making the cylinder and creating the hole. From the CES Manufacturing process selector, the general shape of the cylinder can be made through extrusion. The best option for machining the hole is drilling. This process has a relatively low tooling cost but is high in labor intensity. This is good for our application since we would not want to have a high capital investment which in the end would not really be needed. This process can also achieve the needed tolerance of 0.001in. This process is very slow but high throughput is not needed for this application. In the event that higher tolerances are needed a mechanical machining polishing process can be added. However, this is very expensive and unnecessary.
+
+For the projectiles, AISI 316 stainless steel has been selected as a material. In order to achieve the high tolerances needed for the projectiles to be compatible to the shaft, grinding is the best option for manufacturing. This process has low tooling costs and labor intensities. So for its low overall cost and high precision this is the best process for manufacturing the projectiles.
+
+Appendix D: QFD
+
+Table here
+Appendix E: Preliminary Concept Designs
+
+Figure here
+Picture of motorized pendulum [1]
+
+Figure here
+Dynatup® 9200 Series Impact Test Machine [2]
+
+Appendix E continued: Preliminary Concept Designs
+
+Figure here
+Atlas / Dynisco CS-126 Dart Impact Tester [3]
+
+Appendix E continued: Preliminary Concept Designs
+
+Figure here
+Concept Design sketch of a rail gun [4]
+
+Figure here
+Concept Design sketch of a coil gun [4]
+
+Appendix E continued: Preliminary Concept Designs
+
+Loading...
+
+Figure here
+Concept Design sketch of a pneumatic gun
+
+Appendix F: Testing Procedure for Pneumatic Gun
+
+Initial Dry Fire Test:
+
+1. Make sure gun is depressurized by completely opening the bleed valve. 2. Check all threaded connections to ensure they are not loose. 3. Attach nitrogen tank to the end of pressure hose and securely tighten these connections. 4. Completely close the bleed valve. 5. Slowly open the valve on the nitrogen tank to pressurize the system to approximately 100 psi on the supplied pressure gauge and transducer. 6. Slightly open the bleed valve to depressurize if pressure exceeds 100 psi and then close the bleed valve to maintain an internal pressure of 100 psi. 7. Once system is pressurized to 100 psi double check all connections for any leaks or possible signs of failure. 8. Exit room and trigger the solenoid valve using a 12 V DC source with NO projectile loaded into the barrel. 9. If gun fires properly repeat steps 1-6 at an internal pressure of 500 psi, 1000 psi, and 1500 psi.
+Impact Test:
+
+1. DO NOT COMPLETE THE BELOW STEPS UNTIL ALL DRY FIRE TESTS ARE COMPLETE AND GUN MEETS ADEQUATE SAFETY STANDARDS. 2. Insert desired test shield at the desired distance by attaching the shield to the test holder using the bolts and spacers. 3. Replace lexan panel on testing enclosure to contain any possible ricochet. 4. Make sure gun is completely depressurized by completely opening the bleed valve. 5. Insert ¼" long cylinder projectile into barrel, then using the plunger push the projectile to the very back of the barrel so it is at the outlet of the solenoid valve. 6. Check all threaded connections on the gun to ensure they are not loose. 7. Attach nitrogen tank to the end of pressure hose and securely tighten these connections. 8. Completely close the bleed valve. 9. Slowly open the valve on the nitrogen tank to pressurize the system to approximately 1000 psi on the supplied pressure gauge and transducer. 10. Slightly open the bleed valve to depressurize if pressure exceeds 1000 psi and then close the bleed valve to maintain an internal pressure of 1000 psi. 11. Exit room and trigger the solenoid valve using a 12 V DC source. 12. After impact occurs, remove lexan panel from the testing enclose and observe the effects the impact had on the shield. 13. If gun fires properly repeat steps 2-12 at an internal pressure of 1500 psi and 2000 psi to ensure the gun works properly at high internal pressures.

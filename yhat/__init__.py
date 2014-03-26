@@ -8,4 +8,4 @@ from .deployment.input_and_output import df_to_json
 # client
 from .api import Yhat
 
-__version__ = "0.6.14"
+__version__ = "0.6.16"

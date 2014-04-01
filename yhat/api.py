@@ -395,6 +395,7 @@ need to connect to the server first. try running "connect_to_socket"
         if not re.match("^[A-Za-z0-9_]+$", name):
             raise Exception("Model name must only contain: [A-Za-z0-9_]")
         bundle = self._extract_model(name, model, session)
+        bundle['apikey'] = self.apikey
         with open("%s.yhat" % name, "w") as f:
             bundle = json.dumps(bundle)
             if compress==True:

@@ -144,11 +144,15 @@ def _extract_module(module_name, modules={}):
         tree = ast.parse(module_source)
         for thing in ast.walk(tree):
             if hasattr(thing, "module"):
+                print "THING: _extract_module: %s" % str(thing.module)
                 modules.update(_extract_module(thing.module))
             elif isinstance(thing, (ast.Import, ast.ImportFrom)):
                 for imp in thing.names:
                     if imp.name!="*":
+                        print "IMP: _extract_module: %s" % str(img.name)
                         modules.update(_extract_module(imp.name))
+    else:
+        modules[module_name] = None
     return modules
 
 
@@ -176,6 +180,7 @@ def _spider_function(function, session, pickles={}):
     pickles: dictionary
         dictionary of variable names and their values as pickled strings
     """
+
     if '_objects_seen' not in pickles:
         pickles['_objects_seen'] = []
     pickles['_objects_seen'].append(str(function))
@@ -188,6 +193,9 @@ def _spider_function(function, session, pickles={}):
         source += _get_source(function) + '\n'
     
     for varname in _get_naked_loads(function):
+        if varname in pickles['_objects_seen']:
+            continue
+        pickles['_objects_seen'].append(varname)
         if varname not in session:
             continue
         obj = session[varname]
@@ -200,7 +208,7 @@ def _spider_function(function, session, pickles={}):
                 source += new_source + '\n'
                 imports += new_imports
                 pickles.update(new_pickles)
-                modules.update(new_modules )
+                modules.update(new_modules)
             else:
                 modules.update(_extract_module(obj.__module__))
                 ref = inspect.getmodule(obj).__name__
@@ -240,7 +248,7 @@ def save_function(function, session):
     pickles = {
         "objects": pickles,
         "code": source_code,
-        "modules": modules.values()
+        "modules": [value for name, value in modules.items() if value is not None]
     }
 
     if "_objects_seen" in pickles["objects"]:

@@ -144,12 +144,10 @@ def _extract_module(module_name, modules={}):
         tree = ast.parse(module_source)
         for thing in ast.walk(tree):
             if hasattr(thing, "module"):
-                print "THING: _extract_module: %s" % str(thing.module)
                 modules.update(_extract_module(thing.module))
             elif isinstance(thing, (ast.Import, ast.ImportFrom)):
                 for imp in thing.names:
                     if imp.name!="*":
-                        print "IMP: _extract_module: %s" % str(img.name)
                         modules.update(_extract_module(imp.name))
     else:
         modules[module_name] = None

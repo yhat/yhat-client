@@ -339,7 +339,7 @@ need to connect to the server first. try running "connect_to_socket"
         bundle["reqs"] = bundle["reqs"].strip().replace('"', '').replace("'", "")
         return bundle
     
-    def deploy(self, name, model, session, sure=False):
+    def deploy(self, name, model, session, sure=False, packages=[]):
         """
         Deploys your model to a Yhat server
 
@@ -360,12 +360,15 @@ need to connect to the server first. try running "connect_to_socket"
         # a new version
         if not re.match("^[A-Za-z0-9_]+$", name):
             raise Exception("Model name must only contain: [A-Za-z0-9_]")
+        if not isinstance(packages, list):
+            raise Exception("`packages` must be a list of ubuntu packages to install")
         if sure==False:
             sure = raw_input("Are you sure you want to deploy? (y/N): ")
             if sure.lower()!="y":
                 print "Deployment canceled"
                 sys.exit()
         bundle = self._extract_model(name, model, session)
+        bundle['packages'] = packages
         if self._check_obj_size(bundle)==False:
             # we're not going to deploy; model is too big, but let's give the 
             # user the option to upload it manually
@@ -378,7 +381,7 @@ need to connect to the server first. try running "connect_to_socket"
             # TODO: upload w/ a progress bar
             return self.post("deployer/model", self.q, bundle)
 
-    def deploy_to_file(self, name, model, session, compress=True):
+    def deploy_to_file(self, name, model, session, compress=True, packages=[]):
         """
         Bundles a local version of your model that can be manually uploaded to
         the server.
@@ -394,8 +397,11 @@ need to connect to the server first. try running "connect_to_socket"
         """
         if not re.match("^[A-Za-z0-9_]+$", name):
             raise Exception("Model name must only contain: [A-Za-z0-9_]")
+        if not isinstance(packages, list):
+            raise Exception("`packages` must be a list of ubuntu packages to install")
         bundle = self._extract_model(name, model, session)
         bundle['apikey'] = self.apikey
+        bundle['packages'] = packages
         with open("%s.yhat" % name, "w") as f:
             bundle = json.dumps(bundle)
             if compress==True:

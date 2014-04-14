@@ -57,7 +57,7 @@ class YhatModel(object):
         """
         pass
 
-    def serve(self):
+    def serve(self, host='localhost', port=5000):
         """
         Creates a test server on port 5000 for testing purposes. This is a way to test
         your model before you deploy it to production.
@@ -80,7 +80,7 @@ class YhatModel(object):
                     return jsonify(result)
             else:
                 return "Not Implemented."
-        app.run(debug=True)
+        app.run(host=host, port=port, debug=True)
 
     def run(self, testcase=None):
         """

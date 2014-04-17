@@ -215,7 +215,7 @@ class Yhat(API):
             same data, but compatible with JSON
         """
         if isinstance(data, pd.DataFrame):
-            data_values = data.transpose().to_json(orient='values',data_format='iso')
+            data_values = data.transpose().to_json(orient='values',date_format='iso')
             data_values = json.loads(data_values)
             try:
                 from collections import OrderedDict

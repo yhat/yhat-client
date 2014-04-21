@@ -331,7 +331,10 @@ need to connect to the server first. try running "connect_to_socket"
         bundle["language"] = "python"
         bundle["modelname"] = name
         bundle["className"] = model.__name__
-        bundle["reqs"] = getattr(model, "REQUIREMENTS", "")
+        reqs = getattr(model, "REQUIREMENTS", "")
+        if isinstance(reqs,list):
+            reqs = '\n'.join(reqs)
+        bundle["reqs"] = reqs
         # make sure we freeze Yhat so we're sure we're using the right version
         # this makes it a lot easier to upgrade the client
         import yhat

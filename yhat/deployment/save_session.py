@@ -225,6 +225,26 @@ def _spider_function(function, session, pickles={}):
             pickles[varname] = pickle.dumps(obj)
     return imports, source, pickles, modules
 
+def _detect_future_imports(session):
+    """
+    Detect all __future__ imports. Since these imports must come first in
+    the source code, these are attempt to be detected outside of other
+    spidering.
+    
+    Parameters
+    ----------
+    session: dictionary
+        globals() from the user's environment
+    """
+    imports = []
+    for k in session.keys():
+        v = session[k]
+        if hasattr(v,"__module__"):
+            if v.__module__ == "__future__":
+                if not k.startswith('_'):
+                    imports.append("from __future__ import %s" % k)
+    return imports
+
 def save_function(function, session):
     """
     Saves a user's session and all dependencies to a big 'ole JSON object with
@@ -237,6 +257,7 @@ def save_function(function, session):
     session: dictionary
         globals() from the user's environment
     """
+    future_imports = "\n".join(_detect_future_imports(session))
     imports, source_code, pickles, modules = _spider_function(function, session)
     # de-dup and order the imports
     imports = sorted(list(set(imports)))
@@ -245,6 +266,7 @@ def save_function(function, session):
     source_code = "\n".join(imports) + "\n\n\n" + source_code
     pickles = {
         "objects": pickles,
+        "future": future_imports,
         "code": source_code,
         "modules": [value for name, value in modules.items() if value is not None]
     }

@@ -241,6 +241,8 @@ def _detect_future_imports(session):
         v = session[k]
         if hasattr(v,"__module__"):
             if v.__module__ == "__future__":
+                if k is 'print_function':
+                    continue
                 if not k.startswith('_'):
                     imports.append("from __future__ import %s" % k)
     return imports

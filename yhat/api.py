@@ -112,12 +112,14 @@ as a pandas DataFrame. If you're still having trouble, please contact:
             raise e
             print "Message: %s" % str(rsp)
     
-    def handshake(self, model_name):
+    def handshake(self, model_name, model_owner=None):
         """
         Parameters
         ----------
         model_name: string
             name of the model you want to connect to
+        model_owner: string
+            username of the model owner for shared models. optional
 
         Returns
         -------
@@ -126,7 +128,8 @@ as a pandas DataFrame. If you're still having trouble, please contact:
         """
         ws_uri = "{BASE_URI}/{USERNAME}/models/{MODEL_NAME}/"
         ws_base = self.base_uri.replace("http://", "ws://")
-        ws_uri = ws_uri.format(BASE_URI=ws_base, USERNAME=self.username,
+        username = self.username if model_owner is None else model_owner
+        ws_uri = ws_uri.format(BASE_URI=ws_base, USERNAME=username,
                                MODEL_NAME=model_name)
         ws = websocket.create_connection(ws_uri)
         auth = { 
@@ -224,7 +227,7 @@ class Yhat(API):
                 data = dict(zip(data.columns,data_values))
         return data
 
-    def predict(self, model, data):
+    def predict(self, model, data, model_owner=None):
         """
         Executes a single prediction via the Yhat API.
 
@@ -235,6 +238,8 @@ class Yhat(API):
         data: dictionary/data frame
             data required to make a single prediction. this can be a dict or
             a dataframe
+        model_owner: string
+            username of the model owner for shared models. optional
 
         Returns
         -------
@@ -244,8 +249,9 @@ class Yhat(API):
         data = self._convert_to_json(data)
         q = self.q
         q['model'] = model
+        model_user = self.username if model_owner is None else model_owner
         if self.base_uri!=BASE_URI:
-            endpoint = "%s/models/%s/" % (self.username, model)
+            endpoint = "%s/models/%s/" % (model_user, model)
         else:
             data = {"data": data}
             endpoint = 'predict'
@@ -295,15 +301,17 @@ need to connect to the server first. try running "connect_to_socket"
         while True:
             yield self.ws.recv()
 
-    def connect_to_socket(self, model):
+    def connect_to_socket(self, model, model_owner=None):
         """
         Connects to the model's WebSocket endpoint. This is a pre-requisite for
         making predictions via the WebSocketServer.
 
         model: string
             name of the model you want to connect to
+        model_owner: string
+            username of the model owner for shared models. optional
         """
-        self.ws = self.handshake(model)
+        self.ws = self.handshake(model, model_owner)
 
     def _extract_model(self, name, model, session):
         """

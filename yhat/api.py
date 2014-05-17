@@ -99,6 +99,7 @@ array, try casting it to a list (x.tolist()), or consider structuring your data
 as a pandas DataFrame. If you're still having trouble, please contact: 
 {URL}.""".format(URL="support@yhathq.com")
                 print msg
+                return
             response = urllib2.urlopen(req, data)
             rsp = response.read()
             try:

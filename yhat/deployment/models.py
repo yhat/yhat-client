@@ -72,8 +72,13 @@ class YhatModel(object):
                 data = request.json
                 try:
                     result = self.execute(data)
-                    if isinstance(result, pd.DataFrame):
-                        result = result.to_dict('list')
+                    try:
+                        import pandas as pd
+                        if isinstance(result, pd.DataFrame):
+                            result = result.transpose().to_json(orient='values',date_format='iso')
+                            result = json.loads(result)
+                    except ImportError:
+                        None
                     return jsonify(result)
                 except Exception, e:
                     result = {"error": str(e)}

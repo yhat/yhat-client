@@ -18,11 +18,6 @@ init()
 from deployment.models import YhatModel
 from deployment.save_session import save_function, _get_source
 
-try:
-    import pandas as pd
-except:
-    warnings.warn("Could not import pandas")
-
 BASE_URI = "http://api.yhathq.com/"
 
 
@@ -217,6 +212,11 @@ class Yhat(API):
         data: object
             same data, but compatible with JSON
         """
+        try:
+            import pandas as pd
+        except ImportError:
+            return data
+
         if isinstance(data, pd.DataFrame):
             data_values = data.transpose().to_json(orient='values',date_format='iso')
             data_values = json.loads(data_values)

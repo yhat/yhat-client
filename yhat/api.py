@@ -334,7 +334,6 @@ need to connect to the server first. try running "connect_to_socket"
             msg += "indentation error."
             raise Exception(msg)
 
-        # TODO: change this mofo'
         bundle = save_function(model, session)
         bundle["largefile"] = True
         bundle["username"] = self.username

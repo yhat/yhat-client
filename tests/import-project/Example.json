@@ -1,0 +1,32 @@
+{
+  "packages": [],
+  "modelname": "Example",
+  "future": "",
+  "largefile": true,
+  "username": "greg",
+  "code": "from another.testfile import bye\nfrom first import Support\nfrom yhat.deployment.input_and_output import preprocess\nfrom yhat.deployment.models import YhatModel\nimport json\nimport pickle\nfrom yhat.deployment import terragon\n\n\n# code for <class '__main__.Example'>\nclass Example(YhatModel):\n    @preprocess(in_type=dict, out_type=dict)\n    def execute(self, data):\n        goodbye(x)\n        return Support().hello(10)\n\n# code for <function goodbye at 0x10ffc6140>\ndef goodbye(y):\n    bye()\n    print y, \"goodbye!\"\n\n\n",
+  "language": "python",
+  "objects": {
+    "x": "gAJdcQAoSwBLAUsCSwNLBEsFSwZLB0sISwllLg==\n"
+  },
+  "apikey": "fCVZiLJhS95cnxOrsp5e2VSkk0GfypZqeRCntTD1nHA",
+  "modules": [
+    {
+      "parent_dir": "",
+      "name": "second.py",
+      "source": "\n\ndef puts(x):\n    return \"Hello: \" % str(x)\n"
+    },
+    {
+      "parent_dir": "another",
+      "name": "testfile.py",
+      "source": "\n\ndef bye():\n    return \"bye!\"\n"
+    },
+    {
+      "parent_dir": "",
+      "name": "first.py",
+      "source": "from second import puts\nfrom bs4 import BeautifulSoup\nimport urllib\n\ndef hello():\n    return puts(\"Greg\")\n\n\nclass Support(object):\n    def hello(self, one):\n        return 100\n\nx = range(10)\n"
+    }
+  ],
+  "reqs": "yhat==0.8.2",
+  "className": "Example"
+}

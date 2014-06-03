@@ -1,4 +1,5 @@
 import pickle
+import terragon
 import ast
 import inspect
 import types
@@ -199,7 +200,7 @@ def _spider_function(function, session, pickles={}):
         obj = session[varname]
         # checking to see if this is an instance of an object
         if hasattr(obj, "__name__")==False:
-            pickles[varname] = pickle.dumps(obj)
+            pickles[varname] = terragon.dumps_to_base64(obj)
         elif hasattr(obj, "__module__"):
             if obj.__module__=="__main__":
                 new_imports, new_source, new_pickles, new_modules = _spider_function(obj, session, pickles)
@@ -222,7 +223,7 @@ def _spider_function(function, session, pickles={}):
                 imports.append("import %s" % (varname))
         else:
             # catch all. if all else fails, pickle it
-            pickles[varname] = pickle.dumps(obj)
+            pickles[varname] = terragon.dumps_to_base64(obj)
     return imports, source, pickles, modules
 
 def _detect_future_imports(session):
@@ -265,6 +266,7 @@ def save_function(function, session):
     imports = sorted(list(set(imports)))
     imports.append("import json")
     imports.append("import pickle")
+    imports.append("from yhat.deployment import terragon")
     source_code = "\n".join(imports) + "\n\n\n" + source_code
     pickles = {
         "objects": pickles,

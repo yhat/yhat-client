@@ -266,7 +266,7 @@ def save_function(function, session):
     imports = sorted(list(set(imports)))
     imports.append("import json")
     imports.append("import pickle")
-    imports.append("try:\n    from yhat.deployment import terragon\n    except:\n    pass")
+    imports.append("try:\n    from yhat.deployment import terragon\nexcept:\n    pass")
     source_code = "\n".join(imports) + "\n\n\n" + source_code
     pickles = {
         "objects": pickles,

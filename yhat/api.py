@@ -10,6 +10,8 @@ import uuid
 import zlib
 import re
 import os
+import os.path
+import subprocess
 from colorama import init
 from colorama import Fore
 
@@ -414,7 +416,8 @@ need to connect to the server first. try running "connect_to_socket"
         bundle = self._extract_model(name, model, session)
         bundle['apikey'] = self.apikey
         bundle['packages'] = packages
-        with open("%s.yhat" % name, "w") as f:
+        filename= "%s.yhat" % name
+        with open(filename, "w") as f:
             bundle = json.dumps(bundle)
             if compress==True:
                 bundle = zlib.compress(bundle)
@@ -427,6 +430,27 @@ need to connect to the server first. try running "connect_to_socket"
         msg = msg % (upload_url, "%s.yhat" % name)
         print Fore.CYAN + msg
         print Fore.RESET
+        return filename 
+
+    def deploy_with_scp(self,name,model,sessions,compress=True,packages=[],pem_path=None):
+        if pem_path is None:
+            raise Exception("Please specify your pem file for authentication through the `pem_path` argument")
+            return
+        if not os.path.isfile(pem_path):
+            raise Exception("No file found under '%s'" % pem_path)
+        print "Deploying to file"
+        filename = self.deploy_to_file(name,model,sessions,compress=compress,packages=packages)
+        print "Sending over scp"
+        http_re = re.compile("^http://")
+        server_uri = http_re.sub("",self.base_uri.strip())
+        server_uri = server_uri.strip("/")
+        scp_cmd = "scp -i %s %s ubuntu@%s:~/" % (pem_path,filename,server_uri)
+        subprocess.check_call(scp_cmd,shell=True)
+        ssh_cmd = "ssh -i %s ubuntu@%s 'sudo mv ~/%s /var/yhat/headquarters/uploads/'" % (pem_path,
+                                                                                          server_uri,
+                                                                                          filename)
+        subprocess.check_call(ssh_cmd,shell=True)
+        os.remove(filename)
 
 if __name__=="__main__":
     import pandas as pd

@@ -3,7 +3,7 @@ from setuptools import find_packages
 
 setup(
     name="yhat",
-    version="0.10.0",
+    version="1.0.0",
     author="Greg Lamp",
     author_email="greg@yhathq.com",
     url="https://github.com/yhat/yhat-client",
@@ -25,6 +25,7 @@ setup(
         "websocket-client==0.12.0",
         "prettytable==0.7.2",
         "dill==0.2b1",
+        "terragon==0.1.4"
     ],
     long_description=open("README.rst").read(),
     keywords=['yhat', 'scikits', 'numpy', 'pandas'],

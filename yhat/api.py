@@ -19,7 +19,6 @@ init()
 
 from deployment.models import YhatModel
 from deployment.save_session import save_function, _get_source
-from deployment import terragon
 
 BASE_URI = "http://api.yhathq.com/"
 

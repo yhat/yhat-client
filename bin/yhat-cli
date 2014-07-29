@@ -4,7 +4,7 @@
 
 Usage:
   yhat-cli config [--reset]
-  yhat-cli models
+  yhat-cli models [--admin]
   yhat-cli model <modelname>
   yhat-cli (-h | --help)
   yhat-cli (-v | --version)
@@ -16,6 +16,7 @@ Options:
   -h --help        Show this screen.
   -v --version     Show version.
   --reset          Reset the config.
+  --admin          Get all models (admin users only).
 
 """
 
@@ -38,11 +39,11 @@ if __name__ == "__main__":
                 creds_table.append([str(key), str(value)])
             print Table(creds_table).to_spaces()
     elif arguments['models'] and credentials.has() is True:
-        m = models.get(None)
-        print models.table(m)
+        m = models.get(admin=arguments['--admin'])
+        print models.table(m, admin=arguments['--admin'])
     elif (arguments['model'] and arguments['<modelname>'] is not None
           and credentials.has() is True):
-        m = models.get(arguments['<modelname>'])
+        m = models.get(modelname=arguments['<modelname>'])
         print models.table(m)
     else:
         credentials.setup()

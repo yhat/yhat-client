@@ -31,9 +31,9 @@ def create_request(uri, username, apikey):
         return json.load(r)
 
 
-def get_status(username, apikey, server, modelname):
+def get_status(username, apikey, server, owner, modelname):
     request_uri = "%s/users/%s/models/%s/status" % (
-        server, username, modelname)
+        server, owner, modelname)
     resp = create_request(request_uri, username, apikey)
 
     if 'error' in resp:
@@ -43,9 +43,11 @@ def get_status(username, apikey, server, modelname):
     return resp["status"]
 
 
-def get(modelname):
+def get(modelname=None, admin=False):
     creds = read()
-    if modelname is None:
+    if admin and modelname is None:
+        request_uri = "%s/models" % (creds["server"])
+    elif modelname is None:
         request_uri = "%s/users/%s/models" % (
             creds["server"], creds["username"])
     else:
@@ -65,21 +67,28 @@ def get(modelname):
         models = [models]
 
     for model in models:
+        if 'owner' in model:
+            owner = model["owner"]
+        else:
+            owner = creds["username"]
         model["status"] = get_status(creds["username"],
                                      creds["apikey"],
                                      creds["server"],
+                                     owner,
                                      model["name"])
     return models
 
 
-def table(models):
+def table(models, admin=False):
+    if admin is False:
+        creds = read()
+        owner = str(creds["username"])
+
     if models is not None:
         model_table = []
-        model_table.append(['NAME',
-                            'LANG',
-                            'VERSIONS',
-                            'LAST UPDATED',
-                            'STATUS'])
+        model_table.append(
+            ['NAME', 'USERNAME', 'LANG', 'VERSIONS', 'LAST UPDATED', 'STATUS'])
+
         for model in models:
             status = str(model["status"])
             if status == "online":
@@ -91,7 +100,10 @@ def table(models):
             elif status == "failed":
                 status = Fore.RED + status + Fore.RESET
 
+            if admin:
+                owner = str(model["owner"])
             model_table.append([str(model["name"]),
+                                owner,
                                 str(model["lang"]),
                                 str(model["versions"]),
                                 str(model["friendly_date"]),

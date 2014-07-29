@@ -37,8 +37,7 @@ def get_status(username, apikey, server, modelname):
     resp = create_request(request_uri, username, apikey)
 
     if 'error' in resp:
-        print Fore.RED + resp["message"]
-        print Fore.RESET
+        print Fore.RED + resp["message"] + Fore.RESET
         return None
 
     return resp["status"]
@@ -57,13 +56,11 @@ def get(modelname):
     if isinstance(models, (list, tuple)):
         if not models:
             print Fore.RED + "No models found for " \
-                + creds["username"] + " on " + creds["server"]
-            print Fore.RESET
+                + creds["username"] + " on " + creds["server"] + Fore.RESET
             return None
     else:
         if 'error' in models:
-            print Fore.RED + models["message"]
-            print Fore.RESET
+            print Fore.RED + models["message"] + Fore.RESET
             return None
         models = [models]
 
@@ -84,9 +81,19 @@ def table(models):
                             'LAST UPDATED',
                             'STATUS'])
         for model in models:
+            status = str(model["status"])
+            if status == "online":
+                status = Fore.GREEN + status + Fore.RESET
+            elif status == "building":
+                status = Fore.CYAN + status + Fore.RESET
+            elif status == "built":
+                status = Fore.YELLOW + status + Fore.RESET
+            elif status == "failed":
+                status = Fore.RED + status + Fore.RESET
+
             model_table.append([str(model["name"]),
                                 str(model["lang"]),
                                 str(model["versions"]),
                                 str(model["friendly_date"]),
-                                str(model["status"])])
+                                status])
         return Table(model_table).to_spaces()

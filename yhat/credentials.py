@@ -1,6 +1,7 @@
 import json
 import base64
 import os
+import re
 from urlparse import urlparse
 
 
@@ -16,12 +17,25 @@ def setup():
     Prompts the user for their credentials and the saves them to a Yhat "dot"
     file.
     """
-    username = raw_input("Yhat username: ")
-    apikey = raw_input("Yhat apikey: ")
-    server = raw_input("Yhat server: [http://cloud.yhathq.com] ")
+    _username = ""
+    _apikey = ""
+    _server = " [%s]" % "http://cloud.yhathq.com"
+    if has():
+        creds = read()
+        _username = " [%s]" % creds["username"]
+        _apikey = " [%s]" % creds["apikey"]
+        _server = " [%s]" % creds["server"]
+    username = raw_input("Yhat username" + _username + ": ")
+    apikey = raw_input("Yhat apikey" + _apikey + ": ")
+    server = raw_input("Yhat server" + _server + ": ")
+
+    if username == "":
+        username = re.search(r"[^[]*\[([^]]*)\]", _username).group(1)
+    if apikey == "":
+        apikey = re.search(r"[^[]*\[([^]]*)\]", _apikey).group(1)
 
     if server == "":
-        server = "http://cloud.yhathq.com"
+        server = re.search(r"[^[]*\[([^]]*)\]", _server).group(1)
     else:
         if not "http://" in server and not "https://" in server:
             server = "http://" + server

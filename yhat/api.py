@@ -3,7 +3,8 @@ import warnings
 import base64
 import json
 import pickle
-import urllib2, urllib
+import urllib2
+import urllib
 import types
 import websocket
 import uuid
@@ -24,8 +25,9 @@ BASE_URI = "http://api.yhathq.com/"
 
 
 class API(object):
+
     """
-    An abstract class that implements some of the more generic methods for 
+    An abstract class that implements some of the more generic methods for
     interacting with REST APIs.
 
     Parameters
@@ -33,6 +35,7 @@ class API(object):
     base_uri: string
         URI of the API that you're working with
     """
+
     def __init__(self, base_uri):
         self.base_uri = base_uri
         self.headers = {'Content-Type': 'application/json'}
@@ -63,7 +66,7 @@ class API(object):
             return json.loads(rsp)
         except Exception, e:
             raise e
-    
+
     def post(self, endpoint, params, data):
         """
         Parameters
@@ -90,10 +93,10 @@ class API(object):
             try:
                 data = json.dumps(data)
             except Exception, e:
-                msg = """Whoops. The data you're trying to send could not be 
-converted into JSON. If the data you're attempting to send includes a numpy 
+                msg = """Whoops. The data you're trying to send could not be
+converted into JSON. If the data you're attempting to send includes a numpy
 array, try casting it to a list (x.tolist()), or consider structuring your data
-as a pandas DataFrame. If you're still having trouble, please contact: 
+as a pandas DataFrame. If you're still having trouble, please contact:
 {URL}.""".format(URL="support@yhathq.com")
                 print msg
                 return
@@ -103,13 +106,14 @@ as a pandas DataFrame. If you're still having trouble, please contact:
                 return json.loads(rsp)
             except ValueError:
                 msg = """
-        Could not unpack response values. Please visit "http://cloud.yhathq.com"
+        Could not unpack response values.
+        Please visit "http://cloud.yhathq.com"
         to make sure your model is online and not still building."""
                 raise Exception(msg)
         except Exception, e:
             raise e
             print "Message: %s" % str(rsp)
-    
+
     def handshake(self, model_name, model_owner=None):
         """
         Parameters
@@ -130,15 +134,16 @@ as a pandas DataFrame. If you're still having trouble, please contact:
         ws_uri = ws_uri.format(BASE_URI=ws_base, USERNAME=username,
                                MODEL_NAME=model_name)
         ws = websocket.create_connection(ws_uri)
-        auth = { 
-                "username": self.username, 
-                "apikey": self.apikey
+        auth = {
+            "username": self.username,
+            "apikey": self.apikey
         }
         ws.send(json.dumps(auth))
         return ws
- 
+
 
 class Yhat(API):
+
     """
     A connection to the Yhat API
 
@@ -151,17 +156,18 @@ class Yhat(API):
     uri: string
         your Yhat server URL (i.e. http://cloud.yhathq.com/)
     """
+
     def __init__(self, username, apikey, uri):
         self.username = username
         self.apikey = apikey
-        if uri.endswith("/")==False:
+        if uri.endswith("/") is False:
             uri += "/"
         self.ws = None
         self.base_uri = uri
         self.headers = {'Content-Type': 'application/json'}
         self.q = {"username": self.username, "apikey": apikey}
-        if self.base_uri!=BASE_URI:
-            if self._authenticate()==False:
+        if self.base_uri != BASE_URI:
+            if self._authenticate() is False:
                 raise Exception("Incorrect username/apikey!")
 
     def _check_obj_size(self, obj):
@@ -177,7 +183,7 @@ class Yhat(API):
         -------
         boolean
         """
-        if self.base_uri!=BASE_URI:
+        if self.base_uri != BASE_URI:
             # not deploying to the cloud so models can be as big as you want
             if sys.getsizeof(obj) > 52428800:
                 return False
@@ -185,7 +191,7 @@ class Yhat(API):
             raise Exception("Sorry, your file is too big for a free account.")
 
         return True
-    
+
     def _authenticate(self):
         """
         Returns
@@ -194,9 +200,9 @@ class Yhat(API):
             verifies your API credentials are valid
         """
         authed = True
-        try: 
+        try:
             response = self.post('verify', self.q, {})
-            error = response["success"];
+            error = response["success"]
         except Exception, e:
             authed = False
         return authed
@@ -221,13 +227,14 @@ class Yhat(API):
             return data
 
         if isinstance(data, pd.DataFrame):
-            data_values = data.transpose().to_json(orient='values',date_format='iso')
+            data_values = data.transpose().to_json(
+                orient='values', date_format='iso')
             data_values = json.loads(data_values)
             try:
                 from collections import OrderedDict
-                data = OrderedDict(zip(data.columns,data_values))
+                data = OrderedDict(zip(data.columns, data_values))
             except ImportError:
-                data = dict(zip(data.columns,data_values))
+                data = dict(zip(data.columns, data_values))
         return data
 
     def predict(self, model, data, model_owner=None):
@@ -253,13 +260,13 @@ class Yhat(API):
         q = self.q
         q['model'] = model
         model_user = self.username if model_owner is None else model_owner
-        if self.base_uri!=BASE_URI:
+        if self.base_uri != BASE_URI:
             endpoint = "%s/models/%s/" % (model_user, model)
         else:
             data = {"data": data}
             endpoint = 'predict'
         return self.post(endpoint, q, data)
-    
+
     def predict_ws(self, data):
         """
 
@@ -273,10 +280,10 @@ class Yhat(API):
         -------
         id: string
             the id of the event; this will come in handy when it
-            is receieved by the WebSocket client (remember, this is 
+            is receieved by the WebSocket client (remember, this is
             asynchronous)
         """
-        if self.ws==None:
+        if self.ws is None:
             msg = """In order to make predictions with WebScokets, you
 need to connect to the server first. try running "connect_to_socket"
 """
@@ -329,10 +336,10 @@ need to connect to the server first. try running "connect_to_socket"
         session: globals()
             your Python's session variables (i.e. "globals()")
         """
-        if 1==2 and _get_source(YhatModel.execute)==_get_source(model.execute):
-            msg = "'execute' method was not implemented. If you believe that you did "
-            msg += "implement the 'execute' method, check to make sure there isn't an "
-            msg += "indentation error."
+        if 1 == 2 and _get_source(YhatModel.execute) == _get_source(model.execute):
+            msg = """'execute' method was not implemented.
+            If you believe that you did implement the 'execute' method,
+            check to make sure there isn't an indentation error."""
             raise Exception(msg)
 
         bundle = save_function(model, session)
@@ -342,16 +349,17 @@ need to connect to the server first. try running "connect_to_socket"
         bundle["modelname"] = name
         bundle["className"] = model.__name__
         reqs = getattr(model, "REQUIREMENTS", "")
-        if isinstance(reqs,list):
+        if isinstance(reqs, list):
             reqs = '\n'.join(reqs)
         bundle["reqs"] = reqs
         # make sure we freeze Yhat so we're sure we're using the right version
         # this makes it a lot easier to upgrade the client
         import yhat
         bundle["reqs"] += '\n' + "yhat==" + yhat.__version__
-        bundle["reqs"] = bundle["reqs"].strip().replace('"', '').replace("'", "")
+        bundle["reqs"] = bundle["reqs"].strip().replace(
+            '"', '').replace("'", "")
         return bundle
-    
+
     def deploy(self, name, model, session, sure=False, packages=[]):
         """
         Deploys your model to a Yhat server
@@ -374,20 +382,22 @@ need to connect to the server first. try running "connect_to_socket"
         if not re.match("^[A-Za-z0-9_]+$", name):
             raise Exception("Model name must only contain: [A-Za-z0-9_]")
         if not isinstance(packages, list):
-            raise Exception("`packages` must be a list of ubuntu packages to install")
-        if sure==False:
+            raise Exception(
+                "`packages` must be a list of ubuntu packages to install")
+        if sure is False:
             sure = raw_input("Are you sure you want to deploy? (y/N): ")
-            if sure.lower()!="y":
+            if sure.lower() != "y":
                 print "Deployment canceled"
                 sys.exit()
         bundle = self._extract_model(name, model, session)
         bundle['packages'] = packages
-        if self._check_obj_size(bundle)==False:
-            # we're not going to deploy; model is too big, but let's give the 
+        if self._check_obj_size(bundle) is False:
+            # we're not going to deploy; model is too big, but let's give the
             # user the option to upload it manually
             print "Model is to large to deploy over HTTP"
-            should_we_deploy = raw_input("Would you like to upload manually? (Y/n): ")
-            if should_we_deploy.lower()=="y" or should_we_deploy=="":
+            should_we_deploy = raw_input(
+                "Would you like to upload manually? (Y/n): ")
+            if should_we_deploy.lower() == "y" or should_we_deploy == "":
                 self.deploy_to_file(name, model, session)
         else:
             # upload the model to the server
@@ -411,14 +421,15 @@ need to connect to the server first. try running "connect_to_socket"
         if not re.match("^[A-Za-z0-9_]+$", name):
             raise Exception("Model name must only contain: [A-Za-z0-9_]")
         if not isinstance(packages, list):
-            raise Exception("`packages` must be a list of ubuntu packages to install")
+            raise Exception(
+                "`packages` must be a list of ubuntu packages to install")
         bundle = self._extract_model(name, model, session)
         bundle['apikey'] = self.apikey
         bundle['packages'] = packages
-        filename= "%s.yhat" % name
+        filename = "%s.yhat" % name
         with open(filename, "w") as f:
             bundle = json.dumps(bundle)
-            if compress==True:
+            if compress is True:
                 bundle = zlib.compress(bundle)
             f.write(bundle)
 
@@ -429,29 +440,33 @@ need to connect to the server first. try running "connect_to_socket"
         msg = msg % (upload_url, "%s.yhat" % name)
         print Fore.CYAN + msg
         print Fore.RESET
-        return filename 
+        return filename
 
-    def deploy_with_scp(self,name,model,sessions,compress=True,packages=[],pem_path=None):
+    def deploy_with_scp(self, name, model, sessions,
+                        compress=True, packages=[], pem_path=None):
         if pem_path is None:
-            raise Exception("Please specify your pem file for authentication through the `pem_path` argument")
+            raise Exception("Please specify your pem file for "
+                            "authentication through the `pem_path` argument")
             return
         if not os.path.isfile(pem_path):
             raise Exception("No file found under '%s'" % pem_path)
         print "Deploying to file"
-        filename = self.deploy_to_file(name,model,sessions,compress=compress,packages=packages)
+        filename = self.deploy_to_file(
+            name, model, sessions, compress=compress, packages=packages)
         print "Sending over scp"
         http_re = re.compile("^http://")
-        server_uri = http_re.sub("",self.base_uri.strip())
+        server_uri = http_re.sub("", self.base_uri.strip())
         server_uri = server_uri.strip("/")
-        scp_cmd = "scp -i %s %s ubuntu@%s:~/" % (pem_path,filename,server_uri)
-        subprocess.check_call(scp_cmd,shell=True)
-        ssh_cmd = "ssh -i %s ubuntu@%s 'sudo mv ~/%s /var/yhat/headquarters/uploads/'" % (pem_path,
-                                                                                          server_uri,
-                                                                                          filename)
-        subprocess.check_call(ssh_cmd,shell=True)
+        scp_cmd = "scp -i %s %s ubuntu@%s:~/" % (
+            pem_path, filename, server_uri)
+        subprocess.check_call(scp_cmd, shell=True)
+        ssh_cmd = """ssh -i %s ubuntu@%s
+        'sudo mv ~/%s
+        /var/yhat/headquarters/uploads/'""" % (pem_path, server_uri, filename)
+        subprocess.check_call(ssh_cmd, shell=True)
         os.remove(filename)
 
-if __name__=="__main__":
+if __name__ == "__main__":
     import pandas as pd
     df = pd.DataFrame({
         "x": range(10),
@@ -471,4 +486,3 @@ if __name__=="__main__":
     print yh.predict_ws({"beer": "Coors Light"})
     for item in yh.yield_results():
         print item
-

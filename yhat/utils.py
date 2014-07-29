@@ -17,24 +17,24 @@ def download_file(url, filename):
     filesize = file_conn.headers['content-length']
     processed = 0
     pbar = ProgressBar(widgets=[Bar(), ' ', ETA(), ' ', Percentage()],
-            maxval=int(filesize)).start()
+                       maxval=int(filesize)).start()
     with open(filename, "wb") as f:
         for line in file_conn:
             processed += len(line)
             pbar.update(processed)
             f.write(line)
     print
-from progressbar import ProgressBar, Bar, ETA, Percentage
 
 
 class file_with_callback(file):
+
     def __init__(self, path, mode, *args):
         file.__init__(self, path, mode)
         self.seek(0, os.SEEK_END)
         self._total = self.tell()
         self.seek(0)
         self.pbar = ProgressBar(widgets=[Bar(), ' ', ETA(), ' ', Percentage()],
-                maxval=self._total).start()
+                                maxval=self._total).start()
         self.processed = 0
         self._callback = self.pbar.update
 
@@ -47,9 +47,9 @@ class file_with_callback(file):
         self._callback(self.processed)
         return data
 
+
 def upload_file(url, filename):
     stream = file_with_callback(filename, 'rb', filename)
     req = urllib2.Request(url, stream)
-    res = urllib2.urlopen(req)
+    urllib2.urlopen(req)
     print
-

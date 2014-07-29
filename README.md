@@ -1,5 +1,5 @@
 # Yhat Python Client
-This is the connection to the Yhat API. If you'd like to read more, [visit our 
+This is the connection to the Yhat API. If you'd like to read more, [visit our
 docs](http://docs.yhathq.com/).
 
 ## [Quickstart](http://docs.yhathq.com/python/tutorial)
@@ -100,7 +100,7 @@ def execute(self, data)
 }
 ```
 #### Output
-Selecting the `dict` output gives the user the ability to define their own 
+Selecting the `dict` output gives the user the ability to define their own
 output format (so long as it is a valid Python dictionary.
 ```js
 // this is valid
@@ -158,7 +158,7 @@ def execute(self, data)
 {
   "x": {
     "y": 10
-  }, 
+  },
     "z": 100
   }
 }
@@ -184,12 +184,13 @@ def execute(self, data)
 
 *Required*
 
+- doctopt
 - progressbar
 - pip
 - Flask
 - colorama
 - websocket-client
-- prettytable
+- ElasticTabstops
 - dill
 
 *Highly suggested*

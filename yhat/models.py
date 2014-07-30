@@ -43,6 +43,16 @@ def get_status(username, apikey, server, owner, modelname):
     return resp["status"]
 
 
+def clean_model(model, username, apikey, server):
+    if 'owner' in model:
+        owner = model["owner"]
+    else:
+        owner = username
+    model["status"] = get_status(
+        username, apikey, server, owner, model["name"])
+    return model
+
+
 def get(modelname=None, admin=False):
     creds = read()
     if admin and modelname is None:
@@ -66,16 +76,18 @@ def get(modelname=None, admin=False):
             return None
         models = [models]
 
+    newmodels = []
     for model in models:
-        if 'owner' in model:
-            owner = model["owner"]
+        if 'result' in model:
+            for m in model['result']:
+                m = clean_model(m, creds["username"],
+                                creds["apikey"], 'http://' + model['ip'])
+            newmodels = newmodels + model['result']
         else:
-            owner = creds["username"]
-        model["status"] = get_status(creds["username"],
-                                     creds["apikey"],
-                                     creds["server"],
-                                     owner,
-                                     model["name"])
+            model = clean_model(model, creds["username"],
+                                creds["apikey"], creds["server"])
+    if len(newmodels) > 0:
+        models = newmodels
     return models
 
 

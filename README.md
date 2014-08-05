@@ -2,6 +2,18 @@
 This is the connection to the Yhat API. If you'd like to read more, [visit our
 docs](http://docs.yhathq.com/).
 
+**Table of Contents:**
+
+- [Quickstart](#quickstart)
+- [Installation](#installation)
+- [Overview](#overview)
+  - [Handling Input and Output](#handling-input-and-output)
+  - [Deploying](#deploying)
+  - [Examples](#examples)
+- [yhat-cli](#yhat-cli)
+- [Dependencies](#dependencies)
+
+
 ## [Quickstart](http://docs.yhathq.com/python/tutorial)
 You can download the example [here](https://s3.amazonaws.com/yhat-examples/beer-recommender.zip)
 , or clone the git repo.
@@ -18,11 +30,8 @@ Deploy? (y/N): y
 # {"status": "success"}
 ```
 
-## Overview
 
-## Usage
-
-### Installation
+## Installation
 Using `pip`:
 
 ```bash
@@ -37,7 +46,7 @@ $ cd yhat-client
 $ python setup.py install
 ```
 
-### Setting up your model
+## Overview
 
 ### Handling Input and Output
 
@@ -170,7 +179,7 @@ def execute(self, data)
 >>> yh.deploy("myExampleModel", MyExampleModel, globals())
 ```
 
-## Examples
+### Examples
 
 - [Hello World](http://docs.yhathq.com/python/examples/hello-world)
 - [Hello pip](http://docs.yhathq.com/python/examples/hello-pip)
@@ -178,7 +187,30 @@ def execute(self, data)
 - [Random Forest](http://docs.yhathq.com/python/examples/random-forest)
 - [Twitter Feed](http://docs.yhathq.com/python/examples/twitter-feed)
 
-## Misc
+## `yhat-cli`
+
+### Usage
+
+```bash
+yhat-cli config [--reset]
+yhat-cli models [--admin]
+yhat-cli model <modelname>
+yhat-cli (-h | --help)
+yhat-cli (-v | --version)
+```
+
+#### `config [--reset]`
+
+Configure the yhat client with your API credentials. The option `--reset` will reset your credentials.
+
+#### `models`
+
+Return the models for your account. The option `--admin` returns all models on the server, you must have admin access for this.
+
+#### `model <modelname>`
+
+Returns details about the given model. You must own this model to view it.
+
 
 ## Dependencies
 

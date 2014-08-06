@@ -4,6 +4,17 @@ Yhat Python Client
 This is the connection to the Yhat API. If you'd like to read more,
 `visit our docs <http://docs.yhathq.com/>`__.
 
+**Table of Contents:**
+
+-  `Quickstart <#quickstart>`__
+-  `Installation <#installation>`__
+-  `Overview <#overview>`__
+-  `Handling Input and Output <#handling-input-and-output>`__
+-  `Deploying <#deploying>`__
+-  `Examples <#examples>`__
+-  `yhat-cli <#yhat-cli>`__
+-  `Dependencies <#dependencies>`__
+
 `Quickstart <http://docs.yhathq.com/python/tutorial>`__
 -------------------------------------------------------
 
@@ -24,14 +35,8 @@ Insert your APIKEY and USERNAME and run the script.
     Deploy? (y/N): y
     # {"status": "success"}
 
-Overview
---------
-
-Usage
------
-
 Installation
-~~~~~~~~~~~~
+------------
 
 Using ``pip``:
 
@@ -47,8 +52,8 @@ From source:
     $ cd yhat-client
     $ python setup.py install
 
-Setting up your model
-~~~~~~~~~~~~~~~~~~~~~
+Overview
+--------
 
 Handling Input and Output
 ~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -196,7 +201,7 @@ Output
     {
       "x": {
         "y": 10
-      }, 
+      },
         "z": 100
       }
     }
@@ -209,7 +214,7 @@ Deploying
     >>> yh.deploy("myExampleModel", MyExampleModel, globals())
 
 Examples
---------
+~~~~~~~~
 
 -  `Hello World <http://docs.yhathq.com/python/examples/hello-world>`__
 -  `Hello pip <http://docs.yhathq.com/python/examples/hello-pip>`__
@@ -219,20 +224,50 @@ Examples
 -  `Twitter
    Feed <http://docs.yhathq.com/python/examples/twitter-feed>`__
 
-Misc
-----
+``yhat-cli``
+------------
+
+Usage
+~~~~~
+
+.. code:: bash
+
+    yhat-cli config [--reset]
+    yhat-cli models [--admin]
+    yhat-cli model <modelname>
+    yhat-cli (-h | --help)
+    yhat-cli (-v | --version)
+
+``config [--reset]``
+^^^^^^^^^^^^^^^^^^^^
+
+Configure the yhat client with your API credentials. The option
+``--reset`` will reset your credentials.
+
+``models``
+^^^^^^^^^^
+
+Return the models for your account. The option ``--admin`` returns all
+models on the server, you must have admin access for this.
+
+``model <modelname>``
+^^^^^^^^^^^^^^^^^^^^^
+
+Returns details about the given model. You must own this model to view
+it.
 
 Dependencies
 ------------
 
 *Required*
 
+-  doctopt
 -  progressbar
 -  pip
 -  Flask
 -  colorama
 -  websocket-client
--  prettytable
+-  ElasticTabstops
 -  dill
 
 *Highly suggested*

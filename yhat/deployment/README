@@ -1,7 +1,1 @@
 
-
-# cat README | bash
-python modtest.py
-cat pred.json | jq --raw-output .code > test.py
-echo "print pred(100)" >> test.py
-python test.py

@@ -3,7 +3,9 @@ import types
 
 """
 This package attempts to pull all the Python library imports and their
-version numbers from a session's globals.
+version numbers from a session's globals. It also provides a way to merge
+those with a list of user-specified requirements which warns the user on
+strange conditions.
 
 Example:
 
@@ -11,7 +13,9 @@ Example:
     from yhat.requirements import get_requirements
     import pandas as pd
 
-    print get_requirements(globals())
+    print implicit_requirements(globals())
+    print merge_requirements(globals(), [("sklearn", "0.15.2")])
+
 """
 
 # TODO:
@@ -28,7 +32,11 @@ Example:
 #
 #        a. Something is in the REQUIREMENTS that doesn't exist.
 #        b. A version in REQUIREMENTS is not what they have on their system.
-
+#
+# 3. Append to requirements if the model isn't in there. Give warning:
+#
+#        a. We've detected the same thing on your system. Don't need.
+#        b. Diff version.
 
 def _get_package_name(obj):
     """Returns the package name (e.g. "sklearn") for a Python object"""
@@ -42,9 +50,9 @@ def _get_package_name(obj):
         return None
 
 
-def get_requirements(session):
+def implicit_requirements(session):
     """
-    Returns a list of "library==version" strings for all the library
+    Returns a list of (library, version) tuples for all the library
     requirements of a given session. These are matched using the contents of
     "top_level.txt" metadata for all package names in the session.
     """
@@ -62,4 +70,15 @@ def get_requirements(session):
                 else:
                     reqs[d.project_name] = d.version
 
-    return ["%s==%s" % proj for proj in reqs.items()]
+    return reqs.items()
+
+
+def merge_requirements(session, requirements):
+    """
+    Merges the implicit requirements for a given session into an explicit
+    list of user-provided requirements. Gives the user warnings if there is
+    a version mismatch between the two, or if an explicit requirement can
+    be found implicitly.
+    """
+
+

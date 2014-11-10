@@ -17,7 +17,7 @@ Example:
     import pandas as pd
 
     print requirements.implicit(globals())
-    print requirements.merge(globals(), [("sklearn", "0.15.2")])
+    print requirements.merge(globals(), "sklearn==0.15.2")
 """
 
 
@@ -60,7 +60,7 @@ def merge(session, explicit):
     """
     Merges implicit and explicit requirements together. Implicit requirements
     are pulled out the user's session (i.e. globals()). Explicit requirements
-    are provided directly by the user (e.g. [("sklearn", "0.15.2")]). This
+    are provided directly by the user (e.g. ["sklearn==0.15.2"]). This
     function reconciles them and merges them into one set of requirements.
     Warnings are given to the user in case of version mismatche or modules
     that do not need to be required explicitly.

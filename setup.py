@@ -20,6 +20,7 @@ setup(
     ),
     install_requires=[
         "docopt==0.6.1",
+        "pip>=1.5.6",
         "colorama==0.2.5",
         "progressbar==2.2",
         "Flask==0.10.1",

@@ -20,6 +20,7 @@ init()
 
 from deployment.models import YhatModel
 from deployment.save_session import save_function, _get_source
+from requirements import merge
 
 BASE_URI = "http://api.yhathq.com/"
 
@@ -348,16 +349,10 @@ need to connect to the server first. try running "connect_to_socket"
         bundle["language"] = "python"
         bundle["modelname"] = name
         bundle["className"] = model.__name__
-        reqs = getattr(model, "REQUIREMENTS", "")
-        if isinstance(reqs, list):
-            reqs = '\n'.join(reqs)
-        bundle["reqs"] = reqs
-        # make sure we freeze Yhat so we're sure we're using the right version
-        # this makes it a lot easier to upgrade the client
-        import yhat
-        bundle["reqs"] += '\n' + "yhat==" + yhat.__version__
-        bundle["reqs"] = bundle["reqs"].strip().replace(
-            '"', '').replace("'", "")
+        bundle["reqs"] = "\n".join(
+            str(r) for r in merge(session, getattr(model, "REQUIREMENTS", ""))
+        )
+
         return bundle
 
     def deploy(self, name, model, session, sure=False, packages=[]):

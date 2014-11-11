@@ -3,6 +3,7 @@ from pip.util import get_installed_distributions
 from warnings import warn
 import types
 
+
 """
 This package attempts to pull all the Python library imports and their
 version numbers from a session's globals. These are called implicit
@@ -35,9 +36,9 @@ def _get_package_name(obj):
 
 def implicit(session):
     """
-    Returns a list of (ibrary, version) strings for all the library
-    requirements of a given session. These are matched using the contents of
-    "top_level.txt" metadata for all package names in the session.
+    Returns a list of Requirement instances for all the library dependencies
+    of a given session. These are matched using the contents of "top_level.txt"
+    metadata for all package names in the session.
     """
     package_names = [_get_package_name(g) for g in session.values()]
     package_names = set(filter(None, package_names))
@@ -74,6 +75,9 @@ def merge(session, explicit):
     explicit_dict = {r.project_name: r for r in explicit_list}
 
     for project_name, exp_req in explicit_dict.items():
+        # To be polite, we keep the explicit dependencies and add the implicit
+        # ones to them. We respect versions on the former, except in the case
+        # of yhat, which should be the installed version.
         if project_name in implicit_dict:
             imp_req = implicit_dict[project_name]
             if exp_req == imp_req:
@@ -96,5 +100,10 @@ def merge(session, explicit):
 
         else:
             implicit_dict[project_name] = exp_req
+
+    # Verify that yhat is set to the installed version. Normally this whould
+    # show up as an implicit requirement. But we want to be extra sure.
+    import yhat
+    implicit_dict['yhat'] = Requirement.parse('yhat==%s' % yhat.__version__)
 
     return implicit_dict.values()

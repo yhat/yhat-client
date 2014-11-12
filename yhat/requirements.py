@@ -13,7 +13,8 @@ instances from the pip library.
 
 Example:
 
-    from sklearn.svm import SVR
+    from sklearn.svm import SVR as svr
+    import sklearn.svm
     from yhat import requirements
     import pandas as pd
 
@@ -24,13 +25,16 @@ Example:
 
 def _get_package_name(obj):
     """Returns the package name (e.g. "sklearn") for a Python object"""
-    if isinstance(obj, types.ModuleType):
-        return obj.__package__
-    elif isinstance(obj, types.TypeType):
-        return obj.__module__.split(".")[0]
-    elif isinstance(obj, types.ObjectType):
-        return obj.__class__.__module__.split(".")[0]
-    else:
+    try:
+        if isinstance(obj, types.ModuleType):
+            return obj.__package__.split(".")[0]
+        elif isinstance(obj, types.TypeType):
+            return obj.__module__.split(".")[0]
+        elif isinstance(obj, types.ObjectType):
+            return obj.__class__.__module__.split(".")[0]
+        else:
+            return None
+    except:
         return None
 
 

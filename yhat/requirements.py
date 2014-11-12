@@ -14,12 +14,11 @@ instances from the pip library.
 Example:
 
     from sklearn.svm import SVR as svr
-    import sklearn.svm
     from yhat import requirements
     import pandas as pd
 
     print requirements.implicit(globals())
-    print requirements.merge(globals(), "sklearn==0.15.2")
+    print requirements.merge(globals(), "scikit-learn==0.15.2")
 """
 
 
@@ -61,7 +60,7 @@ def implicit(session):
     return [Requirement.parse('%s==%s' % r) for r in reqs.items()]
 
 
-def merge(session, explicit):
+def merge(session, explicit=""):
     """
     Merges implicit and explicit requirements together. Implicit requirements
     are pulled out the user's session (i.e. globals()). Explicit requirements
@@ -73,7 +72,7 @@ def merge(session, explicit):
     implicit_dict = {r.project_name: r for r in implicit(session)}
 
     # explicit can be one requirement in a string, or many in a list.
-    if isinstance(explicit, basestring):
+    if isinstance(explicit, basestring) and explicit:
         explicit = [explicit]
     explicit_list = [Requirement.parse(r) for r in explicit]
     explicit_dict = {r.project_name: r for r in explicit_list}

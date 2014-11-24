@@ -238,7 +238,7 @@ class Yhat(API):
                 data = dict(zip(data.columns, data_values))
         return data
 
-    def predict(self, model, data, model_owner=None):
+    def predict(self, model, data, model_owner=None, raw_input=False):
         """
         Executes a single prediction via the Yhat API.
 
@@ -251,6 +251,9 @@ class Yhat(API):
             a dataframe
         model_owner: string
             username of the model owner for shared models. optional
+        raw_input: bool
+            whether or not to attempt to parse the incoming JSON. for calling R 
+            models only
 
         Returns
         -------
@@ -260,6 +263,8 @@ class Yhat(API):
         data = self._convert_to_json(data)
         q = self.q
         q['model'] = model
+        if raw_input==True:
+            q['raw_input'] = True
         model_user = self.username if model_owner is None else model_owner
         if self.base_uri != BASE_URI:
             endpoint = "%s/models/%s/" % (model_user, model)

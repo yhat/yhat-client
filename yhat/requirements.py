@@ -1,5 +1,5 @@
 from pip._vendor.pkg_resources import Requirement
-from pip.util import get_installed_distributions
+from pip.utils import get_installed_distributions
 from warnings import warn
 import types
 

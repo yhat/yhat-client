@@ -7,12 +7,8 @@ import warnings
 import re
 
 from flask import Flask, request, render_template, jsonify
-from colorama import init
-from colorama import Fore, Back, Style
 
 from input_and_output import df_to_df, parse_json, preprocess
-
-init()
 
 try:
     import pandas as pd
@@ -105,9 +101,9 @@ class YhatModel(object):
         """
         print "Paste your test data here"
         print "Data should be formatted as valid JSON."
-        print Fore.CYAN + "Hit <ENTER> to execute your model"
-        print Fore.RED + "Press <CTRL + C> or type 'quit' to exit"
-        print Fore.RESET + "="*40
+        print "Hit <ENTER> to execute your model"
+        print "Press <CTRL + C> or type 'quit' to exit"
+        print "="*40
         if testcase:
             sys.stdout.write("[In] %s\n" % testcase)
             data = parse_json(testcase + '\n')

@@ -1,5 +1,8 @@
 from pip._vendor.pkg_resources import Requirement
-from pip.utils import get_installed_distributions
+try:
+    from pip.utils import get_installed_distributions # pip 6.0
+except ImportError:
+    from pip.util import get_installed_distributions  # pip 1.5.x
 from warnings import warn
 import types
 

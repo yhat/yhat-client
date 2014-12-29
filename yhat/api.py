@@ -13,10 +13,6 @@ import re
 import os
 import os.path
 import subprocess
-from colorama import init
-from colorama import Fore
-
-init()
 
 from deployment.models import YhatModel
 from deployment.save_session import save_function, _get_source
@@ -438,8 +434,7 @@ need to connect to the server first. try running "connect_to_socket"
         msg = "To deploy, visit %s and upload %s."
         upload_url = os.path.join(self.base_uri, "model", "upload")
         msg = msg % (upload_url, "%s.yhat" % name)
-        print Fore.CYAN + msg
-        print Fore.RESET
+        print msg
         return filename
 
     def deploy_with_scp(self, name, model, sessions,
@@ -465,24 +460,3 @@ need to connect to the server first. try running "connect_to_socket"
         /var/yhat/headquarters/uploads/'""" % (pem_path, server_uri, filename)
         subprocess.check_call(ssh_cmd, shell=True)
         os.remove(filename)
-
-if __name__ == "__main__":
-    import pandas as pd
-    df = pd.DataFrame({
-        "x": range(10),
-        "y": range(10)
-    })
-    yh = Yhat("blah", "blue")
-    print yh._convert_to_json({"x": 1})
-    print yh._convert_to_json(df)
-
-    from yhat import credentials
-    creds = credentials.read()
-
-    yh = Yhat(creds['username'], creds['apikey'], "http://localhost:8080/")
-
-    print yh.predict("mymodel", {"beer": "Coors Light"})
-    yh.connect_to_socket("mymodel")
-    print yh.predict_ws({"beer": "Coors Light"})
-    for item in yh.yield_results():
-        print item

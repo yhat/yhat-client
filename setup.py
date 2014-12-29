@@ -23,7 +23,6 @@ setup(
         "progressbar==2.2",
         "Flask==0.10.1",
         "websocket-client==0.12.0",
-        "ElasticTabstops==1.0.0",
         "dill==0.2b1",
         "terragon==0.1.4"
     ],

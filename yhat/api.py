@@ -18,6 +18,8 @@ from deployment.models import YhatModel
 from deployment.save_session import save_function, _get_source
 from requirements import merge
 
+from .utils import progressbarify
+
 BASE_URI = "http://api.yhathq.com/"
 
 
@@ -64,7 +66,7 @@ class API(object):
         except Exception, e:
             raise e
 
-    def post(self, endpoint, params, data):
+    def post(self, endpoint, params, data, pb=False):
         """
         Parameters
         ----------
@@ -74,6 +76,8 @@ class API(object):
             querystring parameters for API call
         data: dictionary
             data you want transfered as JSON
+        pb: bool
+            do you want a progress bar?
 
         Returns
         -------
@@ -97,6 +101,8 @@ as a pandas DataFrame. If you're still having trouble, please contact:
 {URL}.""".format(URL="support@yhathq.com")
                 print msg
                 return
+            if pb:
+                data = progressbarify(data)
             response = urllib2.urlopen(req, data)
             rsp = response.read()
             try:
@@ -397,8 +403,10 @@ need to connect to the server first. try running "connect_to_socket"
                 self.deploy_to_file(name, model, session)
         else:
             # upload the model to the server
-            # TODO: upload w/ a progress bar
-            return self.post("deployer/model", self.q, bundle)
+            print "Deploying model"
+            data = self.post("deployer/model", self.q, bundle, pb=True)
+            print "Model deployed"
+            return data
 
     def deploy_to_file(self, name, model, session, compress=True, packages=[]):
         """

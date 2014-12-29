@@ -20,7 +20,6 @@ setup(
     ),
     install_requires=[
         "pip>=6.0.3",
-        "progressbar==2.2",
         "Flask==0.10.1",
         "websocket-client==0.12.0",
         "dill==0.2b1",
@@ -28,5 +27,4 @@ setup(
     ],
     long_description=open("README.rst").read(),
     keywords=['yhat', 'scikits', 'numpy', 'pandas'],
-    scripts=['bin/yhat-cli']
 )

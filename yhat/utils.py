@@ -1,55 +1,72 @@
-import urllib2
 import os
+import sys
+import urllib2
+from cStringIO import StringIO
 
-from progressbar import ProgressBar, Bar, ETA, Percentage
+def getTerminalSize():
+    import os
+    env = os.environ
+    def ioctl_GWINSZ(fd):
+        try:
+            import fcntl, termios, struct, os
+            cr = struct.unpack('hh', fcntl.ioctl(fd, termios.TIOCGWINSZ,
+        '1234'))
+        except:
+            return
+        return cr
+    cr = ioctl_GWINSZ(0) or ioctl_GWINSZ(1) or ioctl_GWINSZ(2)
+    if not cr:
+        try:
+            fd = os.open(os.ctermid(), os.O_RDONLY)
+            cr = ioctl_GWINSZ(fd)
+            os.close(fd)
+        except:
+            pass
+    if not cr:
+        cr = (env.get('LINES', 25), env.get('COLUMNS', 80))
+    return int(cr[1]), int(cr[0])
 
+class Progress(object):
+    def __init__(self):
+        s = getTerminalSize()[0]
+        self._size = 80 - 15 if s > 80 else s - 15
+        self._seen = 0
+        sys.stdout.write("\r[>%s]" % (" " * (self._size-1)))
+        sys.stdout.flush()
+        self._last = 0
 
-def download_file(url, filename):
-    """
-    Downloads a file and displays a progress bar on the screen.
+    def update(self, total, size):
+        if size == 0:
+            return
+        self._seen += size
+        n = self._size * self._seen / total
+        if n > self._last:
+            blank = " " * (self._size-(n+1))
+            seenKiB = self._seen / 1024
+            totalKiB = total / 1024
+            sys.stdout.write("\r[%s>%s] %d/%d KiB" % ("-" * n, blank, seenKiB, totalKiB))
+            sys.stdout.flush()
+            self._last = n
+        if total == self._seen:
+            sys.stdout.write("\n")
 
-    url: string
-        URL of the file's source
-    filename: string
-        location where the downloaded file should be saved
-    """
-    file_conn = urllib2.urlopen(url)
-    filesize = file_conn.headers['content-length']
-    processed = 0
-    pbar = ProgressBar(widgets=[Bar(), ' ', ETA(), ' ', Percentage()],
-                       maxval=int(filesize)).start()
-    with open(filename, "wb") as f:
-        for line in file_conn:
-            processed += len(line)
-            pbar.update(processed)
-            f.write(line)
-    print
-
-
-class file_with_callback(file):
-
-    def __init__(self, path, mode, *args):
-        file.__init__(self, path, mode)
-        self.seek(0, os.SEEK_END)
-        self._total = self.tell()
-        self.seek(0)
-        self.pbar = ProgressBar(widgets=[Bar(), ' ', ETA(), ' ', Percentage()],
-                                maxval=self._total).start()
-        self.processed = 0
-        self._callback = self.pbar.update
+class stream_with_callback(file):
+    def __init__(self, data, callback, *args):
+        self._file = StringIO(data)
+        self._file.seek(0, os.SEEK_END)
+        self._total = self._file.tell()
+        self._file.seek(0)
+        self._callback = callback
+        self._args = args
 
     def __len__(self):
         return self._total
 
     def read(self, size):
-        data = file.read(self, size)
-        self.processed += len(data)
-        self._callback(self.processed)
+        data = self._file.read(size)
+        self._callback(self._total, len(data), *self._args)
         return data
 
-
-def upload_file(url, filename):
-    stream = file_with_callback(filename, 'rb', filename)
-    req = urllib2.Request(url, stream)
-    urllib2.urlopen(req)
-    print
+def progressbarify(data):
+    progress = Progress()
+    return stream_with_callback(data, progress.update)

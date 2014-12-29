@@ -183,7 +183,6 @@ def execute(self, data)
 
 - [Hello World](http://docs.yhathq.com/python/examples/hello-world)
 - [Hello pip](http://docs.yhathq.com/python/examples/hello-pip)
-- [Step Model](http://docs.yhathq.com/python/examples/stepmodel)
 - [Random Forest](http://docs.yhathq.com/python/examples/random-forest)
 - [Twitter Feed](http://docs.yhathq.com/python/examples/twitter-feed)
 

@@ -218,7 +218,6 @@ Examples
 
 -  `Hello World <http://docs.yhathq.com/python/examples/hello-world>`__
 -  `Hello pip <http://docs.yhathq.com/python/examples/hello-pip>`__
--  `Step Model <http://docs.yhathq.com/python/examples/stepmodel>`__
 -  `Random
    Forest <http://docs.yhathq.com/python/examples/random-forest>`__
 -  `Twitter

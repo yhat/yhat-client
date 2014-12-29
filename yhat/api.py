@@ -403,9 +403,9 @@ need to connect to the server first. try running "connect_to_socket"
                 self.deploy_to_file(name, model, session)
         else:
             # upload the model to the server
-            print "Deploying model"
+            print "Uploading model data"
             data = self.post("deployer/model", self.q, bundle, pb=True)
-            print "Model deployed"
+            print "Model uploaded"
             return data
 
     def deploy_to_file(self, name, model, session, compress=True, packages=[]):

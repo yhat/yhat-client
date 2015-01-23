@@ -136,6 +136,7 @@ as a pandas DataFrame. If you're still having trouble, please contact:
         username = self.username if model_owner is None else model_owner
         ws_uri = ws_uri.format(BASE_URI=ws_base, USERNAME=username,
                                MODEL_NAME=model_name)
+        ws_uri = "%s?username=%s&apikey=%s" % (ws_uri, self.username, self.apikey)
         ws = websocket.create_connection(ws_uri)
         auth = {
             "username": self.username,

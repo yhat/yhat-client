@@ -135,15 +135,16 @@ as a pandas DataFrame. If you're still having trouble, please contact:
         # headers contains the necessary Content-Type and Content-Length
         # datagen is a generator object that yields the encoded parameters
         filename = ".tmp_yhatmodel.yhat"
+        model_name = data['modelname'] + ".yhat"
         with open(filename, "wb") as f:
             data = json.dumps(data)
             data = zlib.compress(data)
             f.write(data)
 
-        datagen, headers = multipart_encode({"model": open(filename, "rb")}, cb=progress)
+        datagen, headers = multipart_encode({model_name: open(filename, "rb")}, cb=progress)
 
         url = self.base_uri + endpoint + "?" + urllib.urlencode(params)
-        req = urllib2.Request("http://localhost:5000/", datagen, headers)
+        req = urllib2.Request(url, datagen, headers)
         # req.add_header('Content-Type', 'application/json')
         auth = '%s:%s' % (params['username'], params['apikey'])
         base64string = base64.encodestring(auth).replace('\n', '')
@@ -443,7 +444,8 @@ need to connect to the server first. try running "connect_to_socket"
         else:
             # upload the model to the server
             print "Uploading model data"
-            data = self.post_file("deployer/model", self.q, bundle, pb=True)
+            data = self.post("deployer/model", self.q, bundle, pb=True)
+            # data = self.post_file("deployer/model/large", self.q, bundle, pb=True)
             print "Model uploaded"
             return data
 

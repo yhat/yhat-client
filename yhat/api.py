@@ -13,6 +13,9 @@ import re
 import os
 import os.path
 import subprocess
+from poster.encode import multipart_encode
+from poster.streaminghttp import register_openers
+from progressbar import ProgressBar, Percentage, Bar, FileTransferSpeed, ETA
 
 from deployment.models import YhatModel
 from deployment.save_session import save_function, _get_source
@@ -116,6 +119,41 @@ as a pandas DataFrame. If you're still having trouble, please contact:
         except Exception, e:
             raise e
             print "Message: %s" % str(rsp)
+
+    def post_file(self, endpoint, params, data, pb=True):
+        # Register the streaming http handlers with urllib2
+        register_openers()
+
+        widgets = ['Transfering Model: ', Bar(), Percentage(), ' ', ETA(), ' ', FileTransferSpeed()]
+        pbar = ProgressBar(widgets=widgets).start()
+        def progress(param, current, total):
+            if not param:
+                return
+            pbar.maxval = total
+            pbar.update(current)
+
+        # headers contains the necessary Content-Type and Content-Length
+        # datagen is a generator object that yields the encoded parameters
+        filename = ".tmp_yhatmodel.yhat"
+        with open(filename, "wb") as f:
+            data = json.dumps(data)
+            data = zlib.compress(data)
+            f.write(data)
+
+        datagen, headers = multipart_encode({"model": open(filename, "rb")}, cb=progress)
+
+        url = self.base_uri + endpoint + "?" + urllib.urlencode(params)
+        req = urllib2.Request("http://localhost:5000/", datagen, headers)
+        # req.add_header('Content-Type', 'application/json')
+        auth = '%s:%s' % (params['username'], params['apikey'])
+        base64string = base64.encodestring(auth).replace('\n', '')
+        req.add_header("Authorization", "Basic %s" % base64string)
+        # Actually do the request, and get the response
+        response = urllib2.urlopen(req)
+        rsp = response.read()
+        pbar.finish()
+        # clean up after we're done
+        os.remove(filename)
 
     def handshake(self, model_name, model_owner=None):
         """
@@ -405,7 +443,7 @@ need to connect to the server first. try running "connect_to_socket"
         else:
             # upload the model to the server
             print "Uploading model data"
-            data = self.post("deployer/model", self.q, bundle, pb=True)
+            data = self.post_file("deployer/model", self.q, bundle, pb=True)
             print "Model uploaded"
             return data
 

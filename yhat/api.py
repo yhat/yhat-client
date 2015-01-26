@@ -396,7 +396,7 @@ need to connect to the server first. try running "connect_to_socket"
         bundle['packages'] = packages
         if isinstance(patch, str)==True:
             patch = "\n".join([line.strip() for line in patch.strip().split('\n')])
-            bundle['code'] = patch + bundle['code']
+            bundle['code'] = patch + "\n" + bundle['code']
         if self._check_obj_size(bundle) is False:
             # we're not going to deploy; model is too big, but let's give the
             # user the option to upload it manually
@@ -436,7 +436,7 @@ need to connect to the server first. try running "connect_to_socket"
         bundle['packages'] = packages
         if isinstance(patch, str)==True:
             patch = "\n".join([line.strip() for line in patch.strip().split('\n')])
-            bundle['code'] = patch + bundle['code']
+            bundle['code'] = patch + "\n" + bundle['code']
         filename = "%s.yhat" % name
         with open(filename, "w") as f:
             bundle = json.dumps(bundle)

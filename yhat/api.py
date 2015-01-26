@@ -363,7 +363,7 @@ need to connect to the server first. try running "connect_to_socket"
 
         return bundle
 
-    def deploy(self, name, model, session, sure=False, packages=[]):
+    def deploy(self, name, model, session, sure=False, packages=[], patch=None):
         """
         Deploys your model to a Yhat server
 
@@ -394,6 +394,9 @@ need to connect to the server first. try running "connect_to_socket"
                 sys.exit()
         bundle = self._extract_model(name, model, session)
         bundle['packages'] = packages
+        if isinstance(patch, str)==True:
+            patch = "\n".join([line.strip() for line in patch.strip().split('\n')])
+            bundle['code'] = patch + bundle['code']
         if self._check_obj_size(bundle) is False:
             # we're not going to deploy; model is too big, but let's give the
             # user the option to upload it manually
@@ -409,7 +412,7 @@ need to connect to the server first. try running "connect_to_socket"
             print "Model uploaded"
             return data
 
-    def deploy_to_file(self, name, model, session, compress=True, packages=[]):
+    def deploy_to_file(self, name, model, session, compress=True, packages=[], patch=None):
         """
         Bundles a local version of your model that can be manually uploaded to
         the server.
@@ -431,6 +434,9 @@ need to connect to the server first. try running "connect_to_socket"
         bundle = self._extract_model(name, model, session)
         bundle['apikey'] = self.apikey
         bundle['packages'] = packages
+        if isinstance(patch, str)==True:
+            patch = "\n".join([line.strip() for line in patch.strip().split('\n')])
+            bundle['code'] = patch + bundle['code']
         filename = "%s.yhat" % name
         with open(filename, "w") as f:
             bundle = json.dumps(bundle)

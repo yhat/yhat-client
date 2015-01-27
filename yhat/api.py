@@ -145,7 +145,6 @@ as a pandas DataFrame. If you're still having trouble, please contact:
 
         url = self.base_uri + endpoint + "?" + urllib.urlencode(params)
         req = urllib2.Request(url, datagen, headers)
-        # req.add_header('Content-Type', 'application/json')
         auth = '%s:%s' % (params['username'], params['apikey'])
         base64string = base64.encodestring(auth).replace('\n', '')
         req.add_header("Authorization", "Basic %s" % base64string)
@@ -436,7 +435,7 @@ need to connect to the server first. try running "connect_to_socket"
         if self._check_obj_size(bundle) is False:
             # we're not going to deploy; model is too big, but let's give the
             # user the option to upload it manually
-            print "Model is to large to deploy over HTTP"
+            print "Model is too large to deploy over HTTP"
             should_we_deploy = raw_input(
                 "Would you like to upload manually? (Y/n): ")
             if should_we_deploy.lower() == "y" or should_we_deploy == "":

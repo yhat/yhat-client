@@ -16,9 +16,18 @@ import subprocess
 
 from deployment.models import YhatModel
 from deployment.save_session import save_function, _get_source
-from requirements import merge
-
 from .utils import progressbarify
+
+# If we can't import everything we need to detect requirements from
+# this version of pip, then we just warn and turn off the feature.
+try:
+    from requirements import merge
+except ImportError:
+    warnings.warn("Unable to use this version of pip. Requirements detection disabled. Consider upgrading pip.")
+    DETECT_REQUIREMENTS = False
+else:
+    DETECT_REQUIREMENTS = True
+
 
 BASE_URI = "http://api.yhathq.com/"
 
@@ -255,7 +264,7 @@ class Yhat(API):
         model_owner: string
             username of the model owner for shared models. optional
         raw_input: bool
-            whether or not to attempt to parse the incoming JSON. for calling R 
+            whether or not to attempt to parse the incoming JSON. for calling R
             models only
 
         Returns
@@ -357,9 +366,25 @@ need to connect to the server first. try running "connect_to_socket"
         bundle["language"] = "python"
         bundle["modelname"] = name
         bundle["className"] = model.__name__
-        bundle["reqs"] = "\n".join(
-            str(r) for r in merge(session, getattr(model, "REQUIREMENTS", ""))
-        )
+
+        if DETECT_REQUIREMENTS:
+            # Requirements auto-detection.
+            bundle["reqs"] = "\n".join(
+                str(r) for r in merge(session, getattr(model, "REQUIREMENTS", ""))
+            )
+
+        else:
+            # The old way: REQUIREMENTS line.
+            reqs = getattr(model, "REQUIREMENTS", "")
+            if isinstance(reqs, list):
+                reqs = '\n'.join(reqs)
+            bundle["reqs"] = reqs
+
+            # make sure we freeze Yhat so we're sure we're using the right version
+            # this makes it a lot easier to upgrade the client
+            import yhat
+            bundle["reqs"] += '\n' + "yhat==" + yhat.__version__
+            bundle["reqs"] = bundle["reqs"].strip().replace('"', '').replace("'", "")
 
         return bundle
 

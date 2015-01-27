@@ -3,7 +3,7 @@ from setuptools import find_packages
 
 setup(
     name="yhat",
-    version="1.1.5",
+    version="1.1.6",
     author="Greg Lamp",
     author_email="greg@yhathq.com",
     url="https://github.com/yhat/yhat-client",
@@ -19,7 +19,7 @@ setup(
         'Topic :: Software Development :: Libraries :: Python Modules'
     ),
     install_requires=[
-        "pip>=6.0.3",
+        "pip",
         "Flask==0.10.1",
         "websocket-client==0.12.0",
         "dill==0.2b1",

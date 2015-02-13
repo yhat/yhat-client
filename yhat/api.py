@@ -395,6 +395,7 @@ need to connect to the server first. try running "connect_to_socket"
             your Python's session variables (i.e. "globals()")
         """
         code = ""
+        print "extracting model"
         # detect subclasses pickle errors by attempting to pickle all of the
         # objects in the global() session
         # http://stackoverflow.com/a/1948057/2325264
@@ -402,28 +403,29 @@ need to connect to the server first. try running "connect_to_socket"
             try:
                 pickle.dump(v, devnull)
             except pickle.PicklingError as e:
-                m = re.search(r'it\'s not found as ([A-Za-z0-9\.]+)', str(e))
                 try:
-                    path = m.group(1)
-                    parts = path.split(".")
-                    base = ".".join(parts[:-1])
-                    leaf = parts[-1]
-                    for i, _ in enumerate(parts[:-1]):
+                    base = type(v).__module__
+                    leaf = type(v).__class__.__name__
+                    parts = base.split(".")
+                    for i, _ in enumerate(parts):
                         importpath = ".".join(parts[:i+1])
                         globals()[importpath] = __import__(importpath)
-                    mod = sys.modules[base]
-                    for k in dir(mod):
-                        if hasattr(getattr(mod, k), leaf):
-                            break
-                    truepath = ".".join([base, k, leaf])
-                    setattr(sys.modules[base], leaf, eval(truepath))
-                    pickle.dump(v, devnull)
-                    code += "\n" + "\n".join([
-                        "import " + base,
-                        "setattr(sys.modules['%s'], '%s', %s)" % (base, leaf, truepath),
-                    ])
+                    subclasses = []
+                    for attr in dir(v):
+                        if attr.startswith("__"):
+                            continue
+                        if types.TypeType == type(getattr(v, attr)):
+                            subclasses.append(attr)
+                    if not subclasses:
+                        continue
+                    for c in subclasses:
+                        truepath = ".".join([base, leaf, c])
+                        code += "\n" + "\n".join([
+                            "import " + base,
+                            "setattr(sys.modules['%s'], '%s', %s)" % (base, ".".join([base, leaf]), truepath),
+                        ])
                 except Exception as e:
-                    pass
+                    print e
             except Exception as e:
                 pass
         if 1 == 2 and _get_source(YhatModel.execute) == _get_source(model.execute):

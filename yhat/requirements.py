@@ -72,13 +72,17 @@ def merge(session, explicit=""):
     Warnings are given to the user in case of version mismatche or modules
     that do not need to be required explicitly.
     """
-    implicit_dict = {r.project_name: r for r in implicit(session)}
+    implicit_dict = {}
+    for r in implicit(session):
+        implicit_dict[r.project_name] = r 
 
     # explicit can be one requirement in a string, or many in a list.
     if isinstance(explicit, basestring) and explicit:
         explicit = [explicit]
     explicit_list = [Requirement.parse(r) for r in explicit]
-    explicit_dict = {r.project_name: r for r in explicit_list}
+    explicit_dict = {}
+    for r in explicit_list:
+        explicit_dict[r.project_name] = r
 
     for project_name, exp_req in explicit_dict.items():
         # To be polite, we keep the explicit dependencies and add the implicit

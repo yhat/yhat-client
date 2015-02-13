@@ -13,6 +13,9 @@ import re
 import os
 import os.path
 import subprocess
+from poster.encode import multipart_encode
+from poster.streaminghttp import register_openers
+from progressbar import ProgressBar, Percentage, Bar, FileTransferSpeed, ETA
 
 from deployment.models import YhatModel
 from deployment.save_session import save_function, _get_source
@@ -125,6 +128,41 @@ as a pandas DataFrame. If you're still having trouble, please contact:
         except Exception, e:
             raise e
             print "Message: %s" % str(rsp)
+
+    def post_file(self, endpoint, params, data, pb=True):
+        # Register the streaming http handlers with urllib2
+        register_openers()
+
+        widgets = ['Transfering Model: ', Bar(), Percentage(), ' ', ETA(), ' ', FileTransferSpeed()]
+        pbar = ProgressBar(widgets=widgets).start()
+        def progress(param, current, total):
+            if not param:
+                return
+            pbar.maxval = total
+            pbar.update(current)
+
+        # headers contains the necessary Content-Type and Content-Length
+        # datagen is a generator object that yields the encoded parameters
+        filename = ".tmp_yhatmodel.yhat"
+        model_name = data['modelname'] + ".yhat"
+        with open(filename, "wb") as f:
+            data = json.dumps(data)
+            data = zlib.compress(data)
+            f.write(data)
+
+        datagen, headers = multipart_encode({model_name: open(filename, "rb")}, cb=progress)
+
+        url = self.base_uri + endpoint + "?" + urllib.urlencode(params)
+        req = urllib2.Request(url, datagen, headers)
+        auth = '%s:%s' % (params['username'], params['apikey'])
+        base64string = base64.encodestring(auth).replace('\n', '')
+        req.add_header("Authorization", "Basic %s" % base64string)
+        # Actually do the request, and get the response
+        response = urllib2.urlopen(req)
+        rsp = response.read()
+        pbar.finish()
+        # clean up after we're done
+        os.remove(filename)
 
     def handshake(self, model_name, model_owner=None):
         """
@@ -425,16 +463,14 @@ need to connect to the server first. try running "connect_to_socket"
         if self._check_obj_size(bundle) is False:
             # we're not going to deploy; model is too big, but let's give the
             # user the option to upload it manually
-            print "Model is to large to deploy over HTTP"
+            print "Model is too large to deploy over HTTP"
             should_we_deploy = raw_input(
                 "Would you like to upload manually? (Y/n): ")
             if should_we_deploy.lower() == "y" or should_we_deploy == "":
                 self.deploy_to_file(name, model, session)
         else:
             # upload the model to the server
-            print "Uploading model data"
-            data = self.post("deployer/model", self.q, bundle, pb=True)
-            print "Model uploaded"
+            data = self.post_file("deployer/model/large", self.q, bundle, pb=True)
             return data
 
     def deploy_to_file(self, name, model, session, compress=True, packages=[], patch=None):

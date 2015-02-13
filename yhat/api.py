@@ -165,6 +165,7 @@ as a pandas DataFrame. If you're still having trouble, please contact:
         pbar.finish()
         # clean up after we're done
         os.remove(filename)
+        return json.loads(rsp)
 
     def handshake(self, model_name, model_owner=None):
         """

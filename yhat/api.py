@@ -165,6 +165,11 @@ as a pandas DataFrame. If you're still having trouble, please contact:
         pbar.finish()
         # clean up after we're done
         os.remove(filename)
+        reply = {
+            "status": "OK",
+            "message": "Model successfully deployed. Please see %s for more details" % self.base_uri
+        }
+        return reply
 
     def handshake(self, model_name, model_owner=None):
         """

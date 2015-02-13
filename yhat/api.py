@@ -21,6 +21,8 @@ from deployment.models import YhatModel
 from deployment.save_session import save_function, _get_source
 from .utils import progressbarify
 
+devnull = open(os.devnull, "w")
+
 # If we can't import everything we need to detect requirements from
 # this version of pip, then we just warn and turn off the feature.
 try:
@@ -392,6 +394,38 @@ need to connect to the server first. try running "connect_to_socket"
         session: globals()
             your Python's session variables (i.e. "globals()")
         """
+        code = ""
+        # detect subclasses pickle errors by attempting to pickle all of the
+        # objects in the global() session
+        # http://stackoverflow.com/a/1948057/2325264
+        for k, v in session.items():
+            try:
+                pickle.dump(v, devnull)
+            except pickle.PicklingError as e:
+                m = re.search(r'it\'s not found as ([A-Za-z0-9\.]+)', str(e))
+                try:
+                    path = m.group(1)
+                    parts = path.split(".")
+                    base = ".".join(parts[:-1])
+                    leaf = parts[-1]
+                    for i, _ in enumerate(parts[:-1]):
+                        importpath = ".".join(parts[:i+1])
+                        globals()[importpath] = __import__(importpath)
+                    mod = sys.modules[base]
+                    for k in dir(mod):
+                        if hasattr(getattr(mod, k), leaf):
+                            break
+                    truepath = ".".join([base, k, leaf])
+                    setattr(sys.modules[base], leaf, eval(truepath))
+                    pickle.dump(v, devnull)
+                    code += "\n" + "\n".join([
+                        "import " + base,
+                        "setattr(sys.modules['%s'], '%s', %s)" % (base, leaf, truepath),
+                    ])
+                except Exception as e:
+                    pass
+            except Exception as e:
+                pass
         if 1 == 2 and _get_source(YhatModel.execute) == _get_source(model.execute):
             msg = """'execute' method was not implemented.
             If you believe that you did implement the 'execute' method,
@@ -404,6 +438,7 @@ need to connect to the server first. try running "connect_to_socket"
         bundle["language"] = "python"
         bundle["modelname"] = name
         bundle["className"] = model.__name__
+        bundle["code"] = code + "\n" + bundle.get("code", "")
 
         if DETECT_REQUIREMENTS:
             # Requirements auto-detection.

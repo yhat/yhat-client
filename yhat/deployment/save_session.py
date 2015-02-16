@@ -214,6 +214,9 @@ def _spider_function(function, session, pickles={}):
                 if hasattr(obj, "func_name") and obj.func_name!=varname:
                     imports.append("from %s import %s as %s" % (ref, obj.func_name, varname))
                 else:
+                    # we need to figure out how to import this library. i'm not 
+                    # sure exactly what the right way to get the module and 
+                    # class name, but this works just fine
                     try:
                         import_statement = "from %s import %s" % (ref, varname)
                         exec import_statement in locals()

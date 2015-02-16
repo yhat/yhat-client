@@ -3,6 +3,7 @@ import warnings
 import base64
 import json
 import pickle
+import terragon
 import urllib2
 import urllib
 import types
@@ -167,7 +168,7 @@ as a pandas DataFrame. If you're still having trouble, please contact:
         os.remove(filename)
         reply = {
             "status": "OK",
-            "message": "Model successfully deployed. Please see %s for more details" % self.base_uri
+            "message": "Model successfully uploaded. Your model will begin building momentarily. Please see %s for more details" % self.base_uri
         }
         return reply
 
@@ -404,35 +405,36 @@ need to connect to the server first. try running "connect_to_socket"
         # detect subclasses pickle errors by attempting to pickle all of the
         # objects in the global() session
         # http://stackoverflow.com/a/1948057/2325264
-        for k, v in session.items():
-            try:
-                pickle.dump(v, devnull)
-            except pickle.PicklingError as e:
-                try:
-                    base = type(v).__module__
-                    leaf = type(v).__class__.__name__
-                    parts = base.split(".")
-                    for i, _ in enumerate(parts):
-                        importpath = ".".join(parts[:i+1])
-                        globals()[importpath] = __import__(importpath)
-                    subclasses = []
-                    for attr in dir(v):
-                        if attr.startswith("__"):
-                            continue
-                        if types.TypeType == type(getattr(v, attr)):
-                            subclasses.append(attr)
-                    if not subclasses:
-                        continue
-                    for c in subclasses:
-                        truepath = ".".join([base, leaf, c])
-                        code += "\n" + "\n".join([
-                            "import " + base,
-                            "setattr(sys.modules['%s'], '%s', %s)" % (base, ".".join([base, leaf]), truepath),
-                        ])
-                except Exception as e:
-                    print e
-            except Exception as e:
-                pass
+        # for k, v in session.items():
+        #     try:
+        #         terragon.dump(v, devnull)
+        #     except terragon.pickle.PicklingError as e:
+        #         try:
+        #             base = type(v).__module__
+        #             leaf = type(v).__class__.__name__
+        #             parts = base.split(".")
+        #             for i, _ in enumerate(parts):
+        #                 importpath = ".".join(parts[:i+1])
+        #                 globals()[importpath] = __import__(importpath)
+        #             subclasses = []
+        #             for attr in dir(v):
+        #                 if attr.startswith("__"):
+        #                     continue
+        #                 if types.TypeType == type(getattr(v, attr)):
+        #                     subclasses.append(attr)
+        #             if not subclasses:
+        #                 continue
+        #             for c in subclasses:
+        #                 truepath = ".".join([base, leaf, c])
+        #                 code += "\n" + "\n".join([
+        #                     "import " + base,
+        #                     "setattr(sys.modules['%s'], '%s', %s)" % (base, ".".join([base, leaf]), truepath),
+        #                 ])
+        #         except Exception as e:
+        #             print e
+        #     except Exception as e:
+        #         print e
+
         if 1 == 2 and _get_source(YhatModel.execute) == _get_source(model.execute):
             msg = """'execute' method was not implemented.
             If you believe that you did implement the 'execute' method,

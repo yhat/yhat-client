@@ -201,7 +201,7 @@ def _spider_function(function, session, pickles={}):
         # checking to see if this is an instance of an object
         if hasattr(obj, "__name__")==False:
             pickles[varname] = terragon.dumps_to_base64(obj)
-        elif hasattr(obj, "__module__"):
+        if hasattr(obj, "__module__"):
             if obj.__module__=="__main__":
                 new_imports, new_source, new_pickles, new_modules = _spider_function(obj, session, pickles)
                 source += new_source + '\n'
@@ -214,7 +214,18 @@ def _spider_function(function, session, pickles={}):
                 if hasattr(obj, "func_name") and obj.func_name!=varname:
                     imports.append("from %s import %s as %s" % (ref, obj.func_name, varname))
                 else:
-                    imports.append("from %s import %s" % (ref, varname))
+                    try:
+                        import_statement = "from %s import %s" % (ref, varname)
+                        exec import_statement in locals()
+                        imports.append(import_statement)
+                    except:
+                        try:
+                            import_statement = "from %s import %s" % (ref, obj.__class__.__name__)
+                            exec import_statement in locals()
+                            imports.append(import_statement)
+                        except:
+                            pass
+
         elif isinstance(obj, types.ModuleType):
             modules.update(_extract_module(obj.__name__))
             if obj.__name__!=varname:

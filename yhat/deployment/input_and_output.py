@@ -19,7 +19,10 @@ def make_df(data):
     -------
     data: data frame
     """
-    data = pd.DataFrame(data)
+    try:
+        data = pd.DataFrame(data)
+    except:
+        data = pd.DataFrame([data])
     return data
 
 

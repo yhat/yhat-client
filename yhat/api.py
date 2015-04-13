@@ -470,7 +470,7 @@ need to connect to the server first. try running "connect_to_socket"
 
         return bundle
 
-    def deploy(self, name, model, session, sure=False, packages=[], patch=None):
+    def deploy(self, name, model, session, sure=False, packages=[], patch=None, dry_run=False):
         """
         Deploys your model to a Yhat server
 
@@ -494,7 +494,7 @@ need to connect to the server first. try running "connect_to_socket"
         if not isinstance(packages, list):
             raise Exception(
                 "`packages` must be a list of ubuntu packages to install")
-        if sure is False:
+        if (not sure) and (not dry_run):
             sure = raw_input("Are you sure you want to deploy? (y/N): ")
             if sure.lower() != "y":
                 print "Deployment canceled"
@@ -504,6 +504,8 @@ need to connect to the server first. try running "connect_to_socket"
         if isinstance(patch, str)==True:
             patch = "\n".join([line.strip() for line in patch.strip().split('\n')])
             bundle['code'] = patch + "\n" + bundle['code']
+        if dry_run:
+            return {"status": "ok", "info": "dry run complete"}
         if self._check_obj_size(bundle) is False:
             # we're not going to deploy; model is too big, but let's give the
             # user the option to upload it manually

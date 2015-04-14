@@ -3,7 +3,7 @@ from setuptools import find_packages
 
 setup(
     name="yhat",
-    version="1.2.5",
+    version="1.2.6",
     author="Greg Lamp",
     author_email="greg@yhathq.com",
     url="https://github.com/yhat/yhat-client",

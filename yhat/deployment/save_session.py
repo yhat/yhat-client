@@ -82,7 +82,7 @@ def _strip_function_source(src):
     n = len(src[0]) - len(src[0].lstrip())
     return "\n".join([line[n:] for line in src])
 
-def _get_naked_loads(function):
+def _get_naked_loads(function, verbose=0):
     """
     Takes a reference to a function and determines which variables used in the 
     function are not defined within the scope of the function.
@@ -90,6 +90,8 @@ def _get_naked_loads(function):
     Parameters
     ----------
     function: function
+    verbose: int
+        log level
 
     Returns
     -------
@@ -100,6 +102,10 @@ def _get_naked_loads(function):
     """
     source = _get_source(function)
     source = _strip_function_source(source)
+    if verbose >= 1:
+        sys.stderr.write("[INFO]: parsing source for %s\n" % str(function))
+    if verbose >= 2:
+        sys.stderr.write("[INFO]: %s\n" % source)
     tree = ast.parse(source)
     params = set()
     loaded = set()
@@ -124,7 +130,7 @@ def _get_naked_loads(function):
         if variable not in params and variable not in created:
             yield variable
 
-def _extract_module(module_name, modules={}):
+def _extract_module(module_name, modules={}, verbose=0):
     module = sys.modules.get(module_name)
     # check if we've already seen it
     if module in modules or module is None:
@@ -142,20 +148,24 @@ def _extract_module(module_name, modules={}):
             "name": os.path.basename(module_py),
             "source": module_source
         }
+        if verbose >= 1:
+            sys.stderr.write("[INFO]: parsing source for %s\n" % module_name)
+        if verbose >= 2:
+            sys.stderr.write("[INFO]: %s\n" % module_source)
         tree = ast.parse(module_source)
         for thing in ast.walk(tree):
             if hasattr(thing, "module"):
-                modules.update(_extract_module(thing.module))
+                modules.update(_extract_module(thing.module, verbose=verbose))
             elif isinstance(thing, (ast.Import, ast.ImportFrom)):
                 for imp in thing.names:
                     if imp.name!="*":
-                        modules.update(_extract_module(imp.name))
+                        modules.update(_extract_module(imp.name, verbose=verbose))
     else:
         modules[module_name] = None
     return modules
 
 
-def _spider_function(function, session, pickles={}):
+def _spider_function(function, session, pickles={}, verbose=0):
     """
     Takes a function and global variables referenced in an environment and 
     recursively finds dependencies required in order to execute the function. 
@@ -169,6 +179,8 @@ def _spider_function(function, session, pickles={}):
         variables referenced from a seperate environment; i.e. globals()
     pickles: dictionary
         holds the variables needed to execute the function
+    verbose: int
+        log level
 
     Returns
     -------
@@ -191,7 +203,7 @@ def _spider_function(function, session, pickles={}):
     else:
         source += _get_source(function) + '\n'
     
-    for varname in _get_naked_loads(function):
+    for varname in _get_naked_loads(function, verbose=verbose):
         if varname in pickles['_objects_seen']:
             continue
         pickles['_objects_seen'].append(varname)
@@ -203,13 +215,13 @@ def _spider_function(function, session, pickles={}):
             pickles[varname] = terragon.dumps_to_base64(obj)
         if hasattr(obj, "__module__"):
             if obj.__module__=="__main__":
-                new_imports, new_source, new_pickles, new_modules = _spider_function(obj, session, pickles)
+                new_imports, new_source, new_pickles, new_modules = _spider_function(obj, session, pickles, verbose=verbose)
                 source += new_source + '\n'
                 imports += new_imports
                 pickles.update(new_pickles)
                 modules.update(new_modules)
             else:
-                modules.update(_extract_module(obj.__module__))
+                modules.update(_extract_module(obj.__module__, verbose=verbose))
                 ref = inspect.getmodule(obj).__name__
                 if hasattr(obj, "func_name") and obj.func_name!=varname:
                     imports.append("from %s import %s as %s" % (ref, obj.func_name, varname))
@@ -230,7 +242,7 @@ def _spider_function(function, session, pickles={}):
                             pass
 
         elif isinstance(obj, types.ModuleType):
-            modules.update(_extract_module(obj.__name__))
+            modules.update(_extract_module(obj.__name__, verbose=verbose))
             if obj.__name__!=varname:
                 imports.append("import %s as %s" % (obj.__name__, varname))
             else:
@@ -262,7 +274,7 @@ def _detect_future_imports(session):
                     imports.append("from __future__ import %s" % k)
     return imports
 
-def save_function(function, session):
+def save_function(function, session, verbose=0):
     """
     Saves a user's session and all dependencies to a big 'ole JSON object with
     accompanying pickles for any variable.
@@ -273,9 +285,11 @@ def save_function(function, session):
         function we're saving
     session: dictionary
         globals() from the user's environment
+    verbose: int
+        log level
     """
     future_imports = "\n".join(_detect_future_imports(session))
-    imports, source_code, pickles, modules = _spider_function(function, session)
+    imports, source_code, pickles, modules = _spider_function(function, session, verbose=verbose)
     # de-dup and order the imports
     imports = sorted(list(set(imports)))
     imports.append("import json")

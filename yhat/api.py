@@ -387,7 +387,7 @@ need to connect to the server first. try running "connect_to_socket"
         """
         self.ws = self.handshake(model, model_owner)
 
-    def _extract_model(self, name, model, session):
+    def _extract_model(self, name, model, session, verbose=0):
         """
         Extracts source code and any objects required to deploy the model.
 
@@ -399,6 +399,8 @@ need to connect to the server first. try running "connect_to_socket"
             an instance of a Yhat model
         session: globals()
             your Python's session variables (i.e. "globals()")
+        verbose: int
+            log level
         """
         code = ""
         print "extracting model"
@@ -441,7 +443,7 @@ need to connect to the server first. try running "connect_to_socket"
             check to make sure there isn't an indentation error."""
             raise Exception(msg)
 
-        bundle = save_function(model, session)
+        bundle = save_function(model, session, verbose=verbose)
         bundle["largefile"] = True
         bundle["username"] = self.username
         bundle["language"] = "python"
@@ -470,7 +472,7 @@ need to connect to the server first. try running "connect_to_socket"
 
         return bundle
 
-    def deploy(self, name, model, session, sure=False, packages=[], patch=None, dry_run=False):
+    def deploy(self, name, model, session, sure=False, packages=[], patch=None, dry_run=False, verbose=0):
         """
         Deploys your model to a Yhat server
 
@@ -499,7 +501,7 @@ need to connect to the server first. try running "connect_to_socket"
             if sure.lower() != "y":
                 print "Deployment canceled"
                 sys.exit()
-        bundle = self._extract_model(name, model, session)
+        bundle = self._extract_model(name, model, session, verbose=verbose)
         bundle['packages'] = packages
         if isinstance(patch, str)==True:
             patch = "\n".join([line.strip() for line in patch.strip().split('\n')])

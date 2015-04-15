@@ -139,6 +139,14 @@ def _extract_module(module_name, modules={}, verbose=0):
     elif hasattr(module, "__file__")==False:
         pass
     elif _is_on_syspath(module.__file__)==False:
+        if verbose >= 1:
+            sys.stderr.write("[INFO]: file being parsed is: %s\n" % module.__file__)
+
+        if not module.__file__.endswith(".pyc"):
+            sys.stderr.write("[WARNING]: %s is not a .pyc. it will be skipped.\n" % module.__file__)
+            modules[module_name] = None
+            return modules
+
         module_py = module.__file__.replace(".pyc", ".py")
         module_source = open(module_py, 'rb').read()
         parent_dir = module_py.replace(os.getcwd(), '').lstrip('/')

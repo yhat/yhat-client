@@ -149,7 +149,10 @@ as a pandas DataFrame. If you're still having trouble, please contact:
         filename = ".tmp_yhatmodel.yhat"
         model_name = data['modelname'] + ".yhat"
         with open(filename, "wb") as f:
-            data = json.dumps(data)
+            try:
+                data = json.dumps(data)
+            except UnicodeDecodeError, e:
+                raise Exception("Could not serialize into JSON. String is not utf-8 encoded `%s`" % str(e.args[1]))
             data = zlib.compress(data)
             f.write(data)
 

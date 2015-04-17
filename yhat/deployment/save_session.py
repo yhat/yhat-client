@@ -31,6 +31,12 @@ def _is_on_syspath(filepath):
         elif libpath!="":
             if _in_directory(filepath, libpath)==True:
                 return True
+            elif os.environ.get("CONDA_DEFAULT_ENV"):
+                # CONDA wierdness. check and see if CONDA is messing with our syspath
+                # we're also going to have an exception for the yhat library. not sure
+                # if this actually helps/hurts, but I don't want to find out
+                if "%s/lib/python2.7" % os.environ["CONDA_DEFAULT_ENV"] in filepath and "yhat" not in filepath:
+                    return True
     return False
 
 def _get_source(func):

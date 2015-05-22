@@ -20,7 +20,7 @@ from progressbar import ProgressBar, Percentage, Bar, FileTransferSpeed, ETA
 
 from deployment.models import YhatModel
 from deployment.save_session import save_function, _get_source
-from .utils import progressbarify
+from .utils import progressbarify, sizeof_fmt
 
 devnull = open(os.devnull, "w")
 
@@ -454,6 +454,17 @@ need to connect to the server first. try running "connect_to_socket"
         bundle["className"] = model.__name__
         bundle["code"] = code + "\n" + bundle.get("code", "")
 
+
+        user_reqs = getattr(model, "REQUIREMENTS", "")
+        if isinstance(user_reqs, basestring):
+            user_reqs = [r for r in user_reqs.splitlines() if r]
+        if user_reqs:
+            print "model specified requirements"
+            for r in user_reqs:
+                if "==" not in r:
+                    r = r + " (warning: unversioned)"
+                print " [+]", r
+
         if DETECT_REQUIREMENTS:
             # Requirements auto-detection.
             bundle["reqs"] = "\n".join(
@@ -472,6 +483,39 @@ need to connect to the server first. try running "connect_to_socket"
             import yhat
             bundle["reqs"] += '\n' + "yhat==" + yhat.__version__
             bundle["reqs"] = bundle["reqs"].strip().replace('"', '').replace("'", "")
+
+        reqs = [r for r in bundle["reqs"].splitlines() if r]
+
+        detected_reqs = [r for r in reqs if r not in user_reqs]
+        if detected_reqs:
+            print "requirements automatically detected"
+            for r in detected_reqs:
+                print " [+]", r
+
+        # print modules information
+        modules = bundle.get("modules", [])
+        if modules:
+            print "model source files"
+            for module in modules:
+                name = module["name"]
+                parent_dir = module.get("parent_dir", "")
+                if parent_dir != "":
+                    name = os.path.join(parent_dir, name)
+                print " [+]", name
+
+        objects = bundle.get("objects", {})
+        if objects:
+            print "model variables"
+            for name, pkl in objects.iteritems():
+                try:
+                    obj = terragon.loads_from_base64(pkl)
+                    t = type(obj)
+                    del obj
+                except Exception as e:
+                    print "ERROR pickling object:", name
+                    raise e
+                size = 3. * float(len(pkl)) / 4.
+                print " [+]", name, t, sizeof_fmt(size)
 
         return bundle
 
@@ -509,6 +553,7 @@ need to connect to the server first. try running "connect_to_socket"
         if isinstance(patch, str)==True:
             patch = "\n".join([line.strip() for line in patch.strip().split('\n')])
             bundle['code'] = patch + "\n" + bundle['code']
+
         if dry_run:
             return {"status": "ok", "info": "dry run complete"}
         if self._check_obj_size(bundle) is False:

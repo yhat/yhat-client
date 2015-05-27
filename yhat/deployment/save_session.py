@@ -164,6 +164,15 @@ def _extract_module(module_name, modules={}, verbose=0):
         module_source = open(module_py, 'rb').read()
         parent_dir = module_py.replace(os.getcwd(), '').lstrip('/')
         parent_dir = os.path.dirname(parent_dir)
+        finit = os.path.join(parent_dir, "__init__.py")
+        isinit = os.path.isfile(finit)
+        if isinit:
+            init_source = open(finit, 'rb').read()
+            modules['init'] = {
+                "parent_dir": parent_dir,
+                "name": "__init__.py",
+                "source": init_source
+            }
         modules[module] = {
             "parent_dir": parent_dir,
             "name": os.path.basename(module_py),

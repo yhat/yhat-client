@@ -31,19 +31,22 @@ def _is_on_syspath(filepath):
         elif libpath!="":
             if _in_directory(filepath, libpath)==True:
                 return True
-            elif os.environ.get("CONDA_DEFAULT_ENV"):
-                # CONDA wierdness. check and see if CONDA is messing with our 
-                # syspath we're also going to have an exception for the yhat
-                # library. not sure if this actually helps/hurts, but I don't 
-                # want to find out
-                conda_env = os.environ["CONDA_DEFAULT_ENV"]
-                conda_syspath = os.path.join(conda_env, "lib", "python2.7")
-                if conda_syspath in filepath and "yhat" not in filepath:
-                    return True
-            elif os.environ.get("VIRTUAL_ENV"):
-                # same nonsense as above,but for virtualenv
-                if _in_directory(filepath, os.environ["VIRTUAL_ENV"]) and "yhat" not in filepath:
-                    return True
+
+    if os.environ.get("CONDA_DEFAULT_ENV"):
+        # CONDA wierdness. check and see if CONDA is messing with our 
+        # syspath we're also going to have an exception for the yhat
+        # library. not sure if this actually helps/hurts, but I don't 
+        # want to find out
+        conda_env = os.environ["CONDA_DEFAULT_ENV"]
+        conda_syspath = os.path.join(conda_env, "lib", "python2.7")
+        if conda_syspath in filepath:
+            return True
+
+    if os.environ.get("VIRTUAL_ENV"):
+        # same nonsense as above,but for virtualenv
+        if _in_directory(filepath, os.environ["VIRTUAL_ENV"]):
+            return True
+
     return False
 
 def _get_source(func):

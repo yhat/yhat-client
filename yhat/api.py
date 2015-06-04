@@ -229,8 +229,9 @@ class Yhat(API):
         self.headers = {'Content-Type': 'application/json'}
         self.q = {"username": self.username, "apikey": apikey}
         if self.base_uri != BASE_URI:
-            if self._authenticate() is False:
-                raise Exception("Incorrect username/apikey!")
+            e = self._authenticate()
+            if e is not None:
+                raise Exception("Failed to authenticate: %s" % e)
 
     def _check_obj_size(self, obj):
         """
@@ -258,16 +259,15 @@ class Yhat(API):
         """
         Returns
         -------
-        authed: boolean
+        error: None or Exception
             verifies your API credentials are valid
         """
-        authed = True
         try:
             response = self.post('verify', self.q, {})
             error = response["success"]
+            return None
         except Exception, e:
-            authed = False
-        return authed
+            return e
 
     def _convert_to_json(self, data):
         """

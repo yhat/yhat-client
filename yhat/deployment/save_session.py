@@ -165,15 +165,24 @@ def _extract_module(module_name, modules={}, verbose=0):
         if verbose >= 1:
             sys.stderr.write("[INFO]: file being parsed is: %s\n" % module.__file__)
 
-        if not module.__file__.endswith(".pyc"):
-            sys.stderr.write("[WARNING]: %s is not a .pyc. it will be skipped.\n" % module.__file__)
+        if module.__file__.endswith(".py"):
+            module_py = module.__file__
+        elif module.__file__.endswith(".pyc"):
+            module_py = module.__file__.replace(".pyc", ".py")
+        else:
+            sys.stderr.write("[WARNING]: %s is not a .py or .pyc skipping: \n" % module.__file__)
             modules[module_name] = None
             return modules
-
-        module_py = module.__file__.replace(".pyc", ".py")
+            
         module_source = open(module_py, 'rb').read()
         parent_dir = module_py.replace(os.getcwd(), '').lstrip('/')
         parent_dir = os.path.dirname(parent_dir)
+        modules[module] = {
+            "parent_dir": parent_dir,
+            "name": os.path.basename(module_py),
+            "source": module_source
+        }
+        # Try to extract init files
         finit = os.path.join(parent_dir, "__init__.py")
         isinit = os.path.isfile(finit)
         if isinit:
@@ -183,11 +192,7 @@ def _extract_module(module_name, modules={}, verbose=0):
                 "name": "__init__.py",
                 "source": init_source
             }
-        modules[module] = {
-            "parent_dir": parent_dir,
-            "name": os.path.basename(module_py),
-            "source": module_source
-        }
+
         if verbose >= 1:
             sys.stderr.write("[INFO]: parsing source for %s\n" % module_name)
         if verbose >= 2:

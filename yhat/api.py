@@ -486,7 +486,8 @@ need to connect to the server first. try running "connect_to_socket"
 
         reqs = [r for r in bundle["reqs"].splitlines() if r]
 
-        detected_reqs = [r for r in reqs if r not in user_reqs]
+        user_reqs_cmp = [user_req.lower() for user_req in user_reqs]
+        detected_reqs = [r for r in reqs if r.lower() not in user_reqs_cmp]
         if detected_reqs:
             print "requirements automatically detected"
             for r in detected_reqs:

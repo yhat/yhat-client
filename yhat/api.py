@@ -153,8 +153,7 @@ as a pandas DataFrame. If you're still having trouble, please contact:
                 data = json.dumps(data)
             except UnicodeDecodeError, e:
                 raise Exception("Could not serialize into JSON. String is not utf-8 encoded `%s`" % str(e.args[1]))
-            data = zlib.compress(data)
-            f.write(data)
+            zlib_compress(data, f)
 
         datagen, headers = multipart_encode({model_name: open(filename, "rb")}, cb=progress)
 
@@ -599,8 +598,9 @@ need to connect to the server first. try running "connect_to_socket"
         with open(filename, "w") as f:
             bundle = json.dumps(bundle)
             if compress is True:
-                bundle = zlib.compress(bundle)
-            f.write(bundle)
+                zlib_compress(bundle, f)
+            else:
+                f.write(bundle)
 
         print "Model successfully bundled to file:"
         print "\t%s/%s.yhat" % (os.getcwd(), name)
@@ -633,3 +633,13 @@ need to connect to the server first. try running "connect_to_socket"
         /var/yhat/headquarters/uploads/'""" % (pem_path, server_uri, filename)
         subprocess.check_call(ssh_cmd, shell=True)
         os.remove(filename)
+
+
+def zlib_compress(data, to):
+    step = 4 << 20 # 4MiB
+    c = zlib.compressobj()
+
+    for i in xrange(0, len(data), step):
+        to.write(c.compress(data[i:i+step]))
+
+    to.write(c.flush())

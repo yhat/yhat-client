@@ -163,7 +163,15 @@ as a pandas DataFrame. If you're still having trouble, please contact:
         base64string = base64.encodestring(auth).replace('\n', '')
         req.add_header("Authorization", "Basic %s" % base64string)
         # Actually do the request, and get the response
-        response = urllib2.urlopen(req)
+        try:
+            response = urllib2.urlopen(req)
+        except urllib2.HTTPError, e:
+            if e.code > 200:
+                return { "status": "error", "message": str(e) }
+            else:
+                return { "status": "error", "messae": "Error in HTTP connection." }
+        except Exception, e:
+            return { "status": "error", "message": str(e) }
         rsp = response.read()
         pbar.finish()
         # clean up after we're done

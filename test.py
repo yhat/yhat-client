@@ -10,5 +10,6 @@ class HelloWorld(YhatModel):
         return { "greeting": greeting, "x": x}
 
 # yh = Yhat("greg", "fCVZiLJhS95cnxOrsp5e2VSkk0GfypZqeRCntTD1nHA", "http://cloud.yhathq.com/")
-yh = Yhat("greg", "9207b9a2dd9d48848b139b729d4354bc", "http://localhost:8080/")
-yh.deploy("NewZippedModel", HelloWorld, globals())
+# yh = Yhat("greg", "9207b9a2dd9d48848b139b729d4354bc", "http://localhost:8080/")
+# yh = Yhat("greg", "9207b9a2dd9d48848b139b729d4354bc", "http://localhost:5000/")
+print yh.deploy("NewZippedModel", HelloWorld, globals(), True)

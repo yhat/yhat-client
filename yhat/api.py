@@ -9,6 +9,7 @@ import urllib
 import types
 import websocket
 import uuid
+import tempfile
 import zlib
 import re
 import os
@@ -146,16 +147,16 @@ as a pandas DataFrame. If you're still having trouble, please contact:
 
         # headers contains the necessary Content-Type and Content-Length
         # datagen is a generator object that yields the encoded parameters
-        filename = ".tmp_yhatmodel.yhat"
+        f = tempfile.NamedTemporaryFile(mode='wb', prefix='tmp_yhat_')
         model_name = data['modelname'] + ".yhat"
-        with open(filename, "wb") as f:
-            try:
-                data = json.dumps(data)
-            except UnicodeDecodeError, e:
-                raise Exception("Could not serialize into JSON. String is not utf-8 encoded `%s`" % str(e.args[1]))
-            zlib_compress(data, f)
+        try:
+            data = json.dumps(data)
+        except UnicodeDecodeError, e:
+            raise Exception("Could not serialize into JSON. String is not utf-8 encoded `%s`" % str(e.args[1]))
+        zlib_compress(data, f)
+        f.close()
 
-        datagen, headers = multipart_encode({model_name: open(filename, "rb")}, cb=progress)
+        datagen, headers = multipart_encode({model_name: open(f.name, "rb")}, cb=progress)
 
         url = self.base_uri + endpoint + "?" + urllib.urlencode(params)
         req = urllib2.Request(url, datagen, headers)

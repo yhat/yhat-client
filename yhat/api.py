@@ -168,10 +168,14 @@ as a pandas DataFrame. If you're still having trouble, please contact:
             response = urllib2.urlopen(req)
         except urllib2.HTTPError, e:
             if e.code > 200:
-                return { "status": "error", "message": str(e) }
+                responseText = e.read()
+                sys.stderr.write("\nDeployment error: " + responseText)
+                return { "status": "error", "message": responseText }
             else:
-                return { "status": "error", "messae": "Error in HTTP connection." }
+                sys.stderr.write("\nError in HTTP connection")
+                return { "status": "error", "message": "Error in HTTP connection." }
         except Exception, e:
+            sys.stderr.write("\nDeployment error: " + str(e))
             return { "status": "error", "message": str(e) }
         rsp = response.read()
         pbar.finish()

@@ -147,7 +147,7 @@ as a pandas DataFrame. If you're still having trouble, please contact:
 
         # headers contains the necessary Content-Type and Content-Length
         # datagen is a generator object that yields the encoded parameters
-        f = tempfile.NamedTemporaryFile(mode='wb', prefix='tmp_yhat_')
+        f = tempfile.NamedTemporaryFile(mode='wb', prefix='tmp_yhat_', delete=False)
         model_name = data['modelname'] + ".yhat"
         try:
             data = json.dumps(data)
@@ -180,7 +180,7 @@ as a pandas DataFrame. If you're still having trouble, please contact:
         rsp = response.read()
         pbar.finish()
         # clean up after we're done
-        os.remove(filename)
+        os.remove(f.name)
         reply = {
             "status": "OK",
             "message": "Model successfully uploaded. Your model will begin building momentarily. Please see %s for more details" % self.base_uri

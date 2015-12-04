@@ -6,8 +6,6 @@ import os
 import warnings
 import re
 
-from flask import Flask, request, render_template, jsonify
-
 from input_and_output import df_to_df, parse_json, preprocess
 
 try:
@@ -52,36 +50,6 @@ class YhatModel(object):
             dict_to_dict, etc.). 
         """
         pass
-
-    def serve(self, host='localhost', port=5000):
-        """
-        Creates a test server on port 5000 for testing purposes. This is a way to test
-        your model before you deploy it to production.
-        """
-        template_folder = os.path.join(os.getcwd(), "templates")
-        app = Flask(__name__, template_folder=template_folder)
-        @app.route("/", methods=['GET', 'POST'])
-        def testserver():
-            if request.method=="GET":
-                return render_template("demo.html")
-            elif request.method=="POST":
-                data = request.json
-                try:
-                    result = self.execute(data)
-                    try:
-                        import pandas as pd
-                        if isinstance(result, pd.DataFrame):
-                            result = result.transpose().to_json(orient='values',date_format='iso')
-                            result = json.loads(result)
-                    except ImportError:
-                        None
-                    return jsonify(result)
-                except Exception, e:
-                    result = {"error": str(e)}
-                    return jsonify(result)
-            else:
-                return "Not Implemented."
-        app.run(host=host, port=port, debug=True)
 
     def run(self, testcase=None):
         """

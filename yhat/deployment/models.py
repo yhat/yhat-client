@@ -34,9 +34,6 @@ class YhatModel(object):
             for varname, pickled_value in pickles.get('objects', {}).items():
                 globals()[varname] = pickle.loads(pickled_value)
 
-    def execution_plan(self, data):
-        return self.execute(data)
-
     @preprocess
     def execute(self, data):
         """
@@ -50,41 +47,6 @@ class YhatModel(object):
             dict_to_dict, etc.). 
         """
         pass
-
-    def run(self, testcase=None):
-        """
-        Runs a local 'Yhat Server' that mimics the production environment. Data
-        can be passed to the server via stdin (by pasting data into the terminal
-        ).
-        
-        If your data is too big to paste into the terminal, try setting up a 
-        testcase which will run automatically. To do this, use the json module
-        and run json.dumps({ YOUR DATA}) to generate acceptable input for Yhat.
-
-        Parameters
-        ----------
-        testcase: optional, JSON string
-            If a testcase is included, it will automatically execute when `run`
-            is called.
-        """
-        print "Paste your test data here"
-        print "Data should be formatted as valid JSON."
-        print "Hit <ENTER> to execute your model"
-        print "Press <CTRL + C> or type 'quit' to exit"
-        print "="*40
-        if testcase:
-            sys.stdout.write("[In] %s\n" % testcase)
-            data = parse_json(testcase + '\n')
-            sys.stdout.write("[Out]\n")
-            print self.execute(data)
-        while True:
-            sys.stdout.write("[In] ")
-            data = sys.stdin.readline()
-            if data.strip()=="quit":
-                sys.exit()
-            data = parse_json(data)
-            sys.stdout.write("[Out]\n")
-            print self.execute(data)
 
 
 class Model(object):

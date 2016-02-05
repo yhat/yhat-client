@@ -98,38 +98,6 @@ class dict_to_dict(object):
             msg = msg % str(type(result))
             raise Exception(msg)
 
-def handle_nulls(features, data):
-    """
-    Helper function for indicating how null values should be handled during
-    production.
-
-    Parameters
-    ----------
-    features: list
-        a list of features that contains the name and imputation strategy for 
-        each
-    data: list, dictionary, data frame
-        data to be imputed
-
-    Returns
-    -------
-    data: data frame
-        data frame with no null/NA/missing values
-    """
-    data = make_df(data)
-    for feature in features:
-        name = feature["name"]
-        strategy = feature["na_filler"]
-        if hasattr(strategy, '__call__')==False:
-            strategy_func = lambda x: strategy
-        else:
-            strategy_func = strategy
-        if name not in data:
-            data[name] = None
-        mask = data[name].isnull()
-        data[name][mask] = data[mask].apply(strategy_func, axis=1)
-    return data
-
 
 def preprocess(func=None, **options):
     """
@@ -144,8 +112,6 @@ def preprocess(func=None, **options):
         indicates what the input data type should be
     out_type: (optional), dictionary or data frame
         indicates what the returned data type should be
-    null_handler:(optional), list of dicts
-        tells Yhat how to handle null values
 
     Returns
     -------
@@ -158,12 +124,9 @@ def preprocess(func=None, **options):
         def inner(*args, **kwargs):        
             in_type = options.get('in_type', pd.DataFrame)
             out_type = options.get('out_type', pd.DataFrame)
-            null_handler = options.get('null_handler', None)
             data = args[1]
             if in_type==pd.DataFrame:
                 data = make_df(data)
-            if null_handler:
-                data = handle_nulls(null_handler, data)
             data = func(args[0], data)
             if out_type==pd.DataFrame:
                 data = make_df(data)

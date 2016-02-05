@@ -55,7 +55,7 @@ class API(object):
         self.base_uri = base_uri
         self.headers = {'Content-Type': 'application/json'}
 
-    def get(self, endpoint, params):
+    def _get(self, endpoint, params):
         """
         Parameters
         ----------
@@ -82,7 +82,7 @@ class API(object):
         except Exception, e:
             raise e
 
-    def post(self, endpoint, params, data, pb=False):
+    def _post(self, endpoint, params, data, pb=False):
         """
         Parameters
         ----------
@@ -133,7 +133,7 @@ as a pandas DataFrame. If you're still having trouble, please contact:
             raise e
             print "Message: %s" % str(rsp)
 
-    def post_file(self, endpoint, params, data, pb=True):
+    def _post_file(self, endpoint, params, data, pb=True):
         # Register the streaming http handlers with urllib2
         register_openers()
 
@@ -186,35 +186,6 @@ as a pandas DataFrame. If you're still having trouble, please contact:
             "message": "Model successfully uploaded. Your model will begin building momentarily. Please see %s for more details" % self.base_uri
         }
         return reply
-
-    def handshake(self, model_name, model_owner=None):
-        """
-        Parameters
-        ----------
-        model_name: string
-            name of the model you want to connect to
-        model_owner: string
-            username of the model owner for shared models. optional
-
-        Returns
-        -------
-        ws: WebSocket connection
-            a connection to the model's WebSocketServer
-        """
-        ws_uri = "{BASE_URI}/{USERNAME}/models/{MODEL_NAME}/"
-        ws_base = self.base_uri.replace("http://", "ws://")
-        username = self.username if model_owner is None else model_owner
-        ws_uri = ws_uri.format(BASE_URI=ws_base, USERNAME=username,
-                               MODEL_NAME=model_name)
-        ws_uri = "%s?username=%s&apikey=%s" % (ws_uri, self.username, self.apikey)
-        ws = websocket.create_connection(ws_uri)
-        auth = {
-            "username": self.username,
-            "apikey": self.apikey
-        }
-        ws.send(json.dumps(auth))
-        return ws
-
 
 class Yhat(API):
 
@@ -275,7 +246,7 @@ class Yhat(API):
             verifies your API credentials are valid
         """
         try:
-            response = self.post('verify', self.q, {})
+            response = self._post('verify', self.q, {})
             error = response["success"]
             return None
         except Exception, e:
@@ -344,63 +315,7 @@ class Yhat(API):
         else:
             data = {"data": data}
             endpoint = 'predict'
-        return self.post(endpoint, q, data)
-
-    def predict_ws(self, data):
-        """
-
-        Parameters
-        ----------
-        data: dictionary or data frame
-            data required to make a single prediction. this can be a dict or
-            a dataframe
-
-        Returns
-        -------
-        id: string
-            the id of the event; this will come in handy when it
-            is receieved by the WebSocket client (remember, this is
-            asynchronous)
-        """
-        if self.ws is None:
-            msg = """In order to make predictions with WebScokets, you
-need to connect to the server first. try running "connect_to_socket"
-"""
-            raise Exception(msg)
-        data = self._convert_to_json(data)
-        data['_id'] = str(uuid.uuid4())
-        self.ws.send(json.dumps(data))
-        return data['_id']
-
-    def yield_results(self):
-        """
-        Listens to the WebSocket and awaits completed predictions
-
-        Returns
-        -------
-        iterator: generator
-            yields a new prediction
-        """
-        if self.ws is None:
-            msg = """In order to make predictions with WebScokets, you
-need to connect to the server first. try running "connect_to_socket"
-"""
-            raise Exception(msg)
-
-        while True:
-            yield self.ws.recv()
-
-    def connect_to_socket(self, model, model_owner=None):
-        """
-        Connects to the model's WebSocket endpoint. This is a pre-requisite for
-        making predictions via the WebSocketServer.
-
-        model: string
-            name of the model you want to connect to
-        model_owner: string
-            username of the model owner for shared models. optional
-        """
-        self.ws = self.handshake(model, model_owner)
+        return self._post(endpoint, q, data)
 
     def _extract_model(self, name, model, session, verbose=0):
         """
@@ -572,80 +487,11 @@ need to connect to the server first. try running "connect_to_socket"
         if self._check_obj_size(bundle) is False:
             # we're not going to deploy; model is too big, but let's give the
             # user the option to upload it manually
-            print "Model is too large to deploy over HTTP"
-            should_we_deploy = raw_input(
-                "Would you like to upload manually? (Y/n): ")
-            if should_we_deploy.lower() == "y" or should_we_deploy == "":
-                self.deploy_to_file(name, model, session)
+            raise Exception("Model is too large to deploy over HTTP")
         else:
             # upload the model to the server
-            data = self.post_file("deployer/model/large", self.q, bundle, pb=True)
+            data = self._post_file("deployer/model/large", self.q, bundle, pb=True)
             return data
-
-    def deploy_to_file(self, name, model, session, compress=True, packages=[], patch=None):
-        """
-        Bundles a local version of your model that can be manually uploaded to
-        the server.
-
-        Parameters
-        ----------
-        name: string
-            name of your model
-        model: YhatModel
-            an instance of a Yhat model
-        session: globals()
-            your Python's session variables (i.e. "globals()")
-        """
-        if not re.match("^[A-Za-z0-9_]+$", name):
-            raise Exception("Model name must only contain: [A-Za-z0-9_]")
-        if not isinstance(packages, list):
-            raise Exception(
-                "`packages` must be a list of ubuntu packages to install")
-        bundle = self._extract_model(name, model, session)
-        bundle['apikey'] = self.apikey
-        bundle['packages'] = packages
-        if isinstance(patch, str)==True:
-            patch = "\n".join([line.strip() for line in patch.strip().split('\n')])
-            bundle['code'] = patch + "\n" + bundle['code']
-        filename = "%s.yhat" % name
-        with open(filename, "w") as f:
-            bundle = json.dumps(bundle)
-            if compress is True:
-                zlib_compress(bundle, f)
-            else:
-                f.write(bundle)
-
-        print "Model successfully bundled to file:"
-        print "\t%s/%s.yhat" % (os.getcwd(), name)
-        msg = "To deploy, visit %s and upload %s."
-        upload_url = os.path.join(self.base_uri, "model", "upload")
-        msg = msg % (upload_url, "%s.yhat" % name)
-        print msg
-        return filename
-
-    def deploy_with_scp(self, name, model, sessions,
-                        compress=True, packages=[], pem_path=None):
-        if pem_path is None:
-            raise Exception("Please specify your pem file for "
-                            "authentication through the `pem_path` argument")
-            return
-        if not os.path.isfile(pem_path):
-            raise Exception("No file found under '%s'" % pem_path)
-        print "Deploying to file"
-        filename = self.deploy_to_file(
-            name, model, sessions, compress=compress, packages=packages)
-        print "Sending over scp"
-        http_re = re.compile("^http://")
-        server_uri = http_re.sub("", self.base_uri.strip())
-        server_uri = server_uri.strip("/")
-        scp_cmd = "scp -i %s %s ubuntu@%s:~/" % (
-            pem_path, filename, server_uri)
-        subprocess.check_call(scp_cmd, shell=True)
-        ssh_cmd = """ssh -i %s ubuntu@%s
-        'sudo mv ~/%s
-        /var/yhat/headquarters/uploads/'""" % (pem_path, server_uri, filename)
-        subprocess.check_call(ssh_cmd, shell=True)
-        os.remove(filename)
 
 
 def zlib_compress(data, to):

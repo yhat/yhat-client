@@ -6,5 +6,4 @@ from .deployment.input_and_output import preprocess
 from .deployment.input_and_output import df_to_json
 # client
 from .api import Yhat
-
-__version__ = "1.5.0"
+from .version import __version__

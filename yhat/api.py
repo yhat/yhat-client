@@ -317,7 +317,7 @@ class Yhat(API):
             endpoint = 'predict'
         return self._post(endpoint, q, data)
 
-    def _extract_model(self, name, model, session, verbose=0):
+    def _extract_model(self, name, model, session, autodetect, verbose=0):
         """
         Extracts source code and any objects required to deploy the model.
 
@@ -392,10 +392,11 @@ class Yhat(API):
                     r = r + " (warning: unversioned)"
                 print " [+]", r
 
-        if DETECT_REQUIREMENTS:
+        if DETECT_REQUIREMENTS and autodetect:
             # Requirements auto-detection.
+            mergedReqs = merge(session, getattr(model, "REQUIREMENTS", ""))
             bundle["reqs"] = "\n".join(
-                str(r) for r in merge(session, getattr(model, "REQUIREMENTS", ""))
+                str(r) for r in (mergedReqs['pkg'] + mergedReqs['git'])
             )
 
         else:
@@ -444,10 +445,9 @@ class Yhat(API):
                     raise e
                 size = 3. * float(len(pkl)) / 4.
                 print " [+]", name, t, sizeof_fmt(size)
-
         return bundle
 
-    def deploy(self, name, model, session, sure=False, packages=[], patch=None, dry_run=False, verbose=0):
+    def deploy(self, name, model, session, sure=False, packages=[], patch=None, dry_run=False, verbose=0, autodetect=True):
         """
         Deploys your model to a Yhat server
 
@@ -463,6 +463,7 @@ class Yhat(API):
             if true, then this will force a deployment (like -y in apt-get).
             if false or blank, this will ask you if you're sure you want to
             deploy
+        autodetect: flag for using the requirement auto-detection feature
         """
         # first let's check and make sure the user actually wants to deploy
         # a new version
@@ -476,7 +477,7 @@ class Yhat(API):
             if sure.lower() != "y":
                 print "Deployment canceled"
                 sys.exit()
-        bundle = self._extract_model(name, model, session, verbose=verbose)
+        bundle = self._extract_model(name, model, session, verbose=verbose, autodetect=autodetect)
         bundle['packages'] = packages
         if isinstance(patch, str)==True:
             patch = "\n".join([line.strip() for line in patch.strip().split('\n')])

@@ -1,4 +1,4 @@
-from pip._vendor.pkg_resources import Requirement
+from pip._vendor.pkg_resources import Requirement, RequirementParseError
 try:
     from pip.utils import get_installed_distributions # pip 6.0
 except ImportError:
@@ -74,12 +74,22 @@ def merge(session, explicit=""):
     """
     implicit_dict = {}
     for r in implicit(session):
-        implicit_dict[r.project_name] = r 
+        implicit_dict[r.project_name] = r
 
     # explicit can be one requirement in a string, or many in a list.
     if isinstance(explicit, basestring) and explicit:
         explicit = [explicit]
-    explicit_list = [Requirement.parse(r) for r in explicit]
+
+    explicit_list = []
+    git_list = []
+    for r in explicit:
+        try:
+            explicit_list.append(Requirement.parse(r))
+        except RequirementParseError:
+            if r[:3] == 'git' or r[:9] == 'ssh://git':
+                git_list.append(r)
+            else:
+                print 'Package ' + r + ' was not recognized as a valid package'
     explicit_dict = {}
     for r in explicit_list:
         explicit_dict[r.project_name] = r
@@ -115,5 +125,4 @@ def merge(session, explicit=""):
     # show up as an implicit requirement. But we want to be extra sure.
     import yhat
     implicit_dict['yhat'] = Requirement.parse('yhat==%s' % yhat.__version__)
-
-    return implicit_dict.values()
+    return {'pkg': implicit_dict.values(), 'git': git_list}

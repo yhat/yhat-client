@@ -70,11 +70,8 @@ class YhatModel(object):
         conda_file: use this, run `conda list --export > package-list.txt` and pass in this
                 file path as the conda_file
             or
-        github_uri: URI to [public] Git project like these:
-            #  git://git.myproject.org/MyProject#egg=MyProject
+        git_uri: URI to [public] Git project like these:
             #  https://git.myproject.org/MyProject#egg=MyProject
-            #  ssh://git.myproject.org/MyProject#egg=MyProject
-            #  git@git.myproject.org:MyProject#egg=MyProject
         """
         if package_name != None:
             if package_version != None:
@@ -104,9 +101,17 @@ class YhatModel(object):
             f.close()
 
         elif git_uri != None:
-            # Need to add checking here
-            self.REQUIREMENTS.append('git+' + git_uri)
-
+            if git_uri[:4] == 'http':
+                self.REQUIREMENTS.append('git+' + git_uri)
+            # elif git_uri[:4] == 'git@':
+            #     self.REQUIREMENTS.append(git_uri)
+            # elif git_uri[:6] == 'ssh://':
+            #     self.REQUIREMENTS.append(git_uri)
+            # elif git_uri[:6] == 'git://':
+            #     self.REQUIREMENTS.append(git_uri)
+            else:
+                print git_uri + " is an unrecognized git resource. \
+                Please use HTTPS"
         else:
             print "you haven't specified a requirement!"
 

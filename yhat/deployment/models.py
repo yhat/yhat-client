@@ -105,7 +105,7 @@ class YhatModel(object):
 
         elif git_uri != None:
             # Need to add checking here
-            self.REQUIREMENTS.append('-e git+' + git_uri)
+            self.REQUIREMENTS.append('git+' + git_uri)
 
         else:
             print "you haven't specified a requirement!"

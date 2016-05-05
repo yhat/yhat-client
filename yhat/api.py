@@ -388,7 +388,7 @@ class Yhat(API):
         if user_reqs:
             print "model specified requirements"
             for r in user_reqs:
-                if "==" not in r:
+                if "==" not in r and r[:3] != 'git':
                     r = r + " (warning: unversioned)"
                 print " [+]", r
 

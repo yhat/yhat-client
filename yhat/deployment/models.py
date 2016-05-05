@@ -71,10 +71,10 @@ class YhatModel(object):
                 file path as the conda_file
             or
         github_uri: URI to [public] Git project like these:
-            #  git+git://git.myproject.org/MyProject#egg=MyProject
-            #  git+https://git.myproject.org/MyProject#egg=MyProject
-            #  git+ssh://git.myproject.org/MyProject#egg=MyProject
-            #  git+git@git.myproject.org:MyProject#egg=MyProject
+            #  git://git.myproject.org/MyProject#egg=MyProject
+            #  https://git.myproject.org/MyProject#egg=MyProject
+            #  ssh://git.myproject.org/MyProject#egg=MyProject
+            #  git@git.myproject.org:MyProject#egg=MyProject
         """
         if package_name != None:
             if package_version != None:
@@ -84,9 +84,9 @@ class YhatModel(object):
 
         elif req_file != None:
             f = open(req_file, 'r')
-                for line in f:
-                    if line[0] != '#':
-                        self.REQUIREMENTS.append(p)
+            for line in f:
+                if line[0] != '#':
+                    self.REQUIREMENTS.append(line)
             f.close()
 
         elif pip_freeze:
@@ -96,16 +96,16 @@ class YhatModel(object):
 
         elif conda_file != None:
             f = open(conda_file, 'r')
-                for line in f:
-                    if line[0] != '#':
-                        splitLine = line.split('=')
-                        pkg = splitLine[0] + '==' + splitLine[1]
-                        self.REQUIREMENTS.append(pkg)
+            for line in f:
+                if line[0] != '#':
+                    splitLine = line.split('=')
+                    pkg = splitLine[0] + '==' + splitLine[1]
+                    self.REQUIREMENTS.append(pkg)
             f.close()
 
         elif git_uri != None:
             # Need to add checking here
-            self.REQUIREMENTS.append('-e ' + git_uri)
+            self.REQUIREMENTS.append('-e git+' + git_uri)
 
         else:
             print "you haven't specified a requirement!"

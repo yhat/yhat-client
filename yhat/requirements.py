@@ -24,7 +24,6 @@ Example:
     print requirements.merge(globals(), "scikit-learn==0.15.2")
 """
 
-
 def _get_package_name(obj):
     """Returns the package name (e.g. "sklearn") for a Python object"""
     try:
@@ -39,8 +38,78 @@ def _get_package_name(obj):
     except:
         return None
 
+def initializeRequirements(model):
+    requirements = {
+        'modelSpecified': [],
+        'required': [],
+        'autodetected': []
+    }
+    user_reqs = getattr(model, "REQUIREMENTS", "")
+    if isinstance(user_reqs, basestring):
+        user_reqs = [r for r in user_reqs.splitlines() if r]
+    if user_reqs:
+        for r in user_reqs:
+            try:
+                if r[:4] != 'yhat':
+                    requirements['modelSpecified'].append(Requirement.parse(r))
+            except RequirementParseError:
+                if r[:3] == 'git' or r[:9] == 'ssh://git':
+                    requirements['modelSpecified'].append(r)
+                else:
+                    print 'Package ' + r + ' was not recognized as a valid package.'
+            except:
+                print "Unexpected error:", sys.exc_info()[0]
+                raise
 
-def implicit(session):
+    # Always add yhat package to required with installed version.
+    import yhat
+    yhatReq = Requirement.parse('yhat==%s' % yhat.__version__)
+    requirements['required'].append(yhatReq)
+
+    return requirements
+
+def getImplicitRequirements(model, session):
+    requirements = initializeRequirements(model)
+    requirements = implicit(session, requirements)
+    printRequirements(requirements)
+    return bundleRequirments(requirements)
+
+def getExplicitRequirmets(model, session):
+    requirements = initializeRequirements(model)
+    printRequirements(requirements)
+    return bundleRequirments(requirements)
+
+def printRequirements(requirements):
+    for cat, reqList in requirements.items():
+        if reqList:
+            if cat == "required":
+                print "required packages"
+            elif cat == "modelSpecified":
+                print "model specified requirements"
+            elif cat == "autodetected":
+                print "autodetected packages"
+            for r in reqList:
+                if "==" not in str(r) and str(r)[:3] != 'git':
+                    r = r + " (warning: unversioned)"
+                print " [+]", r
+
+def bundleRequirments(requirements):
+    """
+    Put the requirements into a structure for the bundle
+    """
+    reqList = []
+    mergedReqs = merge(requirements)
+    for reqs in requirements.itervalues():
+        if reqs:
+            for r in reqs:
+                reqList.append(r)
+    bundleString = "\n".join(
+        str(r) for r in reqList
+    )
+
+    return bundleString
+
+def implicit(session, requirements):
     """
     Returns a list of Requirement instances for all the library dependencies
     of a given session. These are matched using the contents of "top_level.txt"
@@ -59,40 +128,29 @@ def implicit(session):
                     reqs[d.project_name] = max(reqs[d.project_name], d.version)
                 else:
                     reqs[d.project_name] = d.version
+    requirements['autodetected'] = [Requirement.parse('%s==%s' % r) for r in reqs.items() if r[0] != 'yhat']
 
-    return [Requirement.parse('%s==%s' % r) for r in reqs.items()]
+
+    return requirements
 
 
-def merge(session, explicit=""):
+def merge(requirements):
     """
-    Merges implicit and explicit requirements together. Implicit requirements
-    are pulled out the user's session (i.e. globals()). Explicit requirements
-    are provided directly by the user (e.g. ["sklearn==0.15.2"]). This
+    Merges autodetected and explicit requirements together. Autodetected
+    requirements are pulled out the user's session (i.e. globals()).
+    Explicit requirements are provided directly by the user. This
     function reconciles them and merges them into one set of requirements.
-    Warnings are given to the user in case of version mismatche or modules
+    Warnings are given to the user in case of version mismatch or modules
     that do not need to be required explicitly.
     """
     implicit_dict = {}
-    for r in implicit(session):
+    for r in requirements['autodetected']:
         implicit_dict[r.project_name] = r
 
-    # explicit can be one requirement in a string, or many in a list.
-    if isinstance(explicit, basestring) and explicit:
-        explicit = [explicit]
-
-    explicit_list = []
-    git_list = []
-    for r in explicit:
-        try:
-            explicit_list.append(Requirement.parse(r))
-        except RequirementParseError:
-            if r[:3] == 'git' or r[:9] == 'ssh://git':
-                git_list.append(r)
-            else:
-                print 'Package ' + r + ' was not recognized as a valid package'
     explicit_dict = {}
-    for r in explicit_list:
-        explicit_dict[r.project_name] = r
+    for r in requirements['modelSpecified']:
+        if type(r) != str:
+            explicit_dict[r.project_name] = r
 
     for project_name, exp_req in explicit_dict.items():
         # To be polite, we keep the explicit dependencies and add the implicit
@@ -105,24 +163,21 @@ def merge(session, explicit=""):
                     "Dependency %s found implicitly. It can be removed "
                     "from REQUIREMENTS." % exp_req
                 )
-
+                requirements['autodetected'].remove(imp_req)
             elif project_name == "yhat":
                 warn(
-                    "Dependency yhat will be set to version %s." % imp_req
+                    "Dependency yhat can be removed form REQUIREMENTS. "
+                    "It is required and added for you."
                 )
-
+                requirements['autodetected'].remove(imp_req)
+                requirements['modelSpecified'].remove(exp_req)
             else:
                 warn(
                     "Dependency %s specified in REQUIREMENTS, but %s is "
                     "installed. Using the former." % (exp_req, imp_req)
                 )
-                implicit_dict[project_name] = exp_req
+                requirements['autodetected'].remove(imp_req)
+                requirements['autodetected'].remove(exp_req)
 
-        else:
-            implicit_dict[project_name] = exp_req
 
-    # Verify that yhat is set to the installed version. Normally this whould
-    # show up as an implicit requirement. But we want to be extra sure.
-    import yhat
-    implicit_dict['yhat'] = Requirement.parse('yhat==%s' % yhat.__version__)
-    return {'pkg': implicit_dict.values(), 'git': git_list}
+    return requirements

@@ -28,7 +28,7 @@ devnull = open(os.devnull, "w")
 # If we can't import everything we need to detect requirements from
 # this version of pip, then we just warn and turn off the feature.
 try:
-    from requirements import merge
+    from requirements import getExplicitRequirmets, getImplicitRequirements
 except ImportError:
     warnings.warn("Unable to use this version of pip. Requirements detection disabled. Consider upgrading pip.")
     DETECT_REQUIREMENTS = False
@@ -334,38 +334,6 @@ class Yhat(API):
         """
         code = ""
         print "extracting model"
-        # detect subclasses pickle errors by attempting to pickle all of the
-        # objects in the global() session
-        # http://stackoverflow.com/a/1948057/2325264
-        # for k, v in session.items():
-        #     try:
-        #         terragon.dump(v, devnull)
-        #     except terragon.pickle.PicklingError as e:
-        #         try:
-        #             base = type(v).__module__
-        #             leaf = type(v).__class__.__name__
-        #             parts = base.split(".")
-        #             for i, _ in enumerate(parts):
-        #                 importpath = ".".join(parts[:i+1])
-        #                 globals()[importpath] = __import__(importpath)
-        #             subclasses = []
-        #             for attr in dir(v):
-        #                 if attr.startswith("__"):
-        #                     continue
-        #                 if types.TypeType == type(getattr(v, attr)):
-        #                     subclasses.append(attr)
-        #             if not subclasses:
-        #                 continue
-        #             for c in subclasses:
-        #                 truepath = ".".join([base, leaf, c])
-        #                 code += "\n" + "\n".join([
-        #                     "import " + base,
-        #                     "setattr(sys.modules['%s'], '%s', %s)" % (base, ".".join([base, leaf]), truepath),
-        #                 ])
-        #         except Exception as e:
-        #             print e
-        #     except Exception as e:
-        #         print e
 
         if 1 == 2 and _get_source(YhatModel.execute) == _get_source(model.execute):
             msg = """'execute' method was not implemented.
@@ -381,47 +349,17 @@ class Yhat(API):
         bundle["className"] = model.__name__
         bundle["code"] = code + "\n" + bundle.get("code", "")
 
-
-        user_reqs = getattr(model, "REQUIREMENTS", "")
-        if isinstance(user_reqs, basestring):
-            user_reqs = [r for r in user_reqs.splitlines() if r]
-        if user_reqs:
-            print "model specified requirements"
-            for r in user_reqs:
-                if "==" not in r and r[:3] != 'git':
-                    r = r + " (warning: unversioned)"
-                print " [+]", r
-
+        # REQUIREMENTS
         if DETECT_REQUIREMENTS and autodetect:
-            # Requirements auto-detection.
-            mergedReqs = merge(session, getattr(model, "REQUIREMENTS", ""))
-            bundle["reqs"] = "\n".join(
-                str(r) for r in (mergedReqs['pkg'] + mergedReqs['git'])
-            )
-
+            requirements = getImplicitRequirements(model, session)
         else:
-            # The old way: REQUIREMENTS line.
-            reqs = getattr(model, "REQUIREMENTS", "")
-            if isinstance(reqs, list):
-                reqs = '\n'.join(reqs)
-            bundle["reqs"] = reqs
+            requirements = getExplicitRequirmets(model, session)
+        # DEBUG
+        # print 'API version of requirements'
+        # print requirements
+        bundle["reqs"] = requirements
 
-            # make sure we freeze Yhat so we're sure we're using the right version
-            # this makes it a lot easier to upgrade the client
-            import yhat
-            bundle["reqs"] += '\n' + "yhat==" + yhat.__version__
-            bundle["reqs"] = bundle["reqs"].strip().replace('"', '').replace("'", "")
-
-        reqs = [r for r in bundle["reqs"].splitlines() if r]
-
-        user_reqs_cmp = [user_req.lower() for user_req in user_reqs]
-        detected_reqs = [r for r in reqs if r.lower() not in user_reqs_cmp]
-        if detected_reqs:
-            print "requirements automatically detected"
-            for r in detected_reqs:
-                print " [+]", r
-
-        # print modules information
+        # MODULES
         modules = bundle.get("modules", [])
         if modules:
             print "model source files"
@@ -432,6 +370,7 @@ class Yhat(API):
                     name = os.path.join(parent_dir, name)
                 print " [+]", name
 
+        # OBJETCS
         objects = bundle.get("objects", {})
         if objects:
             print "model variables"
@@ -445,6 +384,7 @@ class Yhat(API):
                     raise e
                 size = 3. * float(len(pkl)) / 4.
                 print " [+]", name, t, sizeof_fmt(size)
+
         return bundle
 
     def deploy(self, name, model, session, sure=False, packages=[], patch=None, dry_run=False, verbose=0, autodetect=True):
@@ -463,7 +403,9 @@ class Yhat(API):
             if true, then this will force a deployment (like -y in apt-get).
             if false or blank, this will ask you if you're sure you want to
             deploy
-        autodetect: flag for using the requirement auto-detection feature
+        autodetect: flag for using the requirement auto-detection feature.
+            if False, you should explicitly state the packages required for
+            your model, or it may not run on the server.
         """
         # first let's check and make sure the user actually wants to deploy
         # a new version

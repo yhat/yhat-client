@@ -122,13 +122,13 @@ def implicit(session, requirements):
     for d in get_installed_distributions():
         for top_level in d._get_metadata("top_level.txt"):
             if top_level in package_names:
+            if top_level in package_names and top_level != 'yhat':
                 # Sanity check: if a distribution is already in our
                 # requirements, make sure we only keep the latest version.
                 if d.project_name in reqs:
                     reqs[d.project_name] = max(reqs[d.project_name], d.version)
                 else:
                     reqs[d.project_name] = d.version
-    requirements['autodetected'] = [Requirement.parse('%s==%s' % r) for r in reqs.items() if r[0] != 'yhat']
 
 
     return requirements

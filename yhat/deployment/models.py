@@ -73,36 +73,47 @@ class YhatModel(object):
         git_uri: URI to [public] Git project like these:
             #  https://git.myproject.org/MyProject#egg=MyProject
         """
+        # If there are more than 20 packages, show a warning
+        PACKAGE_WARNING = 20
+        pkgList = []
+        pkgCount = 0
         if package_name != None:
             if package_version != None:
-                self.REQUIREMENTS.append(package_name + "==" + package_version)
+                pkgCount += 1
+                pkgList.append(package_name + "==" + package_version)
             else:
-                self.REQUIREMENTS.append(package_name)
+                pkgCount += 1
+                pkgList.append(package_name)
 
         elif req_file != None:
             f = open(req_file, 'r')
             for line in f:
                 if line[0] != '#':
-                    self.REQUIREMENTS.append(line)
+                    pkgCount += 1
+                    pkgList.append(line)
             f.close()
 
         elif pip_freeze:
             x = freeze.freeze()
             for p in x:
-                self.REQUIREMENTS.append(p)
+                pkgCount += 1
+                pkgList.append(p)
 
         elif conda_file != None:
             f = open(conda_file, 'r')
+            pkgCount = 0
             for line in f:
                 if line[0] != '#':
+                    pkgCount += 1
                     splitLine = line.split('=')
-                    pkg = splitLine[0] + '==' + splitLine[1]
-                    self.REQUIREMENTS.append(pkg)
+                    pkgList.append(splitLine[0] + '==' + splitLine[1])
+
             f.close()
 
         elif git_uri != None:
             if git_uri[:4] == 'http':
-                self.REQUIREMENTS.append('git+' + git_uri)
+                pkgCount += 1
+                pkgList.append('git+' + git_uri)
             # elif git_uri[:4] == 'git@':
             #     self.REQUIREMENTS.append(git_uri)
             # elif git_uri[:6] == 'ssh://':
@@ -114,6 +125,15 @@ class YhatModel(object):
                 Please use HTTPS"
         else:
             print "you haven't specified a requirement!"
+
+        if pkgCount > PACKAGE_WARNING:
+            warnings.warn(
+                "\nYou are reqiring %s packages. \n"
+                "Please consider explicily adding fewer requirements to avoid build issues. \n"
+                "These packages will not be added...\n" % str(pkgCount)
+            )
+        else:
+            self.REQUIREMENTS.extend(pkgList)
 
 class Model(object):
     def __init__(self, **kwargs):

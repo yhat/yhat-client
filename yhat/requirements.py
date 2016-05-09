@@ -71,12 +71,10 @@ def initializeRequirements(model):
 def getImplicitRequirements(model, session):
     requirements = initializeRequirements(model)
     requirements = implicit(session, requirements)
-    printRequirements(requirements)
     return bundleRequirments(requirements)
 
 def getExplicitRequirmets(model, session):
     requirements = initializeRequirements(model)
-    printRequirements(requirements)
     return bundleRequirments(requirements)
 
 def printRequirements(requirements):
@@ -106,6 +104,7 @@ def bundleRequirments(requirements):
     bundleString = "\n".join(
         str(r) for r in reqList
     )
+    printRequirements(requirements)
 
     return bundleString
 
@@ -121,7 +120,6 @@ def implicit(session, requirements):
     reqs = {}
     for d in get_installed_distributions():
         for top_level in d._get_metadata("top_level.txt"):
-            if top_level in package_names:
             if top_level in package_names and top_level != 'yhat':
                 # Sanity check: if a distribution is already in our
                 # requirements, make sure we only keep the latest version.

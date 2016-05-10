@@ -128,9 +128,8 @@ def implicit(session, requirements):
                 else:
                     reqs[d.project_name] = d.version
 
-
+    requirements['autodetected'] = [Requirement.parse('%s==%s' % r) for r in reqs.items()]
     return requirements
-
 
 def merge(requirements):
     """
@@ -157,25 +156,34 @@ def merge(requirements):
         if project_name in implicit_dict:
             imp_req = implicit_dict[project_name]
             if exp_req == imp_req:
-                warn(
-                    "Dependency %s found implicitly. It can be removed "
-                    "from REQUIREMENTS." % exp_req
-                )
-                requirements['autodetected'].remove(imp_req)
+                # we only need one of these, remove the implicit, but don't need
+                # to warn the user
+                requirements['autodetected'].remove(Requirement.parse(str(imp_req)))
             elif project_name == "yhat":
                 warn(
                     "Dependency yhat can be removed form REQUIREMENTS. "
                     "It is required and added for you."
                 )
-                requirements['autodetected'].remove(imp_req)
-                requirements['modelSpecified'].remove(exp_req)
+                try:
+                    requirements['autodetected'].remove(Requirement.parse(str(imp_req)))
+                    requirements['modelSpecified'].remove(Requirement.parse(str(exp_req)))
+                except:
+                    pass
             else:
                 warn(
-                    "Dependency %s specified in REQUIREMENTS, but %s is "
-                    "installed. Using the former." % (exp_req, imp_req)
+                    "Dependency %s specified as a requirement, but %s is "
+                    "installed. Using the former, but you may want to update "
+                    "your code to match your installed version "% (exp_req, imp_req)
                 )
-                requirements['autodetected'].remove(imp_req)
-                requirements['autodetected'].remove(exp_req)
+                requirements['autodetected'].remove(Requirement.parse(str(imp_req)))
 
+    # Loop through the implicit dict and notify users if they haven't explicitly
+    # specified a requirement
+    for project_name, imp_req in implicit_dict.items():
+        if project_name not in explicit_dict:
+            warn(
+                "Dependency %s was found with autodetection, but we reccomend "
+                "explicitly stating your requirements to prevent issues. " % (imp_req)
+            )
 
     return requirements

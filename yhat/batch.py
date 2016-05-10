@@ -65,11 +65,11 @@ class BatchJob(object):
             "job_name": job_name
         }
         datagen, headers = multipart_encode(form_data, cb=progress)
-        
+
         req = urllib2.Request(url, datagen, headers)
 
         # Set authentication on request
-        auth = "{}.{}".format(username, apikey)
+        auth = "{}:{}".format(username, apikey)
         encoded_auth = base64.encodestring(auth).replace("\n", "")
         req.add_header("Authorization", "Basic {}".format(encoded_auth))
         try:
@@ -90,15 +90,16 @@ class BatchJob(object):
     # if sure, don't confirm
     # Is there some reason you might want to pass in something other than
     #    globals?
-    def deploy(self, verbose=False):
+    def deploy(self, session, verbose=False):
         # TODO: Is there some reason you might want to pass in something
         # other than globals()??
-        bundle = save_function(self.__class__, globals(), verbose=verbose)
+        bundle = save_function(self.__class__, session, verbose=verbose)
         bundle["class_name"] = self.__class__.__name__
         bundle_str = json.dumps(bundle)
         filename = ".tmp_yhat_job.tar.gz"
         self.__create_bundle_tar(bundle_str, filename)
         url = urljoin(self.url, "/batch/deploy")
+        print("posting to", url)
         self.__post_file(filename, url, self.username, self.name, self.apikey)
 
     def execute(self):

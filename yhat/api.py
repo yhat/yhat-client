@@ -354,9 +354,6 @@ class Yhat(API):
             requirements = getImplicitRequirements(model, session)
         else:
             requirements = getExplicitRequirmets(model, session)
-        # DEBUG
-        # print 'API version of requirements'
-        # print requirements
         bundle["reqs"] = requirements
 
         # MODULES

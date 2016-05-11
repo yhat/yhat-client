@@ -8,20 +8,14 @@ import types
 
 
 """
-This package attempts to pull all the Python library imports and their
-version numbers from a session's globals. These are called implicit
-requirements. It also provides a function for merging implicit and explicit
-requirement into one requirements list. Both return lists of requirement
-instances from the pip library.
-
-Example:
-
-    from sklearn.svm import SVR as svr
-    from yhat import requirements
-    import pandas as pd
-
-    print requirements.implicit(globals())
-    print requirements.merge(globals(), "scikit-learn==0.15.2")
+This package handles the requirments portion of the yhat client.
+If the user has set the autodetect flag to False in the deploy commpand, then
+we only run getExplicitRequirmets, otherwise we will run getImplicitRequirements.
+The implicit piece attempts to pull all the Python library imports and their
+version numbers from a session's globals. It will then merge these with the user
+defined requirements.
+The final steps are to print the requirments and send a return a one line string
+that can be put into the bundle
 """
 
 def _get_package_name(obj):
@@ -61,7 +55,7 @@ def initializeRequirements(model):
                 print "Unexpected error:", sys.exc_info()[0]
                 raise
 
-    # Always add yhat package to required with installed version.
+    # Always add yhat package to required list with the installed version.
     import yhat
     yhatReq = Requirement.parse('yhat==%s' % yhat.__version__)
     requirements['required'].append(yhatReq)
@@ -92,9 +86,7 @@ def printRequirements(requirements):
                 print " [+]", r
 
 def bundleRequirments(requirements):
-    """
-    Put the requirements into a structure for the bundle
-    """
+    # Put the requirements into a structure for the bundle
     reqList = []
     mergedReqs = merge(requirements)
     for reqs in requirements.itervalues():
@@ -137,8 +129,10 @@ def merge(requirements):
     requirements are pulled out the user's session (i.e. globals()).
     Explicit requirements are provided directly by the user. This
     function reconciles them and merges them into one set of requirements.
-    Warnings are given to the user in case of version mismatch or modules
-    that do not need to be required explicitly.
+    Warnings are given to the user in case of version mismatch.
+    Because we want to move away from implicitly getting requirements, we warn
+    the user if there are implicitly detecdet but not explicitly stated
+    requirements.#
     """
     implicit_dict = {}
     for r in requirements['autodetected']:

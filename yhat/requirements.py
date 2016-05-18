@@ -82,7 +82,7 @@ def printRequirements(requirements):
                 print "autodetected packages"
             for r in reqList:
                 if "==" not in str(r) and str(r)[:3] != 'git':
-                    r = r + " (warning: unversioned)"
+                    r = str(r) + " (warning: unversioned)"
                 print " [+]", r
 
 def bundleRequirments(requirements):

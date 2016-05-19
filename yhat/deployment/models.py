@@ -97,6 +97,7 @@ class YhatModel(object):
         elif req_file != None:
             f = open(req_file, 'r')
             for line in f:
+                line = line.strip('\n').strip()
                 if line[0] != '#':
                     pkgCount += 1
                     pkgList.append(line)

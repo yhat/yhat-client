@@ -146,7 +146,9 @@ class YhatModel(object):
             # block the deployment
             sys.exit()
         else:
-            self.REQUIREMENTS.extend(pkgList)
+            for pkg in pkgList:
+                if pkg not in self.REQUIREMENTS:
+                    self.REQUIREMENTS.append(pkg)
 
 class Model(object):
     def __init__(self, **kwargs):

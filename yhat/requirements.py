@@ -89,7 +89,7 @@ def bundleRequirments(requirements):
     # Put the requirements into a structure for the bundle
     reqList = []
     mergedReqs = merge(requirements)
-    for reqs in requirements.itervalues():
+    for reqs in mergedReqs.itervalues():
         if reqs:
             for r in reqs:
                 reqList.append(r)

@@ -82,7 +82,7 @@ def printRequirements(requirements):
                 print "autodetected packages"
             for r in reqList:
                 if "==" not in str(r) and str(r)[:3] != 'git':
-                    r = str(r) + " (warning: unversioned)"
+                    r = str(r) + " (latest)"
                 print " [+]", r
 
 def bundleRequirments(requirements):
@@ -155,7 +155,7 @@ def merge(requirements):
                 requirements['autodetected'].remove(Requirement.parse(str(imp_req)))
             elif project_name == "yhat":
                 warn(
-                    "Dependency yhat can be removed form REQUIREMENTS. "
+                    "The yhat package can be removed from REQUIREMENTS. "
                     "It is required and added for you."
                 )
                 try:
@@ -165,9 +165,8 @@ def merge(requirements):
                     pass
             else:
                 warn(
-                    "Dependency %s specified as a requirement, but %s is "
-                    "installed. Using the former, but you may want to update "
-                    "your code to match your installed version "% (exp_req, imp_req)
+                    "You have added %s as a requirement, which differs from %s, which is installed locally"
+                    "Deploying with required package: %s " % (exp_req, imp_req, exp_req)
                 )
                 requirements['autodetected'].remove(Requirement.parse(str(imp_req)))
 
@@ -177,7 +176,7 @@ def merge(requirements):
         if project_name not in explicit_dict:
             warn(
                 "Dependency %s was found with autodetection, but we reccomend "
-                "explicitly stating your requirements to prevent issues. " % (imp_req)
+                "explicitly stating your requirements." % (imp_req)
             )
 
     return requirements

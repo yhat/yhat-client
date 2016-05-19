@@ -72,6 +72,15 @@ class YhatModel(object):
             or
         git_uri: URI to [public] Git project like these:
             #  https://git.myproject.org/MyProject#egg=MyProject
+        -------------
+        Examples
+
+        myModel.add_requirement(package_name='pandas', package_version='0.18.1')
+        myModel.add_requirement(package_name='numpy')
+        myModel.add_requirement(req_file='requirements.txt')
+        myModel.add_requirement(pip_freeze=True)
+        myModel.add_requirement(conda_file='conda.txt')
+        myModel.add_requirement(git_uri='https://github.com/yhat/ggplot')
         """
         # If there are more than 20 packages, show a warning
         PACKAGE_WARNING = 20
@@ -114,6 +123,7 @@ class YhatModel(object):
             if git_uri[:4] == 'http':
                 pkgCount += 1
                 pkgList.append('git+' + git_uri)
+            # We can uncomment this when we don't use conda on the image build
             # elif git_uri[:4] == 'git@':
             #     self.REQUIREMENTS.append(git_uri)
             # elif git_uri[:6] == 'ssh://':
@@ -128,10 +138,12 @@ class YhatModel(object):
 
         if pkgCount > PACKAGE_WARNING:
             warnings.warn(
-                "\nYou are reqiring %s packages. \n"
-                "Please consider explicily adding fewer requirements to avoid build issues. \n"
-                "These packages will not be added...\n" % str(pkgCount)
+                "\nYou have tried to add %s requirmements, which exceeds the maximum amount you can add during a deployment.\n"
+                "If possible, please consider explicily adding fewer requirements and try to re-deploy.\n"
+                "Or if you require this many packages, contact Yhat to upgrade your base image.\n" % str(pkgCount)
             )
+            # block the deployment
+            sys.exit()
         else:
             self.REQUIREMENTS.extend(pkgList)
 

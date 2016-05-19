@@ -5,7 +5,6 @@ import sys
 import os
 import warnings
 import re
-from pip.operations import freeze
 
 from input_and_output import df_to_df, parse_json, preprocess
 

@@ -124,6 +124,10 @@ class YhatModel(object):
             if git_uri[:4] == 'http':
                 pkgCount += 1
                 pkgList.append('git+' + git_uri)
+                warnings.warn(
+                "Note that to use git support you must be deploying to"
+                "ScienceOps version >= 2.4.2."
+                )
             # We can uncomment this when we don't use conda on the image build
             # elif git_uri[:4] == 'git@':
             #     self.REQUIREMENTS.append(git_uri)

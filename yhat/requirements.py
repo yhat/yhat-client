@@ -32,28 +32,66 @@ def _get_package_name(obj):
     except:
         return None
 
+def parseUserRequirementsList(reqList):
+    PACKAGE_LIMIT = 25
+    pkgCount = 0
+    userReqsRaw = []
+    userReqs = []
+    for r in reqList:
+        # Look for .txt
+        r = r.strip().strip('/n')
+        if r[-4:] == '.txt':
+            pkgList = []
+            f = open(r, 'r')
+            for line in f:
+                line = line.strip('\n').strip()
+                if line[0] != '#':
+                    pkgList.append(line)
+            f.close()
+            reqList.extend(pkgList)
+        else:
+            try:
+                if r[:4] != 'yhat':
+                    userReqsRaw.append(Requirement.parse(r))
+                    pkgCount += 1
+            except RequirementParseError:
+                if r[:3] == 'git':
+                    userReqsRaw.append(r)
+                    pkgCount += 1
+                else:
+                    print 'Package ' + r + ' was not recognized as a valid package.'
+            except:
+                print "Unexpected error:", sys.exc_info()[0]
+                raise
+
+    if pkgCount > PACKAGE_LIMIT:
+        warn(
+            "\nYou have tried to add %s requirmements, which exceeds the maximum amount you can add during a deployment.\n"
+            "If possible, please consider explicily adding fewer requirements and try to re-deploy.\n"
+            "Or if you require this many packages, contact Yhat to upgrade your base image.\n" % str(pkgCount)
+        )
+        # block the deployment
+        sys.exit()
+    else:
+        for pkg in userReqsRaw:
+            if pkg not in userReqs:
+                userReqs.append(pkg)
+
+    print "userReqs: " + str(userReqs)
+    return userReqs
+
 def initializeRequirements(model):
     requirements = {
         'modelSpecified': [],
         'required': [],
         'autodetected': []
     }
-    user_reqs = getattr(model, "REQUIREMENTS", "")
-    if isinstance(user_reqs, basestring):
-        user_reqs = [r for r in user_reqs.splitlines() if r]
-    if user_reqs:
-        for r in user_reqs:
-            try:
-                if r[:4] != 'yhat':
-                    requirements['modelSpecified'].append(Requirement.parse(r))
-            except RequirementParseError:
-                if r[:3] == 'git' or r[:9] == 'ssh://git':
-                    requirements['modelSpecified'].append(r)
-                else:
-                    print 'Package ' + r + ' was not recognized as a valid package.'
-            except:
-                print "Unexpected error:", sys.exc_info()[0]
-                raise
+    userReqs = getattr(model, "REQUIREMENTS", "")
+    if isinstance(userReqs, basestring):
+        userReqs = [r for r in userReqs.splitlines() if r]
+    if userReqs:
+        userReqs = parseUserRequirementsList(userReqs)
+        requirements['modelSpecified'] = userReqs
 
     # Always add yhat package to required list with the installed version.
     import yhat

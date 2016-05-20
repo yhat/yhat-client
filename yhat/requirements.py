@@ -14,7 +14,7 @@ we only run getExplicitRequirmets, otherwise we will run getImplicitRequirements
 The implicit piece attempts to pull all the Python library imports and their
 version numbers from a session's globals. It will then merge these with the user
 defined requirements.
-The final steps are to print the requirments and send a return a one line string
+The final steps are to print the requirments and return a one line string
 that can be put into the bundle
 """
 
@@ -170,7 +170,7 @@ def merge(requirements):
     Warnings are given to the user in case of version mismatch.
     Because we want to move away from implicitly getting requirements, we warn
     the user if there are implicitly detecdet but not explicitly stated
-    requirements.#
+    requirements.
     """
     implicit_dict = {}
     for r in requirements['autodetected']:
@@ -203,8 +203,9 @@ def merge(requirements):
                     pass
             else:
                 warn(
-                    "You have added %s as a requirement, which differs from %s, which is installed locally"
-                    "Deploying with required package: %s " % (exp_req, imp_req, exp_req)
+                    "You have explicitly %s as a requirement, which differs from %s, \n
+                    "which is was implicitly found to be installed locally\n"
+                    "Deploying with explicitly defined package: %s " % (exp_req, imp_req, exp_req)
                 )
                 requirements['autodetected'].remove(Requirement.parse(str(imp_req)))
 

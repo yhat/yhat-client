@@ -39,7 +39,7 @@ def parseUserRequirementsList(reqList):
     userReqs = []
     for r in reqList:
         # Look for .txt
-        r = r.strip().strip('/n')
+        r = r.strip().strip('\n')
         if r[-4:] == '.txt':
             pkgList = []
             f = open(r, 'r')
@@ -77,7 +77,6 @@ def parseUserRequirementsList(reqList):
             if pkg not in userReqs:
                 userReqs.append(pkg)
 
-    print "userReqs: " + str(userReqs)
     return userReqs
 
 def initializeRequirements(model):
@@ -203,7 +202,7 @@ def merge(requirements):
                     pass
             else:
                 warn(
-                    "You have explicitly %s as a requirement, which differs from %s, \n
+                    "You have explicitly %s as a requirement, which differs from %s, "
                     "which is was implicitly found to be installed locally\n"
                     "Deploying with explicitly defined package: %s " % (exp_req, imp_req, exp_req)
                 )

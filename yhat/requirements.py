@@ -213,7 +213,7 @@ def merge(requirements):
     for project_name, imp_req in implicit_dict.items():
         if project_name not in explicit_dict:
             warn(
-                "Dependency %s was found with autodetection, but we reccomend "
+                "Dependency %s was found with autodetection, but we recommend "
                 "explicitly stating your requirements." % (imp_req)
             )
 

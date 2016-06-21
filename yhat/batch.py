@@ -18,8 +18,9 @@ class BatchJob(object):
 
     def __init__(self, name, **kwargs):
         if not re.match("^[A-Za-z0-9_]+$", name):
-            raise ValueError("job name must contain only [A-Za-z0-9_]" \
-                    .format(key))
+            raise ValueError(
+                "Job name must contain only [A-Za-z0-9_]. Got: {}".format(key)
+            )
         self.name = name
         for key in ["username", "apikey", "url"]:
             if not key in kwargs:

@@ -92,8 +92,6 @@ class BatchJob(object):
     # Is there some reason you might want to pass in something other than
     #    globals?
     def deploy(self, session, verbose=False):
-        # TODO: Is there some reason you might want to pass in something
-        # other than globals()??
         bundle = save_function(self.__class__, session, verbose=verbose)
         bundle["class_name"] = self.__class__.__name__
         bundle_str = json.dumps(bundle)
@@ -102,6 +100,7 @@ class BatchJob(object):
         url = urljoin(self.url, "/batch/deploy")
         print("posting to", url)
         self.__post_file(filename, url, self.username, self.name, self.apikey)
+        os.remove(filename)
 
     def execute(self):
         pass

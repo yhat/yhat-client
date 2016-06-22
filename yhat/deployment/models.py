@@ -44,10 +44,9 @@ class YhatModel(object):
         ----------
         data: dict or DataFrame
             the datatype is decided by the IO Specification; (df_to_df,
-            dict_to_dict, etc.). 
+            dict_to_dict, etc.).
         """
         pass
-
 
 class Model(object):
     def __init__(self, **kwargs):

@@ -17,9 +17,9 @@ from deployment.save_session import save_function
 class BatchJob(object):
 
     def __init__(self, name, **kwargs):
-        if not re.match("^[A-Za-z0-9_]+$", name):
+        if not re.match("^[a-z0-9_]+$", name):
             raise ValueError(
-                "Job name must contain only [A-Za-z0-9_]. Got: {}".format(name)
+                "Job name must contain only [a-z0-9_]. Got: {}".format(name)
             )
         self.name = name
         for key in ["username", "apikey", "url"]:

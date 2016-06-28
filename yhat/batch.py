@@ -94,6 +94,7 @@ class BatchJob(object):
     def deploy(self, session, verbose=False):
         bundle = save_function(self.__class__, session, verbose=verbose)
         bundle["class_name"] = self.__class__.__name__
+        bundle["language"] = "python"
         bundle_str = json.dumps(bundle)
         filename = ".tmp_yhat_job.tar.gz"
         self.__create_bundle_tar(bundle_str, filename)

@@ -433,6 +433,19 @@ class Yhat(API):
             data = self._post_file("deployer/model/large", self.q, bundle, pb=True)
             return data
 
+    # TODO: Hey Emily, write your code here!
+    def create_tests(self, df, output_file, columns=None):
+        """
+        ...docstring goes here...
+        """
+        # if the user doesn't specify columns, then we'll assume they want them 
+        # all!
+        if columns is None:
+            columns = df.columns
+        ...
+        ...
+        ...
+
 
 def zlib_compress(data, to):
     step = 4 << 20 # 4MiB

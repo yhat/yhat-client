@@ -156,7 +156,8 @@ as a pandas DataFrame. If you're still having trouble, please contact:
         zlib_compress(data, f)
         f.close()
 
-        datagen, headers = multipart_encode({model_name: open(f.name, "rb")}, cb=progress)
+        f2 = open(f.name, "rb")
+        datagen, headers = multipart_encode({model_name: f2}, cb=progress)
 
         url = self.base_uri + endpoint + "?" + urllib.urlencode(params)
         req = urllib2.Request(url, datagen, headers)
@@ -180,7 +181,8 @@ as a pandas DataFrame. If you're still having trouble, please contact:
         rsp = response.read()
         pbar.finish()
         # clean up after we're done
-        os.remove(f.name)
+	f2.close()
+	os.unlink(f.name)
         reply = {
             "status": "OK",
             "message": "Model successfully uploaded. Your model will begin building momentarily. Please see %s for more details" % self.base_uri

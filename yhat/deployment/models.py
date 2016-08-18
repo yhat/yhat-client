@@ -81,6 +81,15 @@ class SplitTestModel(YhatModel):
     Create an A/B testable model. This will split traffic between different
     models (specified as methods in your class).
 
+    Examples
+    ========
+
+    class YetAnotherModel(SplitTestModel):
+        variants = [
+            Variant(label="SVC", method="execute_svc", traffic_allocation=0.5),
+            Variant(label="LOGIT", method="execute_logit", traffic_allocation=0.5)
+        ]
+
     class MyModel(SplitTestModel):
         variants = [
             Variant("A", "execute_a", 0.5),
@@ -93,12 +102,6 @@ class SplitTestModel(YhatModel):
             Variant("SVC", "execute_svc", 0.5),
             Variant("LOGIT", "execute_logit", 0.4),
             Variant("DEFAULT", "execute_default", 0.1)
-        ]
-
-    class YetAnotherModel(SplitTestModel):
-        variants = [
-            Variant("SVC", "execute_svc", 0.5),
-            Variant("LOGIT", "execute_logit", 0.5)
         ]
     """
 

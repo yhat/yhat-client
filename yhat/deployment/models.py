@@ -89,6 +89,9 @@ class SplitTestModel(YhatModel):
             Variant(label="SVC", method="execute_svc", traffic_allocation=0.5),
             Variant(label="LOGIT", method="execute_logit", traffic_allocation=0.5)
         ]
+    yam = YetAnotherModel()
+    yam.execute({ "n": 1 })
+    # {"variant": "SVC", "probability": 0.45}
 
     class MyModel(SplitTestModel):
         variants = [
@@ -96,6 +99,9 @@ class SplitTestModel(YhatModel):
             Variant("B", "execute_b", 0.4),
             Variant("C", "execute_c", 0.1)
         ]
+    model = MyModel()
+    model.execute({ "n": 1 })
+    # {"variant": "C", "probability": 0.12}
 
     class AnotherModel(SplitTestModel):
         variants = [
@@ -103,6 +109,9 @@ class SplitTestModel(YhatModel):
             Variant("LOGIT", "execute_logit", 0.4),
             Variant("DEFAULT", "execute_default", 0.1)
         ]
+    am = AnotherModel()
+    am.execute({ "n": 1 })
+    # {"variant": "LOGIT", "probability": 0.32}
     """
 
     def __init__(self, variants=None):

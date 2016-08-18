@@ -78,15 +78,28 @@ class Variant(dict):
 
 class SplitTestModel(YhatModel):
     """
-    Create an A/B testable model. This will split traffic between 2 different
-    `execute` methods.
+    Create an A/B testable model. This will split traffic between different
+    models (specified as methods in your class).
 
-    [
-        { "label": "A", "method": execute_a, "traffic_allocation": 0.5 },
-        { "label": "B", "method": execute_b, "traffic_allocation": 0.4 },
-        { "label": "C", "method": execute_c, "traffic_allocation": 0.1 }
-    ]
+    class MyModel(SplitTestModel):
+        variants = [
+            Variant("A", "execute_a", 0.5),
+            Variant("B", "execute_b", 0.4),
+            Variant("C", "execute_c", 0.1)
+        ]
 
+    class AnotherModel(SplitTestModel):
+        variants = [
+            Variant("SVC", "execute_svc", 0.5),
+            Variant("LOGIT", "execute_logit", 0.4),
+            Variant("DEFAULT", "execute_default", 0.1)
+        ]
+
+    class YetAnotherModel(SplitTestModel):
+        variants = [
+            Variant("SVC", "execute_svc", 0.5),
+            Variant("LOGIT", "execute_logit", 0.5)
+        ]
     """
 
     def __init__(self, variants=None):

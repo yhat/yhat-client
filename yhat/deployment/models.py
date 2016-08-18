@@ -4,6 +4,7 @@ import pickle
 import sys
 import os
 import warnings
+import random
 import re
 
 from input_and_output import df_to_df, parse_json, preprocess
@@ -20,8 +21,7 @@ class YhatModel(object):
     execute in the `execute` method.
 
     The `run` method provides you with a basic development "server" for testing
-    locally. It will give you the same results as you will see on a Yhat server
-    99% of the time.
+    locally. It will give you the same results as you will see on a Yhat server.
 
     Parameters
     ----------
@@ -46,6 +46,26 @@ class YhatModel(object):
             the datatype is decided by the IO Specification; (df_to_df,
             dict_to_dict, etc.).
         """
+        pass
+
+class SplitTestModel(YhatModel):
+    """
+    Create an A/B testable model. This will split traffic between 2 different
+    `execute` methods.
+    """
+
+    def execute(self, data):
+        if random.random() > 0.5:
+            data['variant'] = "A"
+            return self.execute_a(data)
+        else:
+            data['variant'] = "B"
+            return self.execute_b(data)
+
+    def execute_a(self, data):
+        pass
+    
+    def execute_b(self, data):
         pass
 
 class Model(object):

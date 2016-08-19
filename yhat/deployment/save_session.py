@@ -17,7 +17,7 @@ except:
 
 
 def _in_directory(filepath, directory):
-    #make both absolute    
+    #make both absolute
     directory = os.path.realpath(directory)
     filepath = os.path.realpath(filepath)
     #return true, if the common prefix of both is equal to directory
@@ -35,9 +35,9 @@ def _is_on_syspath(filepath):
                 return True
 
     if os.environ.get("CONDA_DEFAULT_ENV"):
-        # CONDA wierdness. check and see if CONDA is messing with our 
+        # CONDA wierdness. check and see if CONDA is messing with our
         # syspath we're also going to have an exception for the yhat
-        # library. not sure if this actually helps/hurts, but I don't 
+        # library. not sure if this actually helps/hurts, but I don't
         # want to find out
         conda_env = os.environ["CONDA_DEFAULT_ENV"]
         conda_syspath = os.path.join(conda_env, "lib", "python2.7")
@@ -53,7 +53,7 @@ def _is_on_syspath(filepath):
 
 def _get_source(func):
     """
-    Gets the source of a function and handles cases when user is in an 
+    Gets the source of a function and handles cases when user is in an
     interactive session
 
     func: function
@@ -107,7 +107,7 @@ def _strip_function_source(src):
 
 def _get_naked_loads(function, verbose=0):
     """
-    Takes a reference to a function and determines which variables used in the 
+    Takes a reference to a function and determines which variables used in the
     function are not defined within the scope of the function.
 
     Parameters
@@ -120,7 +120,7 @@ def _get_naked_loads(function, verbose=0):
     -------
     variables: generator
         returns the variables in a function that are not:
-            1) passed in as parameters 
+            1) passed in as parameters
             2) created within the scope of the function
     """
     source = _get_source(function)
@@ -147,7 +147,7 @@ def _get_naked_loads(function, verbose=0):
             elif isinstance(thingvars['ctx'], ast.Store):
                 if 'id' in thingvars:
                     created.add(thingvars['id'])
-    
+
     for variable in loaded:
         # TODO: if created but loaded before that as something else
         if variable not in params and variable not in created:
@@ -173,7 +173,7 @@ def _extract_module(module_name, modules={}, verbose=0):
             sys.stderr.write("[WARNING]: %s is not a .py or .pyc skipping: \n" % module.__file__)
             modules[module_name] = None
             return modules
-            
+
         module_source = open(module_py, 'rb').read()
         parent_dir = module_py.replace(os.getcwd(), '').lstrip(os.sep)
         parent_dir = os.path.dirname(parent_dir)
@@ -212,8 +212,8 @@ def _extract_module(module_name, modules={}, verbose=0):
 
 def _spider_function(function, session, pickles={}, verbose=0):
     """
-    Takes a function and global variables referenced in an environment and 
-    recursively finds dependencies required in order to execute the function. 
+    Takes a function and global variables referenced in an environment and
+    recursively finds dependencies required in order to execute the function.
     This includes references to classes, libraries, variables, functions, etc.
 
     Parameters
@@ -242,12 +242,12 @@ def _spider_function(function, session, pickles={}, verbose=0):
     pickles['_objects_seen'].append(str(function))
     imports = []
     modules = {}
-    source = "# code for %s\n" % (str(function)) 
+    source = "# code for %s\n" % (str(function))
     if isinstance(function, types.ModuleType):
         pass
     else:
         source += _get_source(function) + '\n'
-    
+
     for varname in _get_naked_loads(function, verbose=verbose):
         if varname in pickles['_objects_seen']:
             continue
@@ -257,7 +257,12 @@ def _spider_function(function, session, pickles={}, verbose=0):
         obj = session[varname]
         # checking to see if this is an instance of an object
         if hasattr(obj, "__name__")==False:
-            pickles[varname] = terragon.dumps_to_base64(obj)
+            try:
+                pickles[varname] = terragon.dumps_to_base64(obj)
+            except Exception as e:
+                if 'sc' not in session:
+                    raise Exception("Did not detect Spark context (`sc`) variable in your session.")
+                pickles[varname] = terragon.dumps_spark_to_base64(session['sc'], obj)
         if hasattr(obj, "__module__"):
             if obj.__module__=="__main__":
                 new_imports, new_source, new_pickles, new_modules = _spider_function(obj, session, pickles, verbose=verbose)
@@ -271,8 +276,8 @@ def _spider_function(function, session, pickles={}, verbose=0):
                 if hasattr(obj, "func_name") and obj.func_name!=varname:
                     imports.append("from %s import %s as %s" % (ref, obj.func_name, varname))
                 else:
-                    # we need to figure out how to import this library. i'm not 
-                    # sure exactly what the right way to get the module and 
+                    # we need to figure out how to import this library. i'm not
+                    # sure exactly what the right way to get the module and
                     # class name, but this works just fine
                     try:
                         import_statement = "from %s import %s" % (ref, varname)
@@ -302,7 +307,7 @@ def _detect_future_imports(session):
     Detect all __future__ imports. Since these imports must come first in
     the source code, these are attempt to be detected outside of other
     spidering.
-    
+
     Parameters
     ----------
     session: dictionary

@@ -473,6 +473,7 @@ class Yhat(API):
 
         patch = "from pyspark import SparkContext\n"
         patch += "sc = SparkContext()\n"
+        patch += "sc.setLogLevel('ERROR')\n"
 
         return self.deploy(name, model, session, sure=sure, packages=packages,
             patch=patch, dry_run=dry_run, verbose=verbose, autodetect=autodetect)

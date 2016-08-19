@@ -3,7 +3,7 @@ from setuptools import find_packages
 
 setup(
     name="yhat",
-    version="1.7.0",
+    version="1.7.1",
     author="Greg Lamp",
     author_email="greg@yhathq.com",
     url="https://github.com/yhat/yhat-client",
@@ -23,7 +23,7 @@ setup(
         "Flask==0.10.1",
         "websocket-client==0.12.0",
         "dill==0.2b1",
-        "terragon==0.1.4",
+        "terragon==0.2.0",
         "progressbar==2.2",
         "poster==0.8.1"
     ],

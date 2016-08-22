@@ -350,8 +350,8 @@ def save_function(function, session, verbose=0):
     if isinstance(function, SplitTestModel):
         if "from yhat.deployment.models import Variant" not in imports:
             imports.append("from yhat.deployment.models import Variant")
-            imports.append("random")
 
+    imports.append("random")
     imports.append("import json")
     imports.append("import pickle")
     imports.append("import terragon")

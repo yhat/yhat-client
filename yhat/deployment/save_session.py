@@ -9,6 +9,7 @@ import StringIO
 import sys
 import os
 import pprint as pp
+from .models import SplitTestModel
 
 try:
     import dill
@@ -338,10 +339,19 @@ def save_function(function, session, verbose=0):
     verbose: int
         log level
     """
+
     future_imports = "\n".join(_detect_future_imports(session))
     imports, source_code, pickles, modules = _spider_function(function, session, verbose=verbose)
+
     # de-dup and order the imports
     imports = sorted(list(set(imports)))
+
+    # patch for jupyter notebook not detecting variants
+    if isinstance(function, SplitTestModel):
+        if "from yhat.deployment.models import Variant" not in imports:
+            imports.append("from yhat.deployment.models import Variant")
+            imports.append("random")
+
     imports.append("import json")
     imports.append("import pickle")
     imports.append("import terragon")

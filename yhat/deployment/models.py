@@ -116,7 +116,10 @@ class SplitTestModel(YhatModel):
 
     def __init__(self, variants=None):
         if variants is None:
-            variants = self.variants
+            if hasattr(self, "variants"):
+                variants = self.variants
+            elif hasattr(self, "setup_variants"):
+                variants = self.setup_variants()
 
         if sum(v['traffic_allocation'] for v in variants) != 1:
             msg = " + ".join([str(v['traffic_allocation']) for v in variants])

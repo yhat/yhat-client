@@ -347,7 +347,6 @@ def save_function(function, session, verbose=0):
     imports = sorted(list(set(imports)))
 
     # patch for jupyter notebook not detecting variants
-    print function.__name__
     if isinstance(function(), SplitTestModel):
         imports.append("import random")
         if "from yhat.deployment.models import Variant" not in imports:
@@ -356,7 +355,6 @@ def save_function(function, session, verbose=0):
     imports.append("import json")
     imports.append("import pickle")
     imports.append("import terragon")
-    print imports
     source_code = "\n".join(imports) + "\n\n\n" + source_code
     pickles = {
         "objects": pickles,

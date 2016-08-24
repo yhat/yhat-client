@@ -85,30 +85,33 @@ class SplitTestModel(YhatModel):
     ========
 
     class YetAnotherModel(SplitTestModel):
-        variants = [
-            Variant(label="SVC", method="execute_svc", traffic_allocation=0.5),
-            Variant(label="LOGIT", method="execute_logit", traffic_allocation=0.5)
-        ]
+        def setup_variants(self):
+            return [
+                Variant(label="SVC", method="execute_svc", traffic_allocation=0.5),
+                Variant(label="LOGIT", method="execute_logit", traffic_allocation=0.5)
+            ]
     yam = YetAnotherModel()
     yam.execute({ "n": 1 })
     # {"variant": "SVC", "probability": 0.45}
 
     class MyModel(SplitTestModel):
-        variants = [
-            Variant("A", "execute_a", 0.5),
-            Variant("B", "execute_b", 0.4),
-            Variant("C", "execute_c", 0.1)
-        ]
+        def setup_variants(self):
+            return [
+                Variant("A", "execute_a", 0.5),
+                Variant("B", "execute_b", 0.4),
+                Variant("C", "execute_c", 0.1)
+            ]
     model = MyModel()
     model.execute({ "n": 1 })
     # {"variant": "C", "probability": 0.12}
 
     class AnotherModel(SplitTestModel):
-        variants = [
-            Variant("SVC", "execute_svc", 0.5),
-            Variant("LOGIT", "execute_logit", 0.4),
-            Variant("DEFAULT", "execute_default", 0.1)
-        ]
+        def setup_variants(self):
+            return [
+                Variant("SVC", "execute_svc", 0.5),
+                Variant("LOGIT", "execute_logit", 0.4),
+                Variant("DEFAULT", "execute_default", 0.1)
+            ]
     am = AnotherModel()
     am.execute({ "n": 1 })
     # {"variant": "LOGIT", "probability": 0.32}

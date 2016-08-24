@@ -156,7 +156,8 @@ as a pandas DataFrame. If you're still having trouble, please contact:
         zlib_compress(data, f)
         f.close()
 
-        datagen, headers = multipart_encode({model_name: open(f.name, "rb")}, cb=progress)
+        f2 = open(f.name, "rb")
+        datagen, headers = multipart_encode({model_name: f2}, cb=progress)
 
         url = self.base_uri + endpoint + "?" + urllib.urlencode(params)
         req = urllib2.Request(url, datagen, headers)
@@ -180,7 +181,8 @@ as a pandas DataFrame. If you're still having trouble, please contact:
         rsp = response.read()
         pbar.finish()
         # clean up after we're done
-        os.remove(f.name)
+	f2.close()
+	os.unlink(f.name)
         reply = {
             "status": "OK",
             "message": "Model successfully uploaded. Your model will begin building momentarily. Please see %s for more details" % self.base_uri
@@ -373,7 +375,10 @@ class Yhat(API):
             print "model variables"
             for name, pkl in objects.iteritems():
                 try:
-                    obj = terragon.loads_from_base64(pkl)
+                    try:
+                        obj = terragon.loads_from_base64(pkl)
+                    except:
+                        obj = terragon.loads_spark_from_base64(session['sc'], pkl)
                     t = type(obj)
                     del obj
                 except Exception as e:
@@ -396,10 +401,14 @@ class Yhat(API):
             an instance of a Yhat model
         session: globals()
             your Python's session variables (i.e. "globals()")
+        packages: list (deprecated in ScienceOps 2.7.x)
+            this is being deprecated in favor of custom runtime images
         sure: boolean
             if true, then this will force a deployment (like -y in apt-get).
             if false or blank, this will ask you if you're sure you want to
             deploy
+        verbose: int
+            Relative amount of logging info to display (higher = more logs)
         autodetect: flag for using the requirement auto-detection feature.
             if False, you should explicitly state the packages required for
             your model, or it may not run on the server.
@@ -433,6 +442,41 @@ class Yhat(API):
             data = self._post_file("deployer/model/large", self.q, bundle, pb=True)
             return data
 
+    def deploy_spark(self, name, model, session, sc, sure=False, packages=[], patch=None, dry_run=False, verbose=0, autodetect=True):
+        """
+        Deploys a Spark model to a Yhat server. This is a special case of deploy.
+
+        Parameters
+        ----------
+        name: string
+            name of your model
+        model: YhatModel
+            an instance of a Yhat model
+        session: globals()
+            your Python's session variables (i.e. "globals()")
+        sc: SparkContext
+            your SparkContext. this is typically `sc`
+        packages: list (deprecated in ScienceOps 2.7.x)
+            this is being deprecated in favor of custom runtime images
+        sure: boolean
+            if true, then this will force a deployment (like -y in apt-get).
+            if false or blank, this will ask you if you're sure you want to
+            deploy
+        verbose: int
+            Relative amount of logging info to display (higher = more logs)
+        autodetect: flag for using the requirement auto-detection feature.
+            if False, you should explicitly state the packages required for
+            your model, or it may not run on the server.
+        """
+        if 'sc' not in session:
+            session['sc'] = sc
+
+        patch = "from pyspark import SparkContext\n"
+        patch += "sc = SparkContext()\n"
+        patch += "sc.setLogLevel('ERROR')\n"
+
+        return self.deploy(name, model, session, sure=sure, packages=packages,
+            patch=patch, dry_run=dry_run, verbose=verbose, autodetect=autodetect)
 
 def zlib_compress(data, to):
     step = 4 << 20 # 4MiB

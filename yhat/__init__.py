@@ -1,5 +1,4 @@
 # models
-from .deployment.models import BaseModel
 from .deployment.models import YhatModel
 from .deployment.models import SplitTestModel, Variant
 # preprocessing decorator

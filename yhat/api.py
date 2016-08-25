@@ -370,7 +370,7 @@ class Yhat(API):
                     name = os.path.join(parent_dir, name)
                 print " [+]", name
 
-        # OBJETCS
+        # OBJECTS
         objects = bundle.get("objects", {})
         if objects:
             print "model variables"

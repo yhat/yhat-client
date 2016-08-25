@@ -27,13 +27,15 @@ devnull = open(os.devnull, "w")
 
 # If we can't import everything we need to detect requirements from
 # this version of pip, then we just warn and turn off the feature.
+getExplicitRequirements, getImplicitRequirements = None, None
 try:
-    from requirements import getExplicitRequirmets, getImplicitRequirements
+    from requirements import getExplicitRequirements, getImplicitRequirements
 except ImportError:
     warnings.warn("Unable to use this version of pip. Requirements detection disabled. Consider upgrading pip.")
     DETECT_REQUIREMENTS = False
 else:
     DETECT_REQUIREMENTS = True
+
 
 
 BASE_URI = "http://api.yhathq.com/"
@@ -337,12 +339,6 @@ class Yhat(API):
         code = ""
         print "extracting model"
 
-        if 1 == 2 and _get_source(YhatModel.execute) == _get_source(model.execute):
-            msg = """'execute' method was not implemented.
-            If you believe that you did implement the 'execute' method,
-            check to make sure there isn't an indentation error."""
-            raise Exception(msg)
-
         bundle = save_function(model, session, verbose=verbose)
         bundle["largefile"] = True
         bundle["username"] = self.username
@@ -352,10 +348,15 @@ class Yhat(API):
         bundle["code"] = code + "\n" + bundle.get("code", "")
 
         # REQUIREMENTS
-        if DETECT_REQUIREMENTS and autodetect:
+        if DETECT_REQUIREMENTS and autodetect and getImplicitRequirements:
+            print(1)
             requirements = getImplicitRequirements(model, session)
+        elif getExplicitRequirements:
+            print(2)
+            requirements = getExplicitRequirements(model, session)
         else:
-            requirements = getExplicitRequirmets(model, session)
+            requirements = "\n".join(getattr(model, "REQUIREMENTS", []))
+
         bundle["reqs"] = requirements
 
         # MODULES

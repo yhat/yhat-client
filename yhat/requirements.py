@@ -104,7 +104,7 @@ def getImplicitRequirements(model, session):
     requirements = implicit(session, requirements)
     return bundleRequirments(requirements)
 
-def getExplicitRequirmets(model, session):
+def getExplicitRequirements(model, session):
     requirements = initializeRequirements(model)
     return bundleRequirments(requirements)
 

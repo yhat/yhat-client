@@ -86,12 +86,7 @@ class BatchJob(object):
 
         progress_bar.finish()
 
-    ##TODO:
-    # print out what's going to happen before deploying and confirm
-    # if sure, don't confirm
-    # Is there some reason you might want to pass in something other than
-    #    globals?
-    def deploy(self, session, verbose=False):
+    def deploy(self, session, sure=False, verbose=False):
         bundle = save_function(self.__class__, session, verbose=verbose)
         bundle["class_name"] = self.__class__.__name__
         bundle["language"] = "python"
@@ -99,9 +94,11 @@ class BatchJob(object):
         filename = ".tmp_yhat_job.tar.gz"
         self.__create_bundle_tar(bundle_str, filename)
         url = urljoin(self.url, "/batch/deploy")
-        print("posting to", url)
+        print("deploying batch job to: " +  str(url))
+        if not sure:
+            sure = raw_input("Are you sure you want to deploy? (y/N): ")
+            if sure.lower() != "y":
+                print "Deployment canceled"
+                sys.exit()
         self.__post_file(filename, url, self.username, self.name, self.apikey)
         os.remove(filename)
-
-    def execute(self):
-        pass

@@ -349,10 +349,8 @@ class Yhat(API):
 
         # REQUIREMENTS
         if DETECT_REQUIREMENTS and autodetect and getImplicitRequirements:
-            print(1)
             requirements = getImplicitRequirements(model, session)
         elif getExplicitRequirements:
-            print(2)
             requirements = getExplicitRequirements(model, session)
         else:
             requirements = "\n".join(getattr(model, "REQUIREMENTS", []))

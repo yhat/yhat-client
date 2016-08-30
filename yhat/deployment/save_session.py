@@ -346,12 +346,7 @@ def save_function(function, session, verbose=0):
     # de-dup and order the imports
     imports = sorted(list(set(imports)))
 
-    # patch for jupyter notebook not detecting variants
-    if isinstance(function(), SplitTestModel):
-        imports.append("import random")
-        if "from yhat.deployment.models import Variant" not in imports:
-            imports.append("from yhat.deployment.models import Variant")
-
+    imports.append("import random") # we need this for the execute method for a SplitTestModel
     imports.append("import json")
     imports.append("import pickle")
     imports.append("import terragon")

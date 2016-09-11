@@ -24,12 +24,6 @@ setup(
     description="Python client for Yhat (http://yhathq.com/)",
     license="BSD",
     classifiers=(
-        'Development Status :: 5 - Production/Stable',
-        'Intended Audience :: Developers',
-        'Programming Language :: Python',
-        'Operating System :: OS Independent',
-        'Topic :: Internet :: WWW/HTTP',
-        'Topic :: Software Development :: Libraries :: Python Modules'
     ),
     install_requires=[
         "pip",

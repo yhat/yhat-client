@@ -6,6 +6,7 @@ import pickle
 import terragon
 import urllib2
 import urllib
+import inspect
 import types
 import websocket
 import uuid
@@ -20,7 +21,7 @@ from poster.streaminghttp import register_openers
 from progressbar import ProgressBar, Percentage, Bar, FileTransferSpeed, ETA
 
 from deployment.models import YhatModel
-from deployment.save_session import save_function, _get_source
+from deployment.save_session import save_function, _get_source, reindent
 from .utils import progressbarify, sizeof_fmt
 
 devnull = open(os.devnull, "w")
@@ -321,7 +322,7 @@ class Yhat(API):
             endpoint = 'predict'
         return self._post(endpoint, q, data)
 
-    def _extract_model(self, name, model, session, autodetect, verbose=0):
+    def _extract_model(self, name, model, session, autodetect, is_tensorflow=False, verbose=0):
         """
         Extracts source code and any objects required to deploy the model.
 
@@ -386,9 +387,12 @@ class Yhat(API):
                 size = 3. * float(len(pkl)) / 4.
                 print " [+]", name, t, sizeof_fmt(size)
 
+        if is_tensorflow==True:
+            bundle['objects']['__tensorflow_session'] = terragon.sparkle.save_tensorflow_graph(session['sess'])
+
         return bundle
 
-    def deploy(self, name, model, session, sure=False, packages=[], patch=None, dry_run=False, verbose=0, autodetect=True):
+    def deploy(self, name, model, session, sure=False, packages=[], patch=None, dry_run=False, verbose=0, autodetect=True, is_tensorflow=False):
         """
         Deploys your model to a Yhat server
 
@@ -424,7 +428,7 @@ class Yhat(API):
             if sure.lower() != "y":
                 print "Deployment canceled"
                 sys.exit()
-        bundle = self._extract_model(name, model, session, verbose=verbose, autodetect=autodetect)
+        bundle = self._extract_model(name, model, session, verbose=verbose, autodetect=autodetect, is_tensorflow=is_tensorflow)
         bundle['packages'] = packages
         if isinstance(patch, str)==True:
             patch = "\n".join([line.strip() for line in patch.strip().split('\n')])
@@ -440,6 +444,19 @@ class Yhat(API):
             # upload the model to the server
             data = self._post_file("deployer/model/large", self.q, bundle, pb=True)
             return data
+
+    def deploy_tensorflow(self, name, model, session, sess, sure=False, packages=[], patch=None, dry_run=False, verbose=0, autodetect=True):
+        if 'sess' not in session:
+            session['sess'] = sess
+
+        patch = "print('loading tensorflow session...')\n"
+        patch += "sess, _ = __terragon.sparkle.load_tensorflow_graph(__bundle['objects']['__tensorflow_session'])\n"
+        patch = "print('done!')\n"
+        src = "\n".join(inspect.getsource(model.setup_tf).split('\n')[1:])
+        patch += reindent(src)
+
+        return self.deploy(name, model, session, sure=sure, packages=packages,
+            patch=patch, dry_run=dry_run, verbose=verbose, autodetect=autodetect, is_tensorflow=True)
 
     def deploy_spark(self, name, model, session, sc, sure=False, packages=[], patch=None, dry_run=False, verbose=0, autodetect=True):
         """

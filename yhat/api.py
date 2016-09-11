@@ -435,7 +435,7 @@ class Yhat(API):
             bundle['code'] = patch + "\n" + bundle['code']
 
         if dry_run:
-            return {"status": "ok", "info": "dry run complete"}
+            return {"status": "ok", "info": "dry run complete"}, bundle
         if self._check_obj_size(bundle) is False:
             # we're not going to deploy; model is too big, but let's give the
             # user the option to upload it manually

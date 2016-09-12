@@ -476,7 +476,7 @@ class Yhat(API):
 
         patch = "print('loading tensorflow session...')\n"
         patch += "sess, _ = __terragon.sparkle.load_tensorflow_graph(__bundle['objects']['__tensorflow_session'])\n"
-        patch = "print('done!')\n"
+        patch += "print('done!')\n"
         src = "\n".join(inspect.getsource(model.setup_tf).split('\n')[1:])
         patch += reindent(src)
 

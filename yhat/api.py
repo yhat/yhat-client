@@ -432,7 +432,7 @@ class Yhat(API):
                 sys.exit()
         bundle = self._extract_model(name, model, session, verbose=verbose, autodetect=autodetect, is_tensorflow=is_tensorflow)
         bundle['packages'] = packages
-        if isinstance(patch, str)==True:
+        if isinstance(patch, (str, unicode))==True:
             patch = "\n".join([line.strip() for line in patch.strip().split('\n')])
             bundle['code'] = patch + "\n" + bundle['code']
 
@@ -478,7 +478,7 @@ class Yhat(API):
 
         patch = "print('loading tensorflow session...')\n"
         patch += "sess, _ = __terragon.sparkle.load_tensorflow_graph(__bundle['objects']['__tensorflow_session'])\n"
-        patch += "print('done!')\n"
+        patch += "print('done!')\n\n"
         src = "\n".join(inspect.getsource(model.setup_tf).split('\n')[1:])
         patch += reindent(src)
 

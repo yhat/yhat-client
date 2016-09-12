@@ -184,8 +184,8 @@ as a pandas DataFrame. If you're still having trouble, please contact:
         rsp = response.read()
         pbar.finish()
         # clean up after we're done
-	f2.close()
-	os.unlink(f.name)
+        f2.close()
+        os.unlink(f.name)
         reply = {
             "status": "OK",
             "message": "Model successfully uploaded. Your model will begin building momentarily. Please see %s for more details" % self.base_uri

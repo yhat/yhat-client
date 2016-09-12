@@ -374,6 +374,8 @@ class Yhat(API):
         if objects:
             print "model variables"
             for name, pkl in objects.iteritems():
+                if name=='__tensorflow_session':
+                    continue
                 try:
                     try:
                         obj = terragon.loads_from_base64(pkl)

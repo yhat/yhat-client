@@ -473,6 +473,12 @@ class Yhat(API):
             if False, you should explicitly state the packages required for
             your model, or it may not run on the server.
         """
+
+        try:
+            model.setup_tf
+        except:
+            raise Exception("tensorflow models must have a `setup_tf` function")
+
         if 'sess' not in session:
             session['sess'] = sess
 

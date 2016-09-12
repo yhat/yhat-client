@@ -446,6 +446,31 @@ class Yhat(API):
             return data
 
     def deploy_tensorflow(self, name, model, session, sess, sure=False, packages=[], patch=None, dry_run=False, verbose=0, autodetect=True):
+        """
+        Deploys a TensorFlow model to a Yhat server. This is a special case of deploy.
+
+        Parameters
+        ----------
+        name: string
+            name of your model
+        model: YhatModel
+            an instance of a Yhat model
+        session: globals()
+            your Python's session variables (i.e. "globals()")
+        sess: tensorflow.Session, tensorflow.InteractiveSession
+            your SparkContext. this is typically `sc`
+        packages: list (deprecated in ScienceOps 2.7.x)
+            this is being deprecated in favor of custom runtime images
+        sure: boolean
+            if true, then this will force a deployment (like -y in apt-get).
+            if false or blank, this will ask you if you're sure you want to
+            deploy
+        verbose: int
+            Relative amount of logging info to display (higher = more logs)
+        autodetect: flag for using the requirement auto-detection feature.
+            if False, you should explicitly state the packages required for
+            your model, or it may not run on the server.
+        """
         if 'sess' not in session:
             session['sess'] = sess
 

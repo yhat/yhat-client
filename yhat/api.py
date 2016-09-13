@@ -6,6 +6,7 @@ import pickle
 import terragon
 import urllib2
 import urllib
+import inspect
 import types
 import websocket
 import uuid
@@ -20,7 +21,7 @@ from poster.streaminghttp import register_openers
 from progressbar import ProgressBar, Percentage, Bar, FileTransferSpeed, ETA
 
 from deployment.models import YhatModel
-from deployment.save_session import save_function, _get_source
+from deployment.save_session import save_function, _get_source, reindent
 from .utils import progressbarify, sizeof_fmt
 
 devnull = open(os.devnull, "w")
@@ -183,8 +184,8 @@ as a pandas DataFrame. If you're still having trouble, please contact:
         rsp = response.read()
         pbar.finish()
         # clean up after we're done
-	f2.close()
-	os.unlink(f.name)
+        f2.close()
+        os.unlink(f.name)
         reply = {
             "status": "OK",
             "message": "Model successfully uploaded. Your model will begin building momentarily. Please see %s for more details" % self.base_uri
@@ -321,7 +322,7 @@ class Yhat(API):
             endpoint = 'predict'
         return self._post(endpoint, q, data)
 
-    def _extract_model(self, name, model, session, autodetect, verbose=0):
+    def _extract_model(self, name, model, session, autodetect, is_tensorflow=False, verbose=0):
         """
         Extracts source code and any objects required to deploy the model.
 
@@ -373,6 +374,8 @@ class Yhat(API):
         if objects:
             print "model variables"
             for name, pkl in objects.iteritems():
+                if name=='__tensorflow_session':
+                    continue
                 try:
                     try:
                         obj = terragon.loads_from_base64(pkl)
@@ -386,9 +389,12 @@ class Yhat(API):
                 size = 3. * float(len(pkl)) / 4.
                 print " [+]", name, t, sizeof_fmt(size)
 
+        if is_tensorflow==True:
+            bundle['objects']['__tensorflow_session'] = terragon.sparkle.save_tensorflow_graph(session['sess'])
+
         return bundle
 
-    def deploy(self, name, model, session, sure=False, packages=[], patch=None, dry_run=False, verbose=0, autodetect=True):
+    def deploy(self, name, model, session, sure=False, packages=[], patch=None, dry_run=False, verbose=0, autodetect=True, is_tensorflow=False):
         """
         Deploys your model to a Yhat server
 
@@ -424,14 +430,14 @@ class Yhat(API):
             if sure.lower() != "y":
                 print "Deployment canceled"
                 sys.exit()
-        bundle = self._extract_model(name, model, session, verbose=verbose, autodetect=autodetect)
+        bundle = self._extract_model(name, model, session, verbose=verbose, autodetect=autodetect, is_tensorflow=is_tensorflow)
         bundle['packages'] = packages
-        if isinstance(patch, str)==True:
+        if isinstance(patch, (str, unicode))==True:
             patch = "\n".join([line.strip() for line in patch.strip().split('\n')])
             bundle['code'] = patch + "\n" + bundle['code']
 
         if dry_run:
-            return {"status": "ok", "info": "dry run complete"}
+            return {"status": "ok", "info": "dry run complete"}, bundle
         if self._check_obj_size(bundle) is False:
             # we're not going to deploy; model is too big, but let's give the
             # user the option to upload it manually
@@ -440,6 +446,50 @@ class Yhat(API):
             # upload the model to the server
             data = self._post_file("deployer/model/large", self.q, bundle, pb=True)
             return data
+
+    def deploy_tensorflow(self, name, model, session, sess, sure=False, packages=[], patch=None, dry_run=False, verbose=0, autodetect=True):
+        """
+        Deploys a TensorFlow model to a Yhat server. This is a special case of deploy.
+
+        Parameters
+        ----------
+        name: string
+            name of your model
+        model: YhatModel
+            an instance of a Yhat model
+        session: globals()
+            your Python's session variables (i.e. "globals()")
+        sess: tensorflow.Session, tensorflow.InteractiveSession
+            your SparkContext. this is typically `sc`
+        packages: list (deprecated in ScienceOps 2.7.x)
+            this is being deprecated in favor of custom runtime images
+        sure: boolean
+            if true, then this will force a deployment (like -y in apt-get).
+            if false or blank, this will ask you if you're sure you want to
+            deploy
+        verbose: int
+            Relative amount of logging info to display (higher = more logs)
+        autodetect: flag for using the requirement auto-detection feature.
+            if False, you should explicitly state the packages required for
+            your model, or it may not run on the server.
+        """
+
+        try:
+            model.setup_tf
+        except:
+            raise Exception("tensorflow models must have a `setup_tf` function")
+
+        if 'sess' not in session:
+            session['sess'] = sess
+
+        patch = "print('loading tensorflow session...')\n"
+        patch += "sess, _ = __terragon.sparkle.load_tensorflow_graph(__bundle['objects']['__tensorflow_session'])\n"
+        patch += "print('done!')\n\n"
+        src = "\n".join(inspect.getsource(model.setup_tf).split('\n')[1:])
+        patch += reindent(src)
+
+        return self.deploy(name, model, session, sure=sure, packages=packages,
+            patch=patch, dry_run=dry_run, verbose=verbose, autodetect=autodetect, is_tensorflow=True)
 
     def deploy_spark(self, name, model, session, sc, sure=False, packages=[], patch=None, dry_run=False, verbose=0, autodetect=True):
         """

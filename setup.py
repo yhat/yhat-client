@@ -24,19 +24,13 @@ setup(
     description="Python client for Yhat (http://yhathq.com/)",
     license="BSD",
     classifiers=(
-        'Development Status :: 5 - Production/Stable',
-        'Intended Audience :: Developers',
-        'Programming Language :: Python',
-        'Operating System :: OS Independent',
-        'Topic :: Internet :: WWW/HTTP',
-        'Topic :: Software Development :: Libraries :: Python Modules'
     ),
     install_requires=[
         "pip",
         "Flask==0.10.1",
         "websocket-client==0.12.0",
         "dill==0.2b1",
-        "terragon==0.2.0",
+        "terragon==0.2.2",
         "progressbar==2.2",
         "poster==0.8.1"
     ],

@@ -210,6 +210,15 @@ def _extract_module(module_name, modules={}, verbose=0):
         modules[module_name] = None
     return modules
 
+def _is_tensor(obj):
+    try:
+        return y.__class__.__name__=="Tensor"
+    except:
+        try:
+            return obj.__module__.startswith("tensorflow")
+        except Exception as e:
+            return False
+
 
 def _spider_function(function, session, pickles={}, verbose=0):
     """
@@ -258,11 +267,11 @@ def _spider_function(function, session, pickles={}, verbose=0):
         obj = session[varname]
         # checking to see if this is an instance of an object
         if hasattr(obj, "__name__")==False:
+            if _is_tensor(obj):
+                continue
             try:
                 pickles[varname] = terragon.dumps_to_base64(obj)
             except Exception as e:
-                if 'sc' not in session:
-                    raise Exception("Did not detect Spark context (`sc`) variable in your session.")
                 pickles[varname] = terragon.dumps_spark_to_base64(session['sc'], obj)
         if hasattr(obj, "__module__"):
             if obj.__module__=="__main__":

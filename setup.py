@@ -30,7 +30,7 @@ setup(
         "Flask==0.10.1",
         "websocket-client==0.12.0",
         "dill==0.2b1",
-        "terragon==0.2.2",
+        "terragon==0.2.3",
         "progressbar==2.2",
         "poster==0.8.1"
     ],

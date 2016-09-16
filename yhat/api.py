@@ -7,17 +7,17 @@ import terragon
 import urllib2
 import urllib
 import inspect
-import types
-import websocket
-import uuid
 import tempfile
 import zlib
 import re
 import os
 import os.path
-import subprocess
-from poster.encode import multipart_encode
-from poster.streaminghttp import register_openers
+
+import requests
+from requests_toolbelt.multipart.encoder import MultipartEncoderMonitor, MultipartEncoder
+
+# from poster.encode import multipart_encode
+# from poster.streaminghttp import register_openers
 from progressbar import ProgressBar, Percentage, Bar, FileTransferSpeed, ETA
 
 from deployment.models import YhatModel
@@ -134,14 +134,14 @@ as a pandas DataFrame. If you're still having trouble, please contact:
                 raise Exception(msg)
         except Exception, e:
             raise e
-            print "Message: %s" % str(rsp)
+            print("Message: %s" % str(rsp))
 
     def _post_file(self, endpoint, params, data, pb=True):
-        # Register the streaming http handlers with urllib2
-        register_openers()
 
+        # Stuff for progress bar setup
         widgets = ['Transfering Model: ', Bar(), Percentage(), ' ', ETA(), ' ', FileTransferSpeed()]
         pbar = ProgressBar(widgets=widgets).start()
+
         def progress(param, current, total):
             if not param:
                 return
@@ -159,20 +159,41 @@ as a pandas DataFrame. If you're still having trouble, please contact:
         zlib_compress(data, f)
         f.close()
 
-        f2 = open(f.name, "rb")
-        datagen, headers = multipart_encode({model_name: f2}, cb=progress)
+        def createCallback(encoder):
+            return
+            # NEED TO FINISH THIS FOR PROGRESS BAR
+            # encoder_len = len(encoder)
+            # bar = ProgressBar(expected_size=encoder_len, filled_char='=')
+            # def callback(monitor):
+            #     bar.show(monitor.bytes_read`)`
+            # return callback
 
-        url = self.base_uri + endpoint + "?" + urllib.urlencode(params)
-        req = urllib2.Request(url, datagen, headers)
+        encoder = MultipartEncoder(
+            fields={'model_name': ('filename', open(f.name, 'rb'), 'text/plain')}
+        )
+
+        # create the headers for the request
         auth = '%s:%s' % (params['username'], params['apikey'])
         base64string = base64.encodestring(auth).replace('\n', '')
-        req.add_header("Authorization", "Basic %s" % base64string)
+        headers = {
+            'Content-Type': encoder.content_type,
+            'Authorization': 'Basic %s' % base64string
+        }
+
+        callback = createCallback(encoder)
+        monitor = MultipartEncoderMonitor(encoder, callback)
+        url = self.base_uri + endpoint + "?" + urllib.urlencode(params)
+
         # Actually do the request, and get the response
         try:
-            response = urllib2.urlopen(req)
-        except urllib2.HTTPError, e:
-            if e.code > 200:
-                responseText = e.read()
+            # response = urllib2.urlopen(req)
+            r = requests.post(url=url, data=encoder, headers=headers)
+            if r.status_code != requests.codes.ok:
+                r.raise_for_status()
+        ### Might need to change this piece
+        except requests.exceptions.HTTPError, e:
+            if e.status_code > 200:
+                responseText = e.text
                 sys.stderr.write("\nDeployment error: " + responseText)
                 return { "status": "error", "message": responseText }
             else:
@@ -181,10 +202,10 @@ as a pandas DataFrame. If you're still having trouble, please contact:
         except Exception, e:
             sys.stderr.write("\nDeployment error: " + str(e))
             return { "status": "error", "message": str(e) }
-        rsp = response.read()
+        rsp = r.text
         pbar.finish()
         # clean up after we're done
-        f2.close()
+        f.close()
         os.unlink(f.name)
         reply = {
             "status": "OK",

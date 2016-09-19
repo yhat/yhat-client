@@ -138,16 +138,6 @@ as a pandas DataFrame. If you're still having trouble, please contact:
 
     def _post_file(self, endpoint, params, data, pb=True):
 
-        # Stuff for progress bar setup
-        widgets = ['Transfering Model: ', Bar(), Percentage(), ' ', ETA(), ' ', FileTransferSpeed()]
-        pbar = ProgressBar(widgets=widgets).start()
-
-        def progress(param, current, total):
-            if not param:
-                return
-            pbar.maxval = total
-            pbar.update(current)
-
         # headers contains the necessary Content-Type and Content-Length
         # datagen is a generator object that yields the encoded parameters
         f = tempfile.NamedTemporaryFile(mode='wb', prefix='tmp_yhat_', delete=False)
@@ -160,13 +150,13 @@ as a pandas DataFrame. If you're still having trouble, please contact:
         f.close()
 
         def createCallback(encoder):
-            return
-            # NEED TO FINISH THIS FOR PROGRESS BAR
-            # encoder_len = len(encoder)
-            # bar = ProgressBar(expected_size=encoder_len, filled_char='=')
-            # def callback(monitor):
-            #     bar.show(monitor.bytes_read`)`
-            # return callback
+            # Stuff for progress bar setup
+            widgets = ['Transfering Model: ', Bar(), Percentage(), ' ', ETA(), ' ', FileTransferSpeed()]
+            pbar = ProgressBar(max_value=encoder.len, widgets=widgets).start()
+            def callback(monitor):
+                current = monitor.bytes_read
+                pbar.update(current)
+            return callback
 
         encoder = MultipartEncoder(
             fields={'model_name': ('filename', open(f.name, 'rb'), 'text/plain')}
@@ -187,23 +177,23 @@ as a pandas DataFrame. If you're still having trouble, please contact:
         # Actually do the request, and get the response
         try:
             # response = urllib2.urlopen(req)
-            r = requests.post(url=url, data=encoder, headers=headers)
+            r = requests.post(url=url, data=monitor, headers=headers)
             if r.status_code != requests.codes.ok:
                 r.raise_for_status()
+
         ### Might need to change this piece
-        except requests.exceptions.HTTPError, e:
-            if e.status_code > 200:
-                responseText = e.text
+        except requests.exceptions.HTTPError as err:
+            if r.status_code > 200:
+                responseText = r.text
                 sys.stderr.write("\nDeployment error: " + responseText)
                 return { "status": "error", "message": responseText }
             else:
                 sys.stderr.write("\nError in HTTP connection")
                 return { "status": "error", "message": "Error in HTTP connection." }
-        except Exception, e:
-            sys.stderr.write("\nDeployment error: " + str(e))
-            return { "status": "error", "message": str(e) }
+        except Exception as err:
+            sys.stderr.write("\nDeployment error: " + str(err))
+            return { "status": "error", "message": str(err) }
         rsp = r.text
-        pbar.finish()
         # clean up after we're done
         f.close()
         os.unlink(f.name)

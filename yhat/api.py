@@ -159,7 +159,7 @@ as a pandas DataFrame. If you're still having trouble, please contact:
             return callback
 
         encoder = MultipartEncoder(
-            fields={'model_name': ('filename', open(f.name, 'rb'), 'text/plain')}
+            fields={'model_name': (open(f.name, 'rb'))}
         )
 
         # create the headers for the request
@@ -180,8 +180,6 @@ as a pandas DataFrame. If you're still having trouble, please contact:
             r = requests.post(url=url, data=monitor, headers=headers)
             if r.status_code != requests.codes.ok:
                 r.raise_for_status()
-
-        ### Might need to change this piece
         except requests.exceptions.HTTPError as err:
             if r.status_code > 200:
                 responseText = r.text

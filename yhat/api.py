@@ -176,7 +176,6 @@ as a pandas DataFrame. If you're still having trouble, please contact:
 
         # Actually do the request, and get the response
         try:
-            # response = urllib2.urlopen(req)
             r = requests.post(url=url, data=monitor, headers=headers)
             if r.status_code != requests.codes.ok:
                 r.raise_for_status()

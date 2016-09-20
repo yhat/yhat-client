@@ -8,8 +8,8 @@ import os.path
 import re
 import tarfile
 from urlparse import urljoin
-from poster.encode import multipart_encode, MultipartParam
-from poster.streaminghttp import register_openers
+import requests
+from requests_toolbelt.multipart.encoder import MultipartEncoderMonitor, MultipartEncoder
 from progressbar import ProgressBar, Percentage, Bar, FileTransferSpeed, ETA
 
 from deployment.save_session import save_function
@@ -47,44 +47,45 @@ class BatchJob(object):
         archive.close()
 
     def __post_file(self, filename, url, username, job_name, apikey):
-        register_openers()
 
-        widgets = ["Transferring job data: ", Bar(), Percentage(), " ", \
-            ETA(), " ", FileTransferSpeed()]
+        def createCallback(encoder):
+            # Stuff for progress bar setup
+            widgets = ['Transfering Model: ', Bar(), Percentage(), ' ', ETA(), ' ', FileTransferSpeed()]
+            pbar = ProgressBar(max_value=encoder.len, widgets=widgets).start()
+            def callback(monitor):
+                current = monitor.bytes_read
+                pbar.update(current)
+            return callback
 
-        progress_bar = ProgressBar(widgets=widgets).start()
-
-        def progress(param, current, total):
-            if not param:
-                return
-            progress_bar.maxval = total
-            progress_bar.update(current)
-
+        # Create the Multi-Part encoder
         data = open(filename, "rb")
-        form_data = {
-            "job": data,
-            "job_name": job_name
-        }
-        datagen, headers = multipart_encode(form_data, cb=progress)
+        encoder = MultipartEncoder(
+            fields={'job_name': job_name, 'job': (filename, data, 'application/x-tar')}
+        )
 
-        req = urllib2.Request(url, datagen, headers)
-
-        # Set authentication on request
+        # Create the headers for the request
         auth = "{}:{}".format(username, apikey)
-        encoded_auth = base64.encodestring(auth).replace("\n", "")
-        req.add_header("Authorization", "Basic {}".format(encoded_auth))
+        base64string = base64.encodestring(auth).replace('\n', '')
+        headers = {
+            'Content-Type': encoder.content_type,
+            'Authorization': 'Basic %s' % base64string
+        }
+        callback = createCallback(encoder)
+        monitor = MultipartEncoderMonitor(encoder, callback)
+
+        # Actually do the request, and get the response
         try:
-            response = urllib2.urlopen(req)
-        except urllib2.HTTPError, e:
-            text = e.read()
+            r = requests.post(url=url, data=monitor, headers=headers)
+            if r.status_code != requests.codes.ok:
+                r.raise_for_status()
+        except requests.exceptions.HTTPError as err:
+            text = r.text
             sys.stderr.write("\nServer error: {}".format(text))
             return
         except Exception, e:
             sys.stderr.write("\nError: {}".format(e))
             return
-        response_text = response.read()
-
-        progress_bar.finish()
+        response_text = r.text
 
     def deploy(self, session, sure=False, verbose=False):
         bundle = save_function(self.__class__, session, verbose=verbose)

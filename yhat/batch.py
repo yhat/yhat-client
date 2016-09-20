@@ -1,18 +1,27 @@
-import urllib2
+try:
+    from urllib.request import urlopen
+    from urllib.parse import urlparse, urljoin
+except ImportError:
+    from urlparse import urlparse, urljoin
+    from urllib import urlopen
+
+try:
+    import StringIO as bufio
+except ImportError:
+    import io as bufio
+
 import json
-import StringIO
 import base64
 import os
 import sys
 import os.path
 import re
 import tarfile
-from urlparse import urljoin
 import requests
 from requests_toolbelt.multipart.encoder import MultipartEncoderMonitor, MultipartEncoder
 from progressbar import ProgressBar, Percentage, Bar, FileTransferSpeed, ETA
 
-from deployment.save_session import save_function
+from .deployment.save_session import save_function
 
 class BatchJob(object):
 
@@ -28,7 +37,7 @@ class BatchJob(object):
             setattr(self, key, kwargs[key])
 
     def __create_bundle_tar(self, bundle, filename):
-        buf = StringIO.StringIO()
+        buf = bufio.StringIO()
         buf.write(bundle)
         buf.seek(0)
         bundle_tarinfo = tarfile.TarInfo("bundle.json")
@@ -82,7 +91,7 @@ class BatchJob(object):
             text = r.text
             sys.stderr.write("\nServer error: {}".format(text))
             return
-        except Exception, e:
+        except Exception as e:
             sys.stderr.write("\nError: {}".format(e))
             return
         response_text = r.text
@@ -95,11 +104,11 @@ class BatchJob(object):
         filename = ".tmp_yhat_job.tar.gz"
         self.__create_bundle_tar(bundle_str, filename)
         url = urljoin(self.url, "/batch/deploy")
-        print("deploying batch job to: " +  str(url))
+        print(("deploying batch job to: " +  str(url)))
         if not sure:
-            sure = raw_input("Are you sure you want to deploy? (y/N): ")
+            sure = input("Are you sure you want to deploy? (y/N): ")
             if sure.lower() != "y":
-                print "Deployment canceled"
+                print("Deployment canceled")
                 sys.exit()
         self.__post_file(filename, url, self.username, self.name, self.apikey)
         os.remove(filename)

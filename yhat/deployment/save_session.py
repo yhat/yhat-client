@@ -374,11 +374,19 @@ def save_function(function, session, verbose=0):
     imports.append("import pickle")
     imports.append("import terragon")
     source_code = "\n".join(imports) + "\n\n\n" + source_code
+    pickModules = []
+    for _, value in list(modules.items()):
+        if value is not None:
+            try:
+                value['source'] = value['source'].decode(encoding="utf-8")
+                pickModules.append(value)
+            except Exception:
+                pickModules.append(value)
     pickles = {
         "objects": pickles,
         "future": future_imports,
         "code": source_code,
-        "modules": [value for name, value in list(modules.items()) if value is not None]
+        "modules": pickModules
     }
 
     if "_objects_seen" in pickles["objects"]:

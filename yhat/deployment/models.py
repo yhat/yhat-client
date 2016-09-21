@@ -7,7 +7,7 @@ import warnings
 import random
 import re
 
-from input_and_output import df_to_df, parse_json, preprocess
+from .input_and_output import df_to_df, parse_json, preprocess
 
 try:
     import pandas as pd

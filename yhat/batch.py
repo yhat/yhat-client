@@ -1,15 +1,15 @@
 try:
-    from urllib.request import urlopen
-    from urllib.parse import urlparse, urljoin
+    from urllib.parse import urljoin
 except ImportError:
-    from urlparse import urlparse, urljoin
-    from urllib import urlopen
+    from urlparse import urljoin
 
 try:
     import StringIO as io
 except ImportError:
     import io as io
+# import io
 
+from builtins import input
 import json
 import base64
 import os
@@ -37,23 +37,25 @@ class BatchJob(object):
             setattr(self, key, kwargs[key])
 
     def __create_bundle_tar(self, bundle, filename):
-        buf = io.StringIO()
-        buf.write(bundle)
-        buf.seek(0)
-        bundle_tarinfo = tarfile.TarInfo("bundle.json")
-        bundle_tarinfo.size = len(bundle)
+        # Write a bundle file
+        f = open('bundle.json', 'w')
+        f.write(bundle)
+        f.close()
 
         # make sure old files are gone from previous job
         if os.path.isfile(filename):
             os.remove(filename)
 
         archive = tarfile.open(filename, "w:gz")
-        archive.addfile(tarinfo=bundle_tarinfo, fileobj=buf)
+        archive.add('bundle.json')
+
         if os.path.isfile("yhat.yaml"):
             archive.add("yhat.yaml")
         if os.path.isfile("requirements.txt"):
             archive.add("requirements.txt")
         archive.close()
+        # remove the bundle file
+        os.unlink('bundle.json')
 
     def __post_file(self, filename, url, username, job_name, apikey):
 
@@ -72,19 +74,15 @@ class BatchJob(object):
             fields={'job_name': job_name, 'job': (filename, data, 'application/x-tar')}
         )
 
-        # Create the headers for the request
-        auth = "{}:{}".format(username, apikey)
-        base64string = base64.encodestring(auth).replace('\n', '')
         headers = {
             'Content-Type': encoder.content_type,
-            'Authorization': 'Basic %s' % base64string
         }
         callback = createCallback(encoder)
         monitor = MultipartEncoderMonitor(encoder, callback)
 
         # Actually do the request, and get the response
         try:
-            r = requests.post(url=url, data=monitor, headers=headers)
+            r = requests.post(url=url, data=monitor, headers=headers, auth=(username, apikey))
             if r.status_code != requests.codes.ok:
                 r.raise_for_status()
         except requests.exceptions.HTTPError as err:

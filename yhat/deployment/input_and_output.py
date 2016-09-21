@@ -40,9 +40,9 @@ def parse_json(somejson):
     """
     try:
         return json.loads(somejson)
-    except Exception, e:
-        print "Input was not valid JSON."
-        print "==> %s" % str(e)
+    except Exception as e:
+        print("Input was not valid JSON.")
+        print("==> %s" % str(e))
 
 class df_to_df(object):
     """
@@ -168,7 +168,7 @@ def df_to_json(df):
     df_values = json.loads(df_values)
     try:
         from collections import OrderedDict
-        df_values = OrderedDict(zip(df.columns,df_values))
+        df_values = OrderedDict(list(zip(df.columns,df_values)))
     except ImportError:
-        df_values = dict(zip(df.columns,df_values))
+        df_values = dict(list(zip(df.columns,df_values)))
     return json.dumps(df_values)

@@ -4,6 +4,7 @@ except ImportError:
     from urllib import urlencode
 
 from builtins import input
+from builtins import bytes
 import sys
 import warnings
 import base64
@@ -22,7 +23,7 @@ from progressbar import ProgressBar, Percentage, Bar, FileTransferSpeed, ETA
 
 from .deployment.models import YhatModel
 from .deployment.save_session import save_function, _get_source, reindent
-from .utils import progressbarify, sizeof_fmt
+from .utils import sizeof_fmt, is_valid_json
 
 devnull = open(os.devnull, "w")
 
@@ -87,7 +88,7 @@ class API(object):
         except Exception as e:
             raise e
 
-    def _post(self, endpoint, params, data, pb=False):
+    def _post(self, endpoint, params, data):
         """
         Parameters
         ----------
@@ -97,48 +98,21 @@ class API(object):
             querystring parameters for API call
         data: dictionary
             data you want transfered as JSON
-        pb: bool
-            do you want a progress bar?
 
         Returns
         -------
         data: dictionary
             whatever is returned by the API
         """
-        try:
-            url = self.base_uri + endpoint + "?" + urlencode(params)
-            auth = '%s:%s' % (params['username'], params['apikey'])
-            base64string = base64.encodestring(auth).replace('\n', '')
-            base64header = "Basic %s" % base64string
-            headers = {
-                'Content-Type': 'application/json',
-                'Authorization': base64header
-            }
-            try:
-                data = json.dumps(data)
-            except Exception as e:
-                msg = """Whoops. The data you're trying to send could not be
-converted into JSON. If the data you're attempting to send includes a numpy
-array, try casting it to a list (x.tolist()), or consider structuring your data
-as a pandas DataFrame. If you're still having trouble, please contact:
-{URL}.""".format(URL="support@yhathq.com")
-                print(msg)
-                return
-            if pb:
-                data = progressbarify(data)
-            response = requests.post(url=url, headers=headers, data=data)
-            rsp = response.text
-            try:
-                return json.loads(rsp)
-            except ValueError:
-                msg = """
-        Could not unpack response values.
-        Please visit "http://cloud.yhathq.com"
-        to make sure your model is online and not still building."""
-                raise Exception(msg)
-        except Exception as e:
-            raise e
-            print(("Message: %s" % str(rsp)))
+        if is_valid_json(data)==False:
+            raise Exception("`data` is not valid JSON")
+
+        url = self.base_uri + endpoint
+        headers = { "Content-Type": "application/json"}
+        username, apikey = params['username'], params['apikey']
+
+        response = requests.post(url=url, headers=headers, data=data, params=params, auth=(username, apikey))
+        return response.json()
 
     def _post_file(self, endpoint, params, data, pb=True):
 
@@ -166,21 +140,16 @@ as a pandas DataFrame. If you're still having trouble, please contact:
             fields={'model_name': (open(f.name, 'rb'))}
         )
 
-        # create the headers for the request
-        auth = '%s:%s' % (params['username'], params['apikey'])
-        base64string = base64.encodestring(auth).replace('\n', '')
-        headers = {
-            'Content-Type': encoder.content_type,
-            'Authorization': 'Basic %s' % base64string
-        }
+        username, apikey = params['username'], params['apikey']
+        headers = {'Content-Type': encoder.content_type,}
 
         callback = createCallback(encoder)
         monitor = MultipartEncoderMonitor(encoder, callback)
-        url = self.base_uri + endpoint + "?" + urlencode(params)
+        url = self.base_uri + endpoint
 
         # Actually do the request, and get the response
         try:
-            r = requests.post(url=url, data=monitor, headers=headers)
+            r = requests.post(url=url, data=monitor, headers=headers, params=params, auth=(username, apikey))
             if r.status_code != requests.codes.ok:
                 r.raise_for_status()
         except requests.exceptions.HTTPError as err:
@@ -230,8 +199,9 @@ class Yhat(API):
         self.q = {"username": self.username, "apikey": apikey}
         if self.base_uri != BASE_URI:
             e = self._authenticate()
+            print(e)
             if e is not None:
-                raise Exception("Failed to authenticate: %s" % e)
+                raise Exception("Failed to authenticate: {}".format(e))
 
     def _check_obj_size(self, obj):
         """
@@ -542,7 +512,7 @@ class Yhat(API):
 def zlib_compress(data, to):
     step = 4 << 20 # 4MiB
     c = zlib.compressobj()
-
+    data = bytes(data, "utf-8")
     for i in range(0, len(data), step):
         to.write(c.compress(data[i:i+step]))
 

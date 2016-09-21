@@ -6,9 +6,9 @@ except ImportError:
     from urllib import urlopen
 
 try:
-    import StringIO as bufio
+    import StringIO as io
 except ImportError:
-    import io as bufio
+    import io as io
 
 import json
 import base64
@@ -37,7 +37,7 @@ class BatchJob(object):
             setattr(self, key, kwargs[key])
 
     def __create_bundle_tar(self, bundle, filename):
-        buf = bufio.StringIO()
+        buf = io.StringIO()
         buf.write(bundle)
         buf.seek(0)
         bundle_tarinfo = tarfile.TarInfo("bundle.json")

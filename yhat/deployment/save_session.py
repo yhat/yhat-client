@@ -1,3 +1,11 @@
+try:
+    import StringIO as io
+except ImportError:
+    import io as io
+try:
+    from .models import SplitTestModel
+except ImportError:
+    from models import SplitTestModel
 import pickle
 import terragon
 import ast
@@ -5,11 +13,10 @@ import inspect
 import tokenize
 import types
 import json
-import StringIO
 import sys
 import os
 import pprint as pp
-from .models import SplitTestModel
+
 
 try:
     import dill
@@ -283,20 +290,20 @@ def _spider_function(function, session, pickles={}, verbose=0):
             else:
                 modules.update(_extract_module(obj.__module__, verbose=verbose))
                 ref = inspect.getmodule(obj).__name__
-                if hasattr(obj, "func_name") and obj.func_name!=varname:
-                    imports.append("from %s import %s as %s" % (ref, obj.func_name, varname))
+                if hasattr(obj, "func_name") and obj.__name__!=varname:
+                    imports.append("from %s import %s as %s" % (ref, obj.__name__, varname))
                 else:
                     # we need to figure out how to import this library. i'm not
                     # sure exactly what the right way to get the module and
                     # class name, but this works just fine
                     try:
                         import_statement = "from %s import %s" % (ref, varname)
-                        exec import_statement in locals()
+                        exec(import_statement, locals())
                         imports.append(import_statement)
                     except:
                         try:
                             import_statement = "from %s import %s" % (ref, obj.__class__.__name__)
-                            exec import_statement in locals()
+                            exec(import_statement, locals())
                             imports.append(import_statement)
                         except:
                             pass
@@ -324,7 +331,7 @@ def _detect_future_imports(session):
         globals() from the user's environment
     """
     imports = []
-    for k in session.keys():
+    for k in list(session.keys()):
         v = session[k]
         if hasattr(v,"__module__"):
             if v.__module__ == "__future__":
@@ -364,7 +371,7 @@ def save_function(function, session, verbose=0):
         "objects": pickles,
         "future": future_imports,
         "code": source_code,
-        "modules": [value for name, value in modules.items() if value is not None]
+        "modules": [value for name, value in list(modules.items()) if value is not None]
     }
 
     if "_objects_seen" in pickles["objects"]:
@@ -372,9 +379,9 @@ def save_function(function, session, verbose=0):
     return pickles
 
 def reindent(code):
-    r = Reindenter(StringIO.StringIO(code))
+    r = Reindenter(io.StringIO(code))
     r.run()
-    out = StringIO.StringIO()
+    out = io.StringIO()
     r.write(out)
     return out.getvalue()
 
@@ -445,7 +452,7 @@ class Reindenter:
                     want = have2want.get(have, -1)
                     if want < 0:
                         # Then it probably belongs to the next real stmt.
-                        for j in xrange(i+1, len(stats)-1):
+                        for j in range(i+1, len(stats)-1):
                             jline, jlevel = stats[j]
                             if jlevel >= 0:
                                 if have == getlspace(lines[jline]):
@@ -455,7 +462,7 @@ class Reindenter:
                                            # comment like this one,
                         # in which case we should shift it like its base
                         # line got shifted.
-                        for j in xrange(i-1, -1, -1):
+                        for j in range(i-1, -1, -1):
                             jline, jlevel = stats[j]
                             if jlevel >= 0:
                                 want = have + getlspace(after[jline-1]) - \
@@ -496,13 +503,14 @@ class Reindenter:
         return line
 
     # Line-eater for tokenize.
-    def tokeneater(self, type, token, (sline, scol), end, line,
+    def tokeneater(self, type, token, lineCol, end, line,
                    INDENT=tokenize.INDENT,
                    DEDENT=tokenize.DEDENT,
                    NEWLINE=tokenize.NEWLINE,
                    COMMENT=tokenize.COMMENT,
                    NL=tokenize.NL):
 
+        (sline, scol) = lineCol
         if type == NEWLINE:
             # A program statement, or ENDMARKER, will eventually follow,
             # after some (possibly empty) run of tokens of the form

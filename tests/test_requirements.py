@@ -32,5 +32,15 @@ class RequirementsTest(unittest.TestCase):
         """
         pass
 
+    def testRequirmentsString(self):
+        """
+        testRequirmentsString will test a normal requirments list
+        """
+        REQUIREMENTS = ['scikit-learn==0.16.1', 'pandas==0.17.1']
+        userReqs = parseUserRequirementsList(REQUIREMENTS)
+        assertReqs = [Requirement.parse('scikit-learn==0.16.1'),
+             Requirement.parse('pandas==0.17.1')]
+        self.assertTrue(userReqs, assertReqs)
+
 if __name__ == '__main__':
     unittest.main()

@@ -18,6 +18,7 @@ import re
 import os
 import os.path
 import requests
+from six import string_types
 from requests_toolbelt.multipart.encoder import MultipartEncoderMonitor, MultipartEncoder
 from progressbar import ProgressBar, Percentage, Bar, FileTransferSpeed, ETA
 
@@ -414,7 +415,7 @@ class Yhat(API):
                 sys.exit()
         bundle = self._extract_model(name, model, session, verbose=verbose, autodetect=autodetect, is_tensorflow=is_tensorflow)
         bundle['packages'] = packages
-        if isinstance(patch, str)==True:
+        if isinstance(patch, string_types) == True:
             patch = "\n".join([line.strip() for line in patch.strip().split('\n')])
             bundle['code'] = patch + "\n" + bundle['code']
 

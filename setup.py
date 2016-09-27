@@ -30,7 +30,7 @@ setup(
         "Flask==0.10.1",
         "websocket-client==0.12.0",
         "dill==0.2.5",
-        "terragon==0.2.2",
+        "terragon==0.3.0",
         "progressbar2==3.10.1",
         "requests",
         "requests-toolbelt"

@@ -1,4 +1,0 @@
-
-
-def bye():
-    return "bye!"

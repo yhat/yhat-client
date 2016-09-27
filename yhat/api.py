@@ -465,11 +465,11 @@ class Yhat(API):
         if 'sess' not in session:
             session['sess'] = sess
 
+        src = "\n".join(inspect.getsource(model.setup_tf).split('\n')[1:])
         patch = "print('loading tensorflow session...')\n"
+        patch += reindent(src)
         patch += "sess, _ = __terragon.sparkle.load_tensorflow_graph(__bundle['objects']['__tensorflow_session'])\n"
         patch += "print('done!')\n\n"
-        src = "\n".join(inspect.getsource(model.setup_tf).split('\n')[1:])
-        patch += reindent(src)
 
         return self.deploy(name, model, session, sure=sure, packages=packages,
             patch=patch, dry_run=dry_run, verbose=verbose, autodetect=autodetect, is_tensorflow=True)

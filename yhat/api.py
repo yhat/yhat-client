@@ -1,3 +1,5 @@
+from __future__ import print_function
+
 try:
     from urllib.parse import urlencode
 except ImportError:

@@ -445,7 +445,7 @@ class Yhat(API):
         session: globals()
             your Python's session variables (i.e. "globals()")
         sess: tensorflow.Session, tensorflow.InteractiveSession
-            your SparkContext. this is typically `sc`
+            your tensorflow session. this is typically `sess`
         packages: list (deprecated in ScienceOps 2.7.x)
             this is being deprecated in favor of custom runtime images
         sure: boolean

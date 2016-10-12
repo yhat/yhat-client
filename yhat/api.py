@@ -202,7 +202,6 @@ class Yhat(API):
         self.q = {"username": self.username, "apikey": apikey}
         if self.base_uri != BASE_URI:
             e = self._authenticate()
-            print(e)
             if e is not None:
                 raise Exception("Failed to authenticate: {}".format(e))
 

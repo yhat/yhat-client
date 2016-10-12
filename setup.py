@@ -27,6 +27,7 @@ setup(
     ),
     install_requires=[
         "pip",
+        "future",
         "Flask==0.10.1",
         "websocket-client==0.12.0",
         "dill==0.2.5",

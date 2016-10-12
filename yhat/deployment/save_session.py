@@ -226,12 +226,18 @@ def _extract_module(module_name, modules={}, verbose=0):
 
 def _is_tensor(obj):
     try:
-        return y.__class__.__name__=="Tensor"
+        return obj.__class__.__name__=="Tensor"
     except:
         try:
             return obj.__module__.startswith("tensorflow")
         except Exception as e:
             return False
+
+def _is_spark(obj):
+    try:
+        return obj.__module__.startswith("pyspark")
+    except Exception as e:
+        return False
 
 
 def _spider_function(function, session, pickles={}, verbose=0):
@@ -283,10 +289,14 @@ def _spider_function(function, session, pickles={}, verbose=0):
         if hasattr(obj, "__name__")==False:
             if _is_tensor(obj):
                 continue
-            try:
-                pickles[varname] = terragon.dumps_to_base64(obj)
-            except Exception as e:
+            elif _is_spark(obj):
                 pickles[varname] = terragon.dumps_spark_to_base64(session['sc'], obj)
+            else:
+                try:
+                    pickles[varname] = terragon.dumps_to_base64(obj)
+                except Exception as e:
+                    pass
+
         if hasattr(obj, "__module__"):
             if obj.__module__=="__main__":
                 new_imports, new_source, new_pickles, new_modules = _spider_function(obj, session, pickles, verbose=verbose)
@@ -324,6 +334,7 @@ def _spider_function(function, session, pickles={}, verbose=0):
         else:
             # catch all. if all else fails, pickle it
             pickles[varname] = terragon.dumps_to_base64(obj)
+
     return imports, source, pickles, modules
 
 def _detect_future_imports(session):

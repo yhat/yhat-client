@@ -32,7 +32,8 @@ setup(
         "dill==0.2b1",
         "terragon==0.2.3",
         "progressbar==2.2",
-        "poster==0.8.1"
+        "poster==0.8.1",
+        "simplejson==3.8.2"
     ],
     long_description=open("README.rst").read(),
     keywords=['yhat', 'scikits', 'numpy', 'pandas'],

@@ -226,19 +226,23 @@ def _extract_module(module_name, modules={}, verbose=0):
 
 def _is_tensor(obj):
     try:
-        return obj.__class__.__name__=="Tensor"
+        return obj.__module__.startswith("tensorflow")
     except:
         try:
-            return obj.__module__.startswith("tensorflow")
-        except Exception as e:
+            import re
+            return None != re.search( r'(tensorflow)', str(obj.__class__))
+        except:
             return False
 
 def _is_spark(obj):
     try:
         return obj.__module__.startswith("pyspark")
-    except Exception as e:
-        return False
-
+    except:
+        try:
+            import re
+            return None != re.search( r'(pyspark)', str(obj.__class__))
+        except:
+            return False
 
 def _spider_function(function, session, pickles={}, verbose=0):
     """

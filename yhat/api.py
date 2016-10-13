@@ -273,6 +273,10 @@ class Yhat(API):
                 data = OrderedDict(list(zip(data.columns, data_values)))
             except ImportError:
                 data = dict(list(zip(data.columns, data_values)))
+        try:
+            data = json.dumps(data)
+        except:
+            pass
         return data
 
     def predict(self, model, data, model_owner=None, raw_input=False):
@@ -299,7 +303,6 @@ class Yhat(API):
         """
         data = self._convert_to_json(data)
         q = self.q
-        q['model'] = model
         if raw_input==True:
             q['raw_input'] = True
         model_user = self.username if model_owner is None else model_owner

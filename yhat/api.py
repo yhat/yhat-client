@@ -115,6 +115,10 @@ class API(object):
         username, apikey = params['username'], params['apikey']
 
         response = requests.post(url=url, headers=headers, data=data, params=params, auth=(username, apikey))
+        if response.status_code > 200:
+            # if we don't get a 200, write the error and raise an status Exception
+            sys.stderr.write("error: " + response.text)
+            response.raise_for_status()
         return response.json()
 
     def _post_file(self, endpoint, params, data, pb=True):

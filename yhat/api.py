@@ -273,10 +273,8 @@ class Yhat(API):
                 data = OrderedDict(list(zip(data.columns, data_values)))
             except ImportError:
                 data = dict(list(zip(data.columns, data_values)))
-        try:
-            data = json.dumps(data)
-        except:
-            pass
+
+        data = json.dumps(data)
         return data
 
     def predict(self, model, data, model_owner=None, raw_input=False):

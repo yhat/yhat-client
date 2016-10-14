@@ -11,6 +11,7 @@ import tokenize
 import types
 import json
 import sys
+import re
 import io
 import os
 import pprint as pp
@@ -229,7 +230,6 @@ def _is_tensor(obj):
         return obj.__module__.startswith("tensorflow")
     except:
         try:
-            import re
             return None != re.search( r'(tensorflow)', str(obj.__class__))
         except:
             return False
@@ -239,7 +239,6 @@ def _is_spark(obj):
         return obj.__module__.startswith("pyspark")
     except:
         try:
-            import re
             return None != re.search( r'(pyspark)', str(obj.__class__))
         except:
             return False
@@ -296,10 +295,8 @@ def _spider_function(function, session, pickles={}, verbose=0):
             elif _is_spark(obj):
                 pickles[varname] = terragon.dumps_spark_to_base64(session['sc'], obj)
             else:
-                try:
-                    pickles[varname] = terragon.dumps_to_base64(obj)
-                except Exception as e:
-                    pass
+                pickles[varname] = terragon.dumps_to_base64(obj)
+
 
         if hasattr(obj, "__module__"):
             if obj.__module__=="__main__":

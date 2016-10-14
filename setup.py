@@ -27,14 +27,12 @@ setup(
     ),
     install_requires=[
         "pip",
-        "future",
-        "Flask==0.10.1",
-        "websocket-client==0.12.0",
+        "future==0.15.2",
         "dill==0.2.5",
         "terragon==0.3.0",
         "progressbar2==3.10.1",
-        "requests",
-        "requests-toolbelt"
+        "requests==2.11.1",
+        "requests-toolbelt==0.7.0"
     ],
     long_description=open("README.rst").read(),
     keywords=['yhat', 'scikits', 'numpy', 'pandas'],

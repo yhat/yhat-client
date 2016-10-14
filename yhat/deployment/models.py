@@ -20,9 +20,6 @@ class YhatModel(object):
     A simple class structure for your model. Place all of the code you want to
     execute in the `execute` method.
 
-    The `run` method provides you with a basic development "server" for testing
-    locally. It will give you the same results as you will see on a Yhat server.
-
     Parameters
     ----------
     filename: string

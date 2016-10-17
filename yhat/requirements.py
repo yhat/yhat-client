@@ -23,9 +23,9 @@ def _get_package_name(obj):
     try:
         if isinstance(obj, types.ModuleType):
             return obj.__package__.split(".")[0]
-        elif isinstance(obj, types.TypeType):
+        elif isinstance(obj, type):
             return obj.__module__.split(".")[0]
-        elif isinstance(obj, types.ObjectType):
+        elif isinstance(obj, object):
             return obj.__class__.__module__.split(".")[0]
         else:
             return None
@@ -59,9 +59,9 @@ def parseUserRequirementsList(reqList):
                     userReqsRaw.append(r)
                     pkgCount += 1
                 else:
-                    print 'Package ' + r + ' was not recognized as a valid package.'
+                    print('Package ' + r + ' was not recognized as a valid package.')
             except:
-                print "Unexpected error:", sys.exc_info()[0]
+                print("Unexpected error:", sys.exc_info()[0])
                 raise
 
     if pkgCount > PACKAGE_LIMIT:
@@ -86,7 +86,7 @@ def initializeRequirements(model):
         'autodetected': []
     }
     userReqs = getattr(model, "REQUIREMENTS", "")
-    if isinstance(userReqs, basestring):
+    if isinstance(userReqs, str):
         userReqs = [r for r in userReqs.splitlines() if r]
     if userReqs:
         userReqs = parseUserRequirementsList(userReqs)
@@ -109,24 +109,24 @@ def getExplicitRequirements(model, session):
     return bundleRequirments(requirements)
 
 def printRequirements(requirements):
-    for cat, reqList in requirements.items():
+    for cat, reqList in list(requirements.items()):
         if reqList:
             if cat == "required":
-                print "required packages"
+                print("required packages")
             elif cat == "modelSpecified":
-                print "model specified requirements"
+                print("model specified requirements")
             elif cat == "autodetected":
-                print "autodetected packages"
+                print("autodetected packages")
             for r in reqList:
                 if "==" not in str(r) and str(r)[:3] != 'git':
                     r = str(r) + " (latest)"
-                print " [+]", r
+                print(" [+] " + str(r))
 
 def bundleRequirments(requirements):
     # Put the requirements into a structure for the bundle
     reqList = []
     mergedReqs = merge(requirements)
-    for reqs in mergedReqs.itervalues():
+    for reqs in mergedReqs.values():
         if reqs:
             for r in reqs:
                 reqList.append(r)
@@ -143,8 +143,8 @@ def implicit(session, requirements):
     of a given session. These are matched using the contents of "top_level.txt"
     metadata for all package names in the session.
     """
-    package_names = [_get_package_name(g) for g in session.values()]
-    package_names = set(filter(None, package_names))
+    package_names = [_get_package_name(g) for g in list(session.values())]
+    package_names = set([_f for _f in package_names if _f])
 
     reqs = {}
     for d in get_installed_distributions():
@@ -157,7 +157,7 @@ def implicit(session, requirements):
                 else:
                     reqs[d.project_name] = d.version
 
-    requirements['autodetected'] = [Requirement.parse('%s==%s' % r) for r in reqs.items()]
+    requirements['autodetected'] = [Requirement.parse('%s==%s' % r) for r in list(reqs.items())]
     return requirements
 
 def merge(requirements):
@@ -180,7 +180,7 @@ def merge(requirements):
         if type(r) != str:
             explicit_dict[r.project_name] = r
 
-    for project_name, exp_req in explicit_dict.items():
+    for project_name, exp_req in list(explicit_dict.items()):
         # To be polite, we keep the explicit dependencies and add the implicit
         # ones to them. We respect versions on the former, except in the case
         # of yhat, which should be the installed version.
@@ -210,7 +210,7 @@ def merge(requirements):
 
     # Loop through the implicit dict and notify users if they haven't explicitly
     # specified a requirement
-    for project_name, imp_req in implicit_dict.items():
+    for project_name, imp_req in list(implicit_dict.items()):
         if project_name not in explicit_dict:
             warn(
                 "Dependency %s was found with autodetection, but we recommend "

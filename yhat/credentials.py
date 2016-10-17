@@ -2,7 +2,11 @@ import json
 import base64
 import os
 import re
-from urlparse import urlparse
+try:
+    from urllib.parse import urlparse
+except ImportError:
+    from urlparse import urlparse
+from builtins import input
 
 
 def has():
@@ -25,9 +29,9 @@ def setup():
         _username = " [%s]" % creds["username"]
         _apikey = " [%s]" % creds["apikey"]
         _server = " [%s]" % creds["server"]
-    username = raw_input("Yhat username" + _username + ": ")
-    apikey = raw_input("Yhat apikey" + _apikey + ": ")
-    server = raw_input("Yhat server" + _server + ": ")
+    username = input("Yhat username" + _username + ": ")
+    apikey = input("Yhat apikey" + _apikey + ": ")
+    server = input("Yhat server" + _server + ": ")
 
     if username == "":
         username = re.search(r"[^[]*\[([^]]*)\]", _username).group(1)

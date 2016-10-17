@@ -1,4 +1,7 @@
 #!/bin/bash
+# Pass in the "upload" flag to ship to pypi.
+# You have to be an admin on the repo (ask greg) and have a
+# ~/.pypirc file setup
 
 pandoc -f markdown -t rst README.md > README.rst
 python setup.py install
@@ -10,4 +13,3 @@ if [[ "${v1}" != "${v2}" ]]; then
 else
   python setup.py install sdist $1
 fi
-

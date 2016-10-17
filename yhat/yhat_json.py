@@ -5,7 +5,7 @@ import simplejson as json
 # installing numpy would just be really annoying.
 try:
     import numpy as np
-except Exception as e:
+except ImportError as e:
     np = None
 
 class NumpyAwareJSONEncoder(json.JSONEncoder):

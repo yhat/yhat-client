@@ -35,7 +35,7 @@ class TestYhatJson(unittest.TestCase):
 
     def test_dumps_numpy_array(self):
         x = np.arange(100)
-        self.assertEqual(yhat_json.dumps(x), json.dumps(range(100)))
+        self.assertEqual(yhat_json.dumps(x), json.dumps(list(range(100))))
 
 if __name__=="__main__":
     unittest.main()

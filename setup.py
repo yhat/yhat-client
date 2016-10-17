@@ -32,7 +32,7 @@ setup(
         "terragon==0.3.0",
         "progressbar2==3.10.1",
         "requests==2.11.1",
-        "requests-toolbelt==0.7.0"
+        "requests-toolbelt==0.7.0",
         "simplejson==3.8.2"
     ],
     long_description=open("README.rst").read(),

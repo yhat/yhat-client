@@ -1,28 +1,32 @@
+from __future__ import print_function
+
+try:
+    from urllib.parse import urlencode
+except ImportError:
+    from urllib import urlencode
+
+from builtins import input
+from builtins import bytes
 import sys
 import warnings
 import base64
 import json
 import pickle
 import terragon
-import urllib2
-import urllib
 import inspect
-import types
-import websocket
-import uuid
 import tempfile
 import zlib
 import re
 import os
 import os.path
-import subprocess
-from poster.encode import multipart_encode
-from poster.streaminghttp import register_openers
+import requests
+from six import string_types
+from requests_toolbelt.multipart.encoder import MultipartEncoderMonitor, MultipartEncoder
 from progressbar import ProgressBar, Percentage, Bar, FileTransferSpeed, ETA
 
-from deployment.models import YhatModel
-from deployment.save_session import save_function, _get_source, reindent
-from .utils import progressbarify, sizeof_fmt
+from .deployment.models import YhatModel
+from .deployment.save_session import save_function, _get_source, reindent
+from .utils import sizeof_fmt, is_valid_json
 
 devnull = open(os.devnull, "w")
 
@@ -30,7 +34,7 @@ devnull = open(os.devnull, "w")
 # this version of pip, then we just warn and turn off the feature.
 getExplicitRequirements, getImplicitRequirements = None, None
 try:
-    from requirements import getExplicitRequirements, getImplicitRequirements
+    from .requirements import getExplicitRequirements, getImplicitRequirements
 except ImportError:
     warnings.warn("Unable to use this version of pip. Requirements detection disabled. Consider upgrading pip.")
     DETECT_REQUIREMENTS = False
@@ -73,19 +77,21 @@ class API(object):
             whatever is returned by the API
         """
         try:
-            url = self.base_uri + endpoint + "?" + urllib.urlencode(params)
-            req = urllib2.Request(url)
-            req.add_header('Content-Type', 'application/json')
+            url = self.base_uri + endpoint + "?" + urlencode(params)
             auth = '%s:%s' % (params['username'], params['apikey'])
             base64string = base64.encodestring(auth).replace('\n', '')
-            req.add_header("Authorization", "Basic %s" % base64string)
-            response = urllib2.urlopen(req)
-            rsp = response.read()
+            base64header = "Basic %s" % base64string
+            headers = {
+                'Content-Type': 'application/json',
+                'Authorization': base64header
+            }
+            response = requests.get(url=url, headers=headers)
+            rsp = response.text
             return json.loads(rsp)
-        except Exception, e:
+        except Exception as e:
             raise e
 
-    def _post(self, endpoint, params, data, pb=False):
+    def _post(self, endpoint, params, data):
         """
         Parameters
         ----------
@@ -95,58 +101,27 @@ class API(object):
             querystring parameters for API call
         data: dictionary
             data you want transfered as JSON
-        pb: bool
-            do you want a progress bar?
 
         Returns
         -------
         data: dictionary
             whatever is returned by the API
         """
-        try:
-            url = self.base_uri + endpoint + "?" + urllib.urlencode(params)
-            req = urllib2.Request(url)
-            req.add_header('Content-Type', 'application/json')
-            auth = '%s:%s' % (params['username'], params['apikey'])
-            base64string = base64.encodestring(auth).replace('\n', '')
-            req.add_header("Authorization", "Basic %s" % base64string)
-            try:
-                data = json.dumps(data)
-            except Exception, e:
-                msg = """Whoops. The data you're trying to send could not be
-converted into JSON. If the data you're attempting to send includes a numpy
-array, try casting it to a list (x.tolist()), or consider structuring your data
-as a pandas DataFrame. If you're still having trouble, please contact:
-{URL}.""".format(URL="support@yhathq.com")
-                print msg
-                return
-            if pb:
-                data = progressbarify(data)
-            response = urllib2.urlopen(req, data)
-            rsp = response.read()
-            try:
-                return json.loads(rsp)
-            except ValueError:
-                msg = """
-        Could not unpack response values.
-        Please visit "http://cloud.yhathq.com"
-        to make sure your model is online and not still building."""
-                raise Exception(msg)
-        except Exception, e:
-            raise e
-            print "Message: %s" % str(rsp)
+        if is_valid_json(data)==False:
+            raise Exception("`data` is not valid JSON")
+
+        url = self.base_uri + endpoint
+        headers = { "Content-Type": "application/json"}
+        username, apikey = params['username'], params['apikey']
+
+        response = requests.post(url=url, headers=headers, data=data, params=params, auth=(username, apikey))
+        if response.status_code > 200:
+            # if we don't get a 200, write the error and raise an status Exception
+            sys.stderr.write("error: " + response.text)
+            response.raise_for_status()
+        return response.json()
 
     def _post_file(self, endpoint, params, data, pb=True):
-        # Register the streaming http handlers with urllib2
-        register_openers()
-
-        widgets = ['Transfering Model: ', Bar(), Percentage(), ' ', ETA(), ' ', FileTransferSpeed()]
-        pbar = ProgressBar(widgets=widgets).start()
-        def progress(param, current, total):
-            if not param:
-                return
-            pbar.maxval = total
-            pbar.update(current)
 
         # headers contains the necessary Content-Type and Content-Length
         # datagen is a generator object that yields the encoded parameters
@@ -154,37 +129,50 @@ as a pandas DataFrame. If you're still having trouble, please contact:
         model_name = data['modelname'] + ".yhat"
         try:
             data = json.dumps(data)
-        except UnicodeDecodeError, e:
+        except UnicodeDecodeError as e:
             raise Exception("Could not serialize into JSON. String is not utf-8 encoded `%s`" % str(e.args[1]))
         zlib_compress(data, f)
         f.close()
 
-        f2 = open(f.name, "rb")
-        datagen, headers = multipart_encode({model_name: f2}, cb=progress)
+        def createCallback(encoder):
+            # Stuff for progress bar setup
+            widgets = ['Transfering Model: ', Bar(), Percentage(), ' ', ETA(), ' ', FileTransferSpeed()]
+            pbar = ProgressBar(max_value=encoder.len, widgets=widgets).start()
+            def callback(monitor):
+                current = monitor.bytes_read
+                pbar.update(current)
+            return callback
 
-        url = self.base_uri + endpoint + "?" + urllib.urlencode(params)
-        req = urllib2.Request(url, datagen, headers)
-        auth = '%s:%s' % (params['username'], params['apikey'])
-        base64string = base64.encodestring(auth).replace('\n', '')
-        req.add_header("Authorization", "Basic %s" % base64string)
+        encoder = MultipartEncoder(
+            fields={'model_name': (open(f.name, 'rb'))}
+        )
+
+        username, apikey = params['username'], params['apikey']
+        headers = {'Content-Type': encoder.content_type,}
+
+        callback = createCallback(encoder)
+        monitor = MultipartEncoderMonitor(encoder, callback)
+        url = self.base_uri + endpoint
+
         # Actually do the request, and get the response
         try:
-            response = urllib2.urlopen(req)
-        except urllib2.HTTPError, e:
-            if e.code > 200:
-                responseText = e.read()
+            r = requests.post(url=url, data=monitor, headers=headers, params=params, auth=(username, apikey))
+            if r.status_code != requests.codes.ok:
+                r.raise_for_status()
+        except requests.exceptions.HTTPError as err:
+            if r.status_code > 200:
+                responseText = r.text
                 sys.stderr.write("\nDeployment error: " + responseText)
                 return { "status": "error", "message": responseText }
             else:
                 sys.stderr.write("\nError in HTTP connection")
                 return { "status": "error", "message": "Error in HTTP connection." }
-        except Exception, e:
-            sys.stderr.write("\nDeployment error: " + str(e))
-            return { "status": "error", "message": str(e) }
-        rsp = response.read()
-        pbar.finish()
+        except Exception as err:
+            sys.stderr.write("\nDeployment error: " + str(err))
+            return { "status": "error", "message": str(err) }
+        rsp = r.text
         # clean up after we're done
-        f2.close()
+        f.close()
         os.unlink(f.name)
         reply = {
             "status": "OK",
@@ -219,7 +207,7 @@ class Yhat(API):
         if self.base_uri != BASE_URI:
             e = self._authenticate()
             if e is not None:
-                raise Exception("Failed to authenticate: %s" % e)
+                raise Exception("Failed to authenticate: {}".format(e))
 
     def _check_obj_size(self, obj):
         """
@@ -254,7 +242,7 @@ class Yhat(API):
             response = self._post('verify', self.q, {})
             error = response["success"]
             return None
-        except Exception, e:
+        except Exception as e:
             return e
 
     def _convert_to_json(self, data):
@@ -282,9 +270,11 @@ class Yhat(API):
             data_values = json.loads(data_values)
             try:
                 from collections import OrderedDict
-                data = OrderedDict(zip(data.columns, data_values))
+                data = OrderedDict(list(zip(data.columns, data_values)))
             except ImportError:
-                data = dict(zip(data.columns, data_values))
+                data = dict(list(zip(data.columns, data_values)))
+
+        data = json.dumps(data)
         return data
 
     def predict(self, model, data, model_owner=None, raw_input=False):
@@ -311,7 +301,6 @@ class Yhat(API):
         """
         data = self._convert_to_json(data)
         q = self.q
-        q['model'] = model
         if raw_input==True:
             q['raw_input'] = True
         model_user = self.username if model_owner is None else model_owner
@@ -338,7 +327,7 @@ class Yhat(API):
             log level
         """
         code = ""
-        print "extracting model"
+        print("extracting model")
 
         bundle = save_function(model, session, verbose=verbose)
         bundle["largefile"] = True
@@ -361,19 +350,19 @@ class Yhat(API):
         # MODULES
         modules = bundle.get("modules", [])
         if modules:
-            print "model source files"
+            print("model source files")
             for module in modules:
                 name = module["name"]
                 parent_dir = module.get("parent_dir", "")
                 if parent_dir != "":
                     name = os.path.join(parent_dir, name)
-                print " [+]", name
+                print(" [+]", name)
 
         # OBJECTS
         objects = bundle.get("objects", {})
         if objects:
-            print "model variables"
-            for name, pkl in objects.iteritems():
+            print("model variables")
+            for name, pkl in objects.items():
                 if name=='__tensorflow_session':
                     continue
                 try:
@@ -384,10 +373,10 @@ class Yhat(API):
                     t = type(obj)
                     del obj
                 except Exception as e:
-                    print "ERROR pickling object:", name
+                    print("ERROR pickling object:", name)
                     raise e
                 size = 3. * float(len(pkl)) / 4.
-                print " [+]", name, t, sizeof_fmt(size)
+                print(" [+]", name, t, sizeof_fmt(size))
 
         if is_tensorflow==True:
             bundle['objects']['__tensorflow_session'] = terragon.sparkle.save_tensorflow_graph(session['sess'])
@@ -426,13 +415,13 @@ class Yhat(API):
             raise Exception(
                 "`packages` must be a list of ubuntu packages to install")
         if (not sure) and (not dry_run):
-            sure = raw_input("Are you sure you want to deploy? (y/N): ")
+            sure = str(input("Are you sure you want to deploy? (y/N): "))
             if sure.lower() != "y":
-                print "Deployment canceled"
+                print("Deployment canceled")
                 sys.exit()
         bundle = self._extract_model(name, model, session, verbose=verbose, autodetect=autodetect, is_tensorflow=is_tensorflow)
         bundle['packages'] = packages
-        if isinstance(patch, (str, unicode))==True:
+        if isinstance(patch, string_types) == True:
             patch = "\n".join([line.strip() for line in patch.strip().split('\n')])
             bundle['code'] = patch + "\n" + bundle['code']
 
@@ -460,7 +449,7 @@ class Yhat(API):
         session: globals()
             your Python's session variables (i.e. "globals()")
         sess: tensorflow.Session, tensorflow.InteractiveSession
-            your SparkContext. this is typically `sc`
+            your tensorflow session. this is typically `sess`
         packages: list (deprecated in ScienceOps 2.7.x)
             this is being deprecated in favor of custom runtime images
         sure: boolean
@@ -530,8 +519,8 @@ class Yhat(API):
 def zlib_compress(data, to):
     step = 4 << 20 # 4MiB
     c = zlib.compressobj()
-
-    for i in xrange(0, len(data), step):
+    data = bytes(data, "utf-8")
+    for i in range(0, len(data), step):
         to.write(c.compress(data[i:i+step]))
 
     to.write(c.flush())

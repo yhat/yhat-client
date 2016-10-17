@@ -21,18 +21,18 @@ setup(
     author_email="greg@yhathq.com",
     url="https://github.com/yhat/yhat-client",
     packages=find_packages(),
-    description="Python client for Yhat (http://yhathq.com/)",
+    description="Python client for Yhat (http://yhat.com/)",
     license="BSD",
     classifiers=(
     ),
     install_requires=[
         "pip",
-        "Flask==0.10.1",
-        "websocket-client==0.12.0",
-        "dill==0.2b1",
-        "terragon==0.2.3",
-        "progressbar==2.2",
-        "poster==0.8.1"
+        "future==0.15.2",
+        "dill==0.2.5",
+        "terragon==0.3.0",
+        "progressbar2==3.10.1",
+        "requests==2.11.1",
+        "requests-toolbelt==0.7.0"
     ],
     long_description=open("README.rst").read(),
     keywords=['yhat', 'scikits', 'numpy', 'pandas'],

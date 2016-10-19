@@ -1,6 +1,6 @@
 import unittest
 import numpy as np
-from yhat.yhat_json import json as yhat_json
+from yhat import simplejson as yhat_json
 import json
 
 class TestYhatJson(unittest.TestCase):

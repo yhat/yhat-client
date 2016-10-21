@@ -7,4 +7,4 @@ from .deployment.input_and_output import df_to_json
 # client
 from .api import Yhat
 from .version import __version__
-# from .yhat_json import json as simplejson
+from .yhat_json import json_dumps

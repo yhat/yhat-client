@@ -2,18 +2,30 @@ Yhat Python Client
 ==================
 
 This is the connection to the Yhat API. If you'd like to read more,
-`visit our docs <http://docs.yhathq.com/>`__.
+`visit our
+docs <http://docs.yhat.com/knowledge-base/docs/scienceops/user-guide/model-building/python-client.html>`__.
 
 **Table of Contents:**
 
--  `Quickstart <#quickstart>`__
 -  `Installation <#installation>`__
--  `Overview <#overview>`__
--  `Handling Input and Output <#handling-input-and-output>`__
--  `Deploying <#deploying>`__
--  `Examples <#examples>`__
--  `yhat-cli <#yhat-cli>`__
--  `Dependencies <#dependencies>`__
+-  `Quickstart <#quickstart>`__
+
+Installation
+------------
+
+Using ``pip``:
+
+.. code:: bash
+
+    $ pip install --upgrade yhat
+
+From source:
+
+.. code:: bash
+
+    $ git clone git@github.com:yhat/yhat-client.git
+    $ cd yhat-client
+    $ python setup.py install
 
 `Quickstart <http://docs.yhathq.com/python/tutorial>`__
 -------------------------------------------------------
@@ -34,23 +46,6 @@ Insert your APIKEY and USERNAME and run the script.
     $ python recommender.py
     Deploy? (y/N): y
     # {"status": "success"}
-
-Installation
-------------
-
-Using ``pip``:
-
-.. code:: bash
-
-    $ pip install --upgrade yhat
-
-From source:
-
-.. code:: bash
-
-    $ git clone git@github.com:yhat/yhat-client.git
-    $ cd yhat-client
-    $ python setup.py install
 
 |Analytics|
 

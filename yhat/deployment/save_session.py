@@ -16,6 +16,7 @@ import io
 import os
 import pprint as pp
 from .reindenter import Reindenter
+import logging
 
 
 try:
@@ -121,7 +122,7 @@ def _strip_function_source(src):
     n = len(src[0]) - len(src[0].lstrip())
     return "\n".join([line[n:] for line in src])
 
-def _get_naked_loads(function, verbose=0):
+def _get_naked_loads(function):
     """
     Takes a reference to a function and determines which variables used in the
     function are not defined within the scope of the function.
@@ -129,8 +130,6 @@ def _get_naked_loads(function, verbose=0):
     Parameters
     ----------
     function: function
-    verbose: int
-        log level
 
     Returns
     -------
@@ -141,10 +140,8 @@ def _get_naked_loads(function, verbose=0):
     """
     source = _get_source(function)
     source = _strip_function_source(source)
-    if verbose >= 1:
-        sys.stderr.write("[INFO]: parsing source for %s\n" % str(function))
-    if verbose >= 2:
-        sys.stderr.write("[INFO]: %s\n" % source)
+    logging.info("parsing source for %s\n" % str(function))
+    logging.debug("%s\n" % source)
     tree = ast.parse(source)
     params = set()
     loaded = set()
@@ -169,24 +166,26 @@ def _get_naked_loads(function, verbose=0):
         if variable not in params and variable not in created:
             yield variable
 
-def _extract_module(module_name, modules={}, verbose=0):
+def _extract_module(module_name, modules={}):
+    logging.debug("\textracting module %s." % module_name)
     module = sys.modules.get(module_name)
     # check if we've already seen it
     if module in modules or module is None:
-        pass
+        logging.debug("\tmodule %s was None, returning." % module_name)
+        return modules
     # make sure it's not a built in module
     elif hasattr(module, "__file__")==False:
-        pass
+        logging.debug("\tmodule %s did not have a `__file__` attribute, returning." % module_name)
+        return modules
     elif _is_on_syspath(module.__file__)==False:
-        if verbose >= 1:
-            sys.stderr.write("[INFO]: file being parsed is: %s\n" % module.__file__)
+        logging.debug("\tfile being parsed is: %s\n" % module.__file__)
 
         if module.__file__.endswith(".py"):
             module_py = module.__file__
         elif module.__file__.endswith(".pyc"):
             module_py = module.__file__.replace(".pyc", ".py")
         else:
-            sys.stderr.write("[WARNING]: %s is not a .py or .pyc skipping: \n" % module.__file__)
+            logging.debug("\t%s is not a .py or .pyc skipping and returning: \n" % module.__file__)
             modules[module_name] = None
             return modules
 
@@ -209,18 +208,18 @@ def _extract_module(module_name, modules={}, verbose=0):
                 "source": init_source
             }
 
-        if verbose >= 1:
-            sys.stderr.write("[INFO]: parsing source for %s\n" % module_name)
-        if verbose >= 2:
-            sys.stderr.write("[INFO]: %s\n" % module_source)
+        logging.info("\tparsing source for %s\n" % module_name)
+        logging.debug("%s\n" % module_source)
+
+        logging.debug("\tparsing module source code for %s and looking for other modules to extract" % module_name)
         tree = ast.parse(module_source)
         for thing in ast.walk(tree):
             if hasattr(thing, "module"):
-                modules.update(_extract_module(thing.module, verbose=verbose))
+                modules.update(_extract_module(thing.module))
             elif isinstance(thing, (ast.Import, ast.ImportFrom)):
                 for imp in thing.names:
                     if imp.name!="*":
-                        modules.update(_extract_module(imp.name, verbose=verbose))
+                        modules.update(_extract_module(imp.name))
     else:
         modules[module_name] = None
     return modules
@@ -243,7 +242,7 @@ def _is_spark(obj):
         except:
             return False
 
-def _spider_function(function, session, pickles={}, verbose=0):
+def _spider_function(function, session, pickles={}):
     """
     Takes a function and global variables referenced in an environment and
     recursively finds dependencies required in order to execute the function.
@@ -257,8 +256,6 @@ def _spider_function(function, session, pickles={}, verbose=0):
         variables referenced from a seperate environment; i.e. globals()
     pickles: dictionary
         holds the variables needed to execute the function
-    verbose: int
-        log level
 
     Returns
     -------
@@ -277,36 +274,47 @@ def _spider_function(function, session, pickles={}, verbose=0):
     modules = {}
     source = "# code for %s\n" % (str(function))
     if isinstance(function, types.ModuleType):
+        logging.debug("object (%s) is a `types.ModuleType`. skipping _get_source" % str(function))
         pass
     else:
         source += _get_source(function) + '\n'
 
-    for varname in _get_naked_loads(function, verbose=verbose):
+    logging.debug("finding objects that need to be serialized")
+    for varname in _get_naked_loads(function):
+        logging.debug("\t%s" % varname)
         if varname in pickles['_objects_seen']:
+            logging.debug("\t%s has already been processed. skipping." % varname)
             continue
         pickles['_objects_seen'].append(varname)
         if varname not in session:
+            logging.debug("\t%s not found in session. skipping." % varname)
             continue
         obj = session[varname]
         # checking to see if this is an instance of an object
         if hasattr(obj, "__name__")==False:
+            logging.debug("\t%s has attribute __name__, performing serialization checks." % varname)
             if _is_tensor(obj):
+                logging.debug("\t%s is from tensorflow skipping." % varname)
                 continue
             elif _is_spark(obj):
+                logging.debug("\t%s is from spark. serializing using `dumps_spark_to_base64`." % varname)
                 pickles[varname] = terragon.dumps_spark_to_base64(session['sc'], obj)
             else:
+                logging.debug("\tno special serialization requirement detected for %s. using dumps_to_base64." % varname)
                 pickles[varname] = terragon.dumps_to_base64(obj)
 
-
         if hasattr(obj, "__module__"):
+            logging.debug("\tobject %s has attribute __module__" % varname)
             if obj.__module__=="__main__":
-                new_imports, new_source, new_pickles, new_modules = _spider_function(obj, session, pickles, verbose=verbose)
+                logging.debug("\t%s is in module __main__" % varname)
+                new_imports, new_source, new_pickles, new_modules = _spider_function(obj, session, pickles)
                 source += new_source + '\n'
                 imports += new_imports
                 pickles.update(new_pickles)
                 modules.update(new_modules)
             else:
-                modules.update(_extract_module(obj.__module__, verbose=verbose))
+                logging.debug("\t%s is a submodule (not __main__). extracting/saving source code and import statements." % varname)
+                modules.update(_extract_module(obj.__module__))
                 ref = inspect.getmodule(obj).__name__
                 if hasattr(obj, "func_name") and obj.__name__!=varname:
                     imports.append("from %s import %s as %s" % (ref, obj.__name__, varname))
@@ -327,12 +335,14 @@ def _spider_function(function, session, pickles={}, verbose=0):
                             pass
 
         elif isinstance(obj, types.ModuleType):
-            modules.update(_extract_module(obj.__name__, verbose=verbose))
+            logging.debug("\tobject %s is a `types.ModuleType`, extracting/saving source code and import statements." % varname)
+            modules.update(_extract_module(obj.__name__))
             if obj.__name__!=varname:
                 imports.append("import %s as %s" % (obj.__name__, varname))
             else:
                 imports.append("import %s" % (varname))
         else:
+            logging.debug("\tno special cases detected for %s. pickling using dumps_to_base64" % varname)
             # catch all. if all else fails, pickle it
             pickles[varname] = terragon.dumps_to_base64(obj)
 
@@ -360,7 +370,7 @@ def _detect_future_imports(session):
                     imports.append("from __future__ import %s" % k)
     return imports
 
-def save_function(function, session, verbose=0):
+def save_function(function, session):
     """
     Saves a user's session and all dependencies to a big 'ole JSON object with
     accompanying pickles for any variable.
@@ -371,12 +381,13 @@ def save_function(function, session, verbose=0):
         function we're saving
     session: dictionary
         globals() from the user's environment
-    verbose: int
-        log level
     """
 
     future_imports = "\n".join(_detect_future_imports(session))
-    imports, source_code, pickles, modules = _spider_function(function, session, verbose=verbose)
+    logging.debug("Detecting future import for session. Found %s" % future_imports)
+
+    logging.debug("Spidering model class %s" % str(function))
+    imports, source_code, pickles, modules = _spider_function(function, session)
 
     # de-dup and order the imports
     imports = sorted(list(set(imports)))
@@ -387,19 +398,28 @@ def save_function(function, session, verbose=0):
     imports.append("import terragon")
     source_code = "\n".join(imports) + "\n\n\n" + source_code
     pickModules = []
+
+    logging.debug("%d sub-modules found. encoding source code as utf-8." % len(modules))
     for _, value in list(modules.items()):
         if value is not None:
             try:
                 value['source'] = value['source'].decode(encoding="utf-8")
                 pickModules.append(value)
-            except Exception:
+            except Exception as e:
+                logging.debug("could not encode source for %s: %s" % (str(value), str(e)))
                 pickModules.append(value)
+
     pickles = {
         "objects": pickles,
         "future": future_imports,
         "code": source_code,
         "modules": pickModules
     }
+
+    logging.debug("Future Imports Found: %s" % str(future_imports))
+    logging.debug("Objects Found: %s" % str(pickles.keys()))
+    logging.debug("Source Code Found:\n%s" % source_code)
+    logging.debug("Modules Found:\n%s" % pp.pformat(pickModules, indent=2))
 
     if "_objects_seen" in pickles["objects"]:
         del pickles["objects"]["_objects_seen"]

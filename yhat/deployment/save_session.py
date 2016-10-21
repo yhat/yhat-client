@@ -297,7 +297,6 @@ def _spider_function(function, session, pickles={}, verbose=0):
             else:
                 pickles[varname] = terragon.dumps_to_base64(obj)
 
-
         if hasattr(obj, "__module__"):
             if obj.__module__=="__main__":
                 new_imports, new_source, new_pickles, new_modules = _spider_function(obj, session, pickles, verbose=verbose)

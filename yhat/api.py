@@ -16,6 +16,7 @@ import terragon
 import inspect
 import tempfile
 import zlib
+import logging
 import re
 import os
 import os.path
@@ -329,7 +330,16 @@ class Yhat(API):
         code = ""
         print("extracting model")
 
-        bundle = save_function(model, session, verbose=verbose)
+        levels = {
+            0: logging.WARNING,
+            1: logging.INFO,
+            2: logging.DEBUG
+        }
+        if verbose > 2:
+            verbose = 2
+
+        logging.basicConfig(format='[%(levelname)s]: %(message)s', level=levels[verbose])
+        bundle = save_function(model, session)
         bundle["largefile"] = True
         bundle["username"] = self.username
         bundle["language"] = "python"

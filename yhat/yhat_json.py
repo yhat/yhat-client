@@ -1,4 +1,3 @@
-# import json
 import json
 # we're not going to require numpy as a hard requirement as it can be a huge
 # pain to install. *most* of our customers will already have it installed. the ones
@@ -31,9 +30,11 @@ class NumpyAwareJSONEncoder(json.JSONEncoder):
 
     # uses code from official python json.encoder module. Same licence applies.
     def iterencode(self, o, _one_shot=False):
-        """Encode the given object and yield each string
-        representation as available.
-        For example::
+        """
+        Encode the given object and yield each string representation as
+        available.
+
+        For example:
             for chunk in JSONEncoder().iterencode(bigobject):
                 mysocket.write(chunk)
         """
@@ -52,14 +53,9 @@ class NumpyAwareJSONEncoder(json.JSONEncoder):
                     o = o.decode(_encoding)
                 return _orig_encoder(o)
 
-        def floatstr(
-            o,
-            allow_nan=self.allow_nan,
-            _repr=json.encoder.FLOAT_REPR,
-            _inf=json.encoder.INFINITY,
-            _neginf=-json.encoder.INFINITY,
-            nan_str=self.nan_str,
-        ):
+        def floatstr(o, allow_nan=self.allow_nan, _repr=json.encoder.FLOAT_REPR,
+            _inf=json.encoder.INFINITY, _neginf=-json.encoder.INFINITY,
+            nan_str=self.nan_str):
             # Check for specials.  Note that this type of test is processor
             # and/or platform-specific, so do tests which don't depend on the
             # internals.

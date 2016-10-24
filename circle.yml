@@ -24,4 +24,4 @@ test:
   override:
     - source activate test-env-2.7 && python tests/test_yhat_json.py
     - source activate test-env-3.5 && python tests/test_yhat_json.py
-    - ci/build-conda-package.sh yhat-conda-channel
+    - ./ci/build-conda-package.sh yhat-conda-channel

@@ -13,8 +13,12 @@ dependencies:
     # Moving to nilearn directory before performing the installation.
     - cd ~/yhat-client
     - source ci/install.sh
+    - ci/create-env.sh 27
+    - python setup.py install
+    - ci/create-env.sh 35
     - python setup.py install
 
 test:
   override:
-    - python tests/test_yhat_json.py
+    - source activate test-env-27 python tests/test_yhat_json.py
+    - source activate test-env-35 python tests/test_yhat_json.py

@@ -47,13 +47,13 @@ class NumpyAwareJSONEncoder(json.JSONEncoder):
 
         else:
             _encoder = json.encoder.encode_basestring
-        if self.encoding != 'utf-8':
-            def _encoder(o, _orig_encoder=_encoder, _encoding=self.encoding):
-                if isinstance(o, str):
-                    o = o.decode(_encoding)
-                return _orig_encoder(o)
+        # if self.encoding != 'utf-8':
+        #     def _encoder(o, _orig_encoder=_encoder, _encoding=self.encoding):
+        #         if isinstance(o, str):
+        #             o = o.decode(_encoding)
+        #         return _orig_encoder(o)
 
-        def floatstr(o, allow_nan=self.allow_nan, _repr=json.encoder.FLOAT_REPR,
+        def floatstr(o, allow_nan=self.allow_nan, _repr=repr,
             _inf=json.encoder.INFINITY, _neginf=-json.encoder.INFINITY,
             nan_str=self.nan_str):
             # Check for specials.  Note that this type of test is processor

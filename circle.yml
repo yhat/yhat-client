@@ -23,5 +23,5 @@ dependencies:
 
 test:
   override:
-    - source activate test-env-27 python tests/test_yhat_json.py
-    - source activate test-env-35 python tests/test_yhat_json.py
+    - source activate test-env-27 && python tests/test_yhat_json.py
+    - source activate test-env-35 && python tests/test_yhat_json.py

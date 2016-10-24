@@ -1,6 +1,19 @@
 machine:
-  python:
-    version: pypy-2.2.1
-  post:
-    - pyenv global 2.7.9 3.4.2
+  environment:
+    PATH: /home/ubuntu/miniconda2/bin:$PATH
 
+dependencies:
+  pre:
+    # Get rid of existing virtualenvs on circle ci as they conflict with conda.
+    # Trick found here:
+    # https://discuss.circleci.com/t/disable-autodetection-of-project-or-application-of-python-venv/235/10
+    - cd && rm -rf ~/.pyenv && rm -rf ~/virtualenvs
+
+  override:
+    # Moving to nilearn directory before performing the installation.
+    - cd ~/yhat-client
+    - source ci/install.sh
+
+test:
+  override:
+    - echo "ignore unit tests in circleCI"

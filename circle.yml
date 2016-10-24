@@ -4,7 +4,7 @@ machine:
 
 dependencies:
   pre:
-    - apt-get install -y s3cmd git
+    - sudo apt-get install -y s3cmd git
     # Get rid of existing virtualenvs on circle ci as they conflict with conda.
     # Trick found here:
     # https://discuss.circleci.com/t/disable-autodetection-of-project-or-application-of-python-venv/235/10

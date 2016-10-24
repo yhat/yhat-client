@@ -4,7 +4,7 @@ machine:
 
 dependencies:
   pre:
-    - sudo apt-get install -y s3cmd git
+    - sudo apt-get install -y git tree
     # Get rid of existing virtualenvs on circle ci as they conflict with conda.
     # Trick found here:
     # https://discuss.circleci.com/t/disable-autodetection-of-project-or-application-of-python-venv/235/10
@@ -24,4 +24,4 @@ test:
   override:
     - source activate test-env-2.7 && python tests/test_yhat_json.py
     - source activate test-env-3.5 && python tests/test_yhat_json.py
-    - aws s3
+    - source ci/build-conda-package.sh

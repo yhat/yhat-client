@@ -13,7 +13,8 @@ dependencies:
     # Moving to nilearn directory before performing the installation.
     - cd ~/yhat-client
     - source ci/install.sh
+    - python setup.py install
 
 test:
   override:
-    - echo "ignore unit tests in circleCI"
+    - python tests/test_yhat_json.py

@@ -9,8 +9,6 @@ dependencies:
     # Trick found here:
     # https://discuss.circleci.com/t/disable-autodetection-of-project-or-application-of-python-venv/235/10
     - cd && rm -rf ~/.pyenv && rm -rf ~/virtualenvs
-    - git clone --depth 1 https://github.com/conda/conda-build && cd conda-build && python setup.py install
-    - pip install filelock
 
   override:
     # Moving to nilearn directory before performing the installation.

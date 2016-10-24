@@ -6,3 +6,4 @@ chmod +x ~/miniconda.sh && ~/miniconda.sh -b
 export PATH=$HOME/miniconda2/bin:$PATH
 echo $PATH
 conda update --quiet --yes conda
+conda install -y conda-build

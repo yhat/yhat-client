@@ -6,10 +6,3 @@ chmod +x ~/miniconda.sh && ~/miniconda.sh -b
 export PATH=$HOME/miniconda2/bin:$PATH
 echo $PATH
 conda update --quiet --yes conda
-
-# Configure the conda environment and put it in the path using the
-# provided versions
-REQUIREMENTS="python numpy"
-echo "conda requirements string: $REQUIREMENTS"
-conda create -n testenv27 --quiet --yes $REQUIREMENTS
-source activate testenv27

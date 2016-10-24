@@ -29,4 +29,4 @@ deployment:
   staging:
     branch: circleci
     commands:
-      - ./ci/build-conda-package.sh yhat-conda-channel
+      - source ~/ci/build-conda-package.sh

@@ -7,7 +7,7 @@ bucket=$1
 if [ "$bucket" == "" ]; then
     echo "usage: build [bucket]"
     exit 2
-fi 
+fi
 
 bucket="s3://$bucket/linux-64"
 

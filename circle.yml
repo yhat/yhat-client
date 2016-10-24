@@ -4,7 +4,7 @@ machine:
 
 dependencies:
   pre:
-    - sudo apt-get install -y s3cmd git tree
+    - sudo apt-get install -y s3cmd git
     # Get rid of existing virtualenvs on circle ci as they conflict with conda.
     # Trick found here:
     # https://discuss.circleci.com/t/disable-autodetection-of-project-or-application-of-python-venv/235/10
@@ -15,12 +15,13 @@ dependencies:
     - cd ~/yhat-client
     - source ci/install.sh
     - ci/create-env.sh 2.7
-    - python setup.py install
+    - source activate test-env-2.7 && python setup.py install
     - ci/create-env.sh 3.5
-    - python setup.py install
+    - source activate test-env-3.5 && python setup.py install
     - pip install awscli
 
 test:
   override:
     - source activate test-env-2.7 && python tests/test_yhat_json.py
     - source activate test-env-3.5 && python tests/test_yhat_json.py
+    - aws s3

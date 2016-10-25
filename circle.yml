@@ -28,7 +28,7 @@ test:
 deployment:
   rc:
     tag: /v\d+\.\d+\.\d+rc\d+/
-    comamnds:
+    commands:
       - echo "IN THEORY THIS WOULD PUSH TO A yhat-rc package or something"
   release:
     tag: /v\d+\.\d+\.\d+/

@@ -19,4 +19,4 @@ pip install $pkg
 conda package --pkg-name "$pkgname" --pkg-version "$pkgversion"
 conda index --no-remove
 tree .
-aws s3 sync --acl-public . $bucket/
+aws s3 sync . $bucket/

@@ -18,5 +18,5 @@ aws s3 sync $bucket/repodata.json.bz2 .
 pip install $pkg
 conda package --pkg-name "$pkgname" --pkg-version "$pkgversion"
 conda index --no-remove
-# aws s3 sync --acl-public . $bucket/
 tree .
+aws s3 sync --acl-public . $bucket/

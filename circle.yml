@@ -30,5 +30,5 @@ deployment:
     branch: master
     commands:
       - ./ci/generate-pypi-config.sh > ~/.pypirc
-      - ./release.sh upload
+      - ./ci/release-to-pypi.sh upload
       - source activate test-env-2.7 && source ~/yhat-client/ci/build-conda-package.sh

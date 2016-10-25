@@ -26,8 +26,9 @@ test:
     - source activate test-env-3.5 && python tests/test_yhat_json.py
 
 deployment:
-  staging:
-    branch: circleci
+  release:
+    branch: master
     commands:
-      - ./release.sh
+      - ./ci/generate-pypi-config.sh > ~/.pypirc
+      - ./release.sh upload
       - source activate test-env-2.7 && source ~/yhat-client/ci/build-conda-package.sh

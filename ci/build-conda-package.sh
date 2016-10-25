@@ -8,9 +8,8 @@ cd "${bucket}"
 
 bucket="s3://$bucket/linux-64"
 
-pkg="yhat==1.9.0"
-pkgname=$(python -c "print '$pkg'.split('==')[0]")
-pkgversion=$(python -c "print '$pkg'.split('==')[1]")
+pkgname="yhat"
+pkgversion=$(python -c "from yhat import version; print(version.__version__)")
 echo "building $pkg $pkgname $pkgversion"
 
 aws s3 sync $bucket/.index.json .

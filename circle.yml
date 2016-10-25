@@ -29,5 +29,5 @@ deployment:
   staging:
     branch: circleci
     commands:
-      - ./release.sh upload
+      - ./release.sh
       - source activate test-env-2.7 && source ~/yhat-client/ci/build-conda-package.sh

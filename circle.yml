@@ -31,4 +31,4 @@ deployment:
     commands:
       - ./ci/generate-pypi-config.sh > ~/.pypirc
       - ./ci/release-to-pypi.sh upload
-      - source activate test-env-2.7 && source ~/yhat-client/ci/build-conda-package.sh
+      - source activate test-env-2.7 && ./ci/build-conda-package.sh

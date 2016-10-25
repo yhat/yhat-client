@@ -85,7 +85,7 @@ class NumpyAwareJSONEncoder(json.JSONEncoder):
 
 # we're going to create a json de-serializer that will by default use
 # NumpyAwareJSONEncoder with json
-def json_dumps(data):
+def json_dumps(data, **kwargs):
     """
     Uses json.dumps to serialize data into JSON. In addition to the standard
     json.dumps function, we're also using the NumpyAwareJSONEncoder to handle

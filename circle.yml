@@ -26,8 +26,12 @@ test:
     - source activate test-env-3.5 && python tests/test_yhat_json.py
 
 deployment:
+  rc:
+    tag: /v\d+\.\d+\.\d+rc\d+/
+    comamnds:
+      - echo "IN THEORY THIS WOULD PUSH TO A yhat-rc package or something"
   release:
-    branch: master
+    tag: /v\d+\.\d+\.\d+/
     commands:
       - ./ci/generate-pypi-config.sh > ~/.pypirc
       - ./ci/release-to-pypi.sh upload

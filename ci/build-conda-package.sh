@@ -19,4 +19,12 @@ pip install $pkg
 conda package --pkg-name "$pkgname" --pkg-version "$pkgversion"
 conda index --no-remove
 tree .
-aws s3 sync . $bucket/
+
+mkdir ~/conda-builds/
+conda convert --platform all "./yhat-${pkgversion}-py27_0.tar.bz2" -o ~/conda-builds/
+tree ~/conda-builds/
+
+
+if [[ "$1" == "upload" ]]; then
+  aws s3 sync . $bucket/
+fi

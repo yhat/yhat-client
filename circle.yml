@@ -31,7 +31,7 @@ deployment:
     commands:
       - ./ci/generate-pypi-config.sh > ~/.pypirc
       - ./ci/release-to-pypi.sh
-      - source activate test-env-2.7 && ./ci/build-conda-package.sh
+      - source activate test-env-2.7 && ./ci/build-conda-package.sh local rc
   release:
     tag: /v\d+\.\d+\.\d+/
     commands:

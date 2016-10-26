@@ -2,7 +2,11 @@
 
 set -ex
 
-bucket_name="yhat-conda-channel"
+if [[ "$2" == "rc" ]]; then
+  bucket_name="yhat-conda-channel"
+else
+  bucket_name="yhat-conda-channel-rc"
+fi
 
 mkdir ~/${bucket_name}
 cd ~/${bucket_name}
@@ -24,6 +28,10 @@ sudo cp -R ~/conda-builds/* ./
 conda index --no-remove
 tree .
 
+
+if [[ "$2" == "rc" ]]; then
+  aws s3 sync . $bucket/
+fi
 
 if [[ "$1" == "upload" ]]; then
   aws s3 sync . $bucket/

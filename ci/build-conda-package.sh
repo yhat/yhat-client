@@ -2,10 +2,12 @@
 
 set -ex
 
-mkdir ~/yhat-conda-channel
-cd ~/yhat-conda-channel
+bucket_name="yhat-conda-channel"
 
-bucket=s3://yhat-conda-channel/
+mkdir ~/${bucket_name}
+cd ~/${bucket_name}
+
+bucket=s3://${bucket_name}/
 aws s3 sync $bucket .
 
 pkgname="yhat"
@@ -17,7 +19,7 @@ mkdir ~/conda-builds/
 conda package --pkg-name "$pkgname" --pkg-version "$pkgversion"
 conda convert --platform all "./yhat-${pkgversion}-py27_0.tar.bz2" -o ~/conda-builds/
 
-cd ~/yhat-conda-channel
+cd ~/${bucket_name}
 sudo cp -R ~/conda-builds/* ./
 conda index --no-remove
 tree .

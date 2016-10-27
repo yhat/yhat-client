@@ -43,8 +43,7 @@ class BatchTestCase(unittest.TestCase):
     def test_create_bundle_tar(self):
         batch_job = self.TestBatchJob("test_job", username="bob", \
             apikey="123", url="http://localhost:9000")
-        bundle = save_function(batch_job.__class__, globals(), \
-            verbose=False)
+        bundle = save_function(batch_job.__class__, globals())
         bundle_str = json.dumps(bundle)
 
         print("checking tar contents...")

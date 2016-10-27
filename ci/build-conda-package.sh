@@ -3,15 +3,15 @@
 set -ex
 
 if [[ "$2" == "rc" ]]; then
-  bucket_name="yhat-conda-channel"
-else
   bucket_name="yhat-conda-channel-rc"
+else
+  bucket_name="yhat-conda-channel"
 fi
 
 mkdir ~/${bucket_name}
 cd ~/${bucket_name}
 
-bucket=s3://${bucket_name}/
+bucket=s3://${bucket_name}
 aws s3 sync $bucket .
 
 pkgname="yhat"

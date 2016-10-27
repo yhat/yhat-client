@@ -22,8 +22,8 @@ dependencies:
 
 test:
   override:
-    - source activate test-env-2.7 && python tests/test_yhat_json.py
-    - source activate test-env-3.5 && python tests/test_yhat_json.py
+    - source activate test-env-2.7 && cd tests/ && python -m unittest discover
+    - source activate test-env-3.5 && cd tests/ && python -m unittest discover
 
 deployment:
   rc:

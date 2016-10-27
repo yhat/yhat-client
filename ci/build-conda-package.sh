@@ -24,8 +24,14 @@ conda package --pkg-name "$pkgname" --pkg-version "$pkgversion"
 conda convert --platform all "./yhat-${pkgversion}-py27_0.tar.bz2" -o ~/conda-builds/
 
 cd ~/${bucket_name}
+rm ./yhat*
 sudo cp -R ~/conda-builds/* ./
-conda index --no-remove
+conda index ./linux-64
+conda index ./linux-32
+conda index ./osx-64
+conda index ./win-64
+conda index ./win-32
+conda index
 tree .
 
 

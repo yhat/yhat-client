@@ -379,7 +379,11 @@ class Yhat(API):
                     try:
                         obj = terragon.loads_from_base64(pkl)
                     except:
-                        obj = terragon.loads_spark_from_base64(session['sc'], pkl)
+                        try:
+                            obj = terragon.loads_spark_from_base64(session['sc'], pkl)
+                        except:
+                            obj = terragon.load_pom_from_base64(pkl)
+
                     t = type(obj)
                     del obj
                 except Exception as e:

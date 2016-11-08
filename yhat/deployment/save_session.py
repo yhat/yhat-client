@@ -310,12 +310,12 @@ def _spider_function(function, session, pickles={}):
                 pickles[varname] = terragon.dumps_spark_to_base64(session['sc'], obj)
             elif _is_pom(obj):
                 logging.debug("\t%s is from pomegranate. serializing using `dumps_pom_to_base64`." % varname)
-                pickles[varname] = terragon.dumps_pom_to_base64(session['sc'], obj)
+                pickles[varname] = terragon.dumps_pom_to_base64(obj)
             else:
                 logging.debug("\tno special serialization requirement detected for %s. using dumps_to_base64." % varname)
                 pickles[varname] = terragon.dumps_to_base64(obj)
 
-        if hasattr(obj, "__module__"):
+        elif hasattr(obj, "__module__"):
             logging.debug("\tobject %s has attribute __module__" % varname)
             if obj.__module__=="__main__":
                 logging.debug("\t%s is in module __main__" % varname)

@@ -29,7 +29,7 @@ setup(
         "pip",
         "future==0.15.2",
         "dill==0.2.5",
-        "terragon==0.3.0",
+        "terragon==0.3.1",
         "progressbar2==3.10.1",
         "requests==2.11.1",
         "requests-toolbelt==0.7.0"

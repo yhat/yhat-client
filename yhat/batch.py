@@ -94,8 +94,8 @@ class BatchJob(object):
             return
         response_text = r.text
 
-    def deploy(self, session, sure=False, verbose=False):
-        bundle = save_function(self.__class__, session, verbose=verbose)
+    def deploy(self, session, sure=False):
+        bundle = save_function(self.__class__, session)
         bundle["class_name"] = self.__class__.__name__
         bundle["language"] = "python"
         bundle_str = json.dumps(bundle)

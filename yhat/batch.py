@@ -11,10 +11,10 @@ try:
     from urllib.parse import urljoin
 except ImportError:
     from urlparse import urljoin
-    try:
-        import StringIO as io
-    except ImportError:
-        import io as io
+try:
+    import StringIO as io
+except ImportError:
+    import io as io
 
 import requests
 from requests_toolbelt.multipart.encoder import MultipartEncoderMonitor, MultipartEncoder

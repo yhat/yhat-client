@@ -1,22 +1,21 @@
+import json
+import logging
+import os
+import os.path
+import re
+import sys
+import tarfile
+from builtins import input
+
 try:
     from urllib.parse import urljoin
 except ImportError:
     from urlparse import urljoin
+    try:
+        import StringIO as io
+    except ImportError:
+        import io as io
 
-try:
-    import StringIO as io
-except ImportError:
-    import io as io
-# import io
-
-from builtins import input
-import json
-import base64
-import os
-import sys
-import os.path
-import re
-import tarfile
 import requests
 from requests_toolbelt.multipart.encoder import MultipartEncoderMonitor, MultipartEncoder
 from progressbar import ProgressBar, Percentage, Bar, FileTransferSpeed, ETA

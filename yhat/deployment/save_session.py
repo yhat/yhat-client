@@ -97,9 +97,29 @@ def _get_source_no_reindent(func):
                     wrapped_source = "\n" + reindent(wrapped_source) + "\n"
                     source += wrapped_source
                 else:
-                    source += reindent(inspect.getsource(method)) + "\n"
+                    try:
+                        source += reindent(inspect.getsource(method)) + "\n"
+                    except IOError as e:
+                        msg = """Could not get the source code from your model. This is likely
+becasue you're in an interactive Python session and have pasted
+code directly into the console. In this situation, Python sometimes
+adds additional whitespace which breaks the source code extraction.
+Try running your code from an file instead.""".replace("\n", " ")
+                        raise Exception(msg)
+                    except Exception as e:
+                        raise e
         else:
-            return inspect.getsource(func) + "\n"
+            try:
+                return inspect.getsource(func) + "\n"
+            except IOError as e:
+                msg = """Could not get the source code from your model. This is likely
+becasue you're in an interactive Python session and have pasted
+code directly into the console. In this situation, Python sometimes
+adds additional whitespace which breaks the source code extraction.
+Try running your code from an file instead.""".replace("\n", " ")
+                raise Exception(msg)
+            except Exception as e:
+                raise e
         return source
 
 

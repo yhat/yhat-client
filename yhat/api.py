@@ -25,6 +25,7 @@ from six import string_types
 from requests_toolbelt.multipart.encoder import MultipartEncoderMonitor, MultipartEncoder
 from progressbar import ProgressBar, Percentage, Bar, FileTransferSpeed, ETA
 
+from .submodules import detect_explicit_submodules
 from .deployment.models import YhatModel
 from .deployment.save_session import save_function, _get_source, reindent
 from .utils import sizeof_fmt, is_valid_json
@@ -357,8 +358,15 @@ class Yhat(API):
 
         bundle["reqs"] = requirements
 
+        submodules = detect_explicit_submodules(model)
         # MODULES
         modules = bundle.get("modules", [])
+        existing_filenames = [os.path.join(m['parent_dir'], m['name']) for m in modules]
+        for submodule in submodules:
+            new_filename = os.path.join(submodule['parent_dir'], submodule['name'])
+            if new_filename not in existing_filenames:
+                modules.append(submodule)
+
         if modules:
             print("model source files")
             for module in modules:

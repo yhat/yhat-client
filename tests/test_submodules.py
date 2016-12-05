@@ -13,7 +13,11 @@ class TestYhatJson(unittest.TestCase):
 
     def test_detect_explicit_submodule(self):
         submodules = detect_explicit_submodules(TestModel)
-        self.assertEqual(len(submodules), 3)
+        has_run_py = False
+        for submodule in submodules:
+            if submodule['name']=="run.py":
+                has_run_py = True
+        self.assertTrue(has_run_py)
 
     def test_detect_submodule_in_deployment(self):
         yh = Yhat("greg", "test", "http://api.yhathq.com/")

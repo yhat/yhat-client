@@ -6,7 +6,7 @@ import json
 
 class TestModel(YhatModel):
     FILES = [
-        "tests/sub-sub-modules/run.py"
+        "sub-sub-modules/run.py"
     ]
 
 class TestYhatJson(unittest.TestCase):

@@ -144,7 +144,10 @@ class SplitTestModel(YhatModel):
             if r < total:
                 method = getattr(self, variant['method'])
                 output = method(data)
-                output['variant'] = variant['label']
+                if isinstance(output, dict):
+                    output['variant'] = variant['label']
+                else:
+                    output = { 'variant': variant['label'], 'output': output }
                 return output
 
 class Model(object):

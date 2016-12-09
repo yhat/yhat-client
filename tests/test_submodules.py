@@ -23,7 +23,7 @@ class TestYhatJson(unittest.TestCase):
     def test_detect_submodule_in_deployment(self):
         yh = Yhat("greg", "test", "http://api.yhathq.com/")
         _, bundle = yh.deploy("TestModel", TestModel, globals(), sure=True, dry_run=True)
-        self.assertEqual(len(bundle['modules']), 6)
+        self.assertEqual(len(bundle['modules']), 8)
 
 if __name__=="__main__":
     unittest.main()

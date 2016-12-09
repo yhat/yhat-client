@@ -15,11 +15,14 @@ def detect_explicit_submodules(model_object):
         submodules.append(submodule)
 
         directories = parent_dir.split('/')
+        # print("ze directories", directories)
         for i in range(len(directories) + 1):
+            # print(i, "/".join(directories[:i]))
             submodules.append({
                 "parent_dir": "/".join(directories[:i]),
                 "name": "__init__.py",
                 "source": ""
             })
+        # print [os.path.join(s['parent_dir'], s['name']) for s in submodules]
 
     return submodules

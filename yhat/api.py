@@ -367,6 +367,7 @@ class Yhat(API):
             if new_filename not in existing_filenames:
                 modules.append(submodule)
 
+        modules = sorted(modules, key=lambda x: os.path.join(x['parent_dir'], x['name']))
         if modules:
             print("model source files")
             for module in modules:

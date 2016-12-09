@@ -2,11 +2,12 @@ import unittest
 import numpy as np
 from yhat import Yhat, YhatModel
 from yhat.submodules import detect_explicit_submodules
+import os
 import json
 
 class TestModel(YhatModel):
     FILES = [
-        "sub-sub-modules/run.py"
+        os.path.join(os.path.dirname(__file__), "sub-sub-modules/run.py")
     ]
 
 class TestYhatJson(unittest.TestCase):
@@ -21,7 +22,8 @@ class TestYhatJson(unittest.TestCase):
 
     def test_detect_submodule_in_deployment(self):
         yh = Yhat("greg", "test", "http://api.yhathq.com/")
-        yh.deploy("TestModel", TestModel, globals(), sure=True, dry_run=True)
+        _, bundle = yh.deploy("TestModel", TestModel, globals(), sure=True, dry_run=True)
+        self.assertEqual(len(bundle['modules']), 6)
 
 if __name__=="__main__":
     unittest.main()

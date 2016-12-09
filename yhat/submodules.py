@@ -15,7 +15,7 @@ def detect_explicit_submodules(model_object):
         submodules.append(submodule)
 
         directories = parent_dir.split('/')
-        for i in range(len(directories)):
+        for i in range(len(directories) + 1):
             submodules.append({
                 "parent_dir": "/".join(directories[:i]),
                 "name": "__init__.py",

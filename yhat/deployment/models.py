@@ -134,9 +134,12 @@ class SplitTestModel(YhatModel):
 
         self.variants = variants
         super(SplitTestModel, self).__init__()
-
+        self.execute = self.__execute
 
     def execute(self, data):
+        pass
+
+    def __execute(self, data):
         r = random.random()
         total = 0.0
         for variant in self.variants:

@@ -127,6 +127,8 @@ class SplitTestModel(YhatModel):
             raise Exception("Your total traffic allocation for all variants must sum to 1!\n\t%s" % msg)
 
         for variant in variants:
+            if variant['method']=="execute":
+                raise Exception("Method name for Variant %s is invalid. Method name for individual variant cannot be `execute`. Please use a different method name." % variant['label'])
             try:
                 getattr(self, variant['method'])
             except:

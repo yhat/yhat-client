@@ -209,7 +209,8 @@ def _extract_module(module_name, modules={}):
             modules[module_name] = None
             return modules
 
-        module_source = open(module_py, 'rb').read()
+        with open(module_py, 'rb') as f:
+            module_source = f.read()
         parent_dir = module_py.replace(os.getcwd(), '').lstrip(os.sep)
         parent_dir = os.path.dirname(parent_dir)
         modules[module] = {
@@ -219,14 +220,14 @@ def _extract_module(module_name, modules={}):
         }
         # Try to extract init files
         finit = os.path.join(parent_dir, "__init__.py")
-        isinit = os.path.isfile(finit)
-        if isinit:
-            init_source = open(finit, 'rb').read()
-            modules['init'] = {
-                "parent_dir": parent_dir,
-                "name": "__init__.py",
-                "source": init_source
-            }
+        if os.path.isfile(finit):
+            with open(finit, 'rb') as f:
+                init_source = f.read()
+                modules['init'] = {
+                    "parent_dir": parent_dir,
+                    "name": "__init__.py",
+                    "source": init_source
+                }
 
         logging.info("\tparsing source for %s\n" % module_name)
         logging.debug("%s\n" % module_source)

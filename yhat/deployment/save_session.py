@@ -68,6 +68,12 @@ def _is_on_syspath(filepath):
 
     return False
 
+def _get_source_inspect_or_dill(obj):
+    try:
+        return inspect.getsource(obj)
+    except Exception as e:
+        return dill.source.getsource(obj)
+
 def _get_source(func):
     """
     Gets the source of a function and handles cases when user is in an
@@ -81,7 +87,7 @@ def _get_source(func):
 
 def _get_source_no_reindent(func):
     try:
-        return inspect.getsource(func)
+        return _get_source_inspect_or_dill(func)
     except:
         if inspect.isclass(func):
             source = ""
@@ -89,7 +95,7 @@ def _get_source_no_reindent(func):
             source += "\n"
             for name, method in inspect.getmembers(func, predicate=inspect.ismethod):
                 if hasattr(method, '__wrapped_func__'):
-                    wrapped_source = dill.source.getsource(method.__wrapped_func__)
+                    wrapped_source = _get_source_inspect_or_dill(method.__wrapped_func__)
                     wrapped_source = wrapped_source.split('\n')
                     nchar = len(wrapped_source[1]) - len(wrapped_source[1].lstrip())
                     wrapped_source[0] = " "*nchar + wrapped_source[0]
@@ -98,7 +104,7 @@ def _get_source_no_reindent(func):
                     source += wrapped_source
                 else:
                     try:
-                        source += reindent(inspect.getsource(method)) + "\n"
+                        source += reindent(_get_source_inspect_or_dill(method)) + "\n"
                     except IOError as e:
                         msg = """Could not get the source code from your model. This is likely
 becasue you're in an interactive Python session and have pasted
@@ -110,7 +116,7 @@ Try running your code from an file instead.""".replace("\n", " ")
                         raise e
         else:
             try:
-                return inspect.getsource(func) + "\n"
+                return _get_source_inspect_or_dill(func) + "\n"
             except IOError as e:
                 msg = """Could not get the source code from your model. This is likely
 becasue you're in an interactive Python session and have pasted

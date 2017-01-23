@@ -6,7 +6,11 @@ def detect_explicit_submodules(model_object):
     for f in files:
         basename = os.path.basename(f)
         parent_dir = os.path.dirname(f)
+
         source = open(f, 'rb').read()
+        with open(f, 'rb') as f:
+            source = f.read()
+
         submodule = {
             "parent_dir": parent_dir,
             "name": basename,

@@ -175,7 +175,10 @@ class API(object):
         rsp = r.text
         # clean up after we're done
         f.close()
-        os.unlink(f.name)
+        try:
+            os.unlink(f.name)
+        except:
+            pass
         reply = {
             "status": "OK",
             "message": "Model successfully uploaded. Your model will begin building momentarily. Please see %s for more details" % self.base_uri

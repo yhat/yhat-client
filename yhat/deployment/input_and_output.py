@@ -1,5 +1,6 @@
 import warnings
 import json
+from schema import Schema
 
 try:
     import pandas as pd
@@ -24,6 +25,19 @@ def _make_df(data):
     except:
         data = pd.DataFrame([data])
     return data
+
+
+def validate(schema):
+    def real_decorator(function):
+        def wrapper(*args, **kwargs):
+            if isinstance(schema, Schema):
+                schema.validate(args[1])
+            else:
+                warnings.warn("`schema` parameter passed to `@validate` is not a Schema object. Cannot validate schema.")
+
+            return function(*args, **kwargs)
+        return wrapper
+    return real_decorator
 
 
 def preprocess(func=None, **options):
@@ -69,33 +83,3 @@ def preprocess(func=None, **options):
             return preprocess(func, **options)   
         return partial_inner
 
-def df_to_json(df):
-    """
-    Convert Pandas DataFrame to Yhat compatable json
-
-    Parameters
-    ----------
-    df: Pandas DataFrame
-
-    Returns
-    -------
-    json string: str
-    """
-    try:
-        pd
-    except NameError:
-        raise ImportError("df_to_json() requires pandas")
-    if not isinstance(df,pd.DataFrame):
-        raise ValueError("'df' parameter must be a pandas DataFrame")
-    if df.index.name:
-        msg = "index values are NOT maintained through jsonifification," + \
-                " consider resetting index";
-        warnings.warn(msg)
-    df_values = df.transpose().to_json(orient='values',date_format='iso')
-    df_values = json.loads(df_values)
-    try:
-        from collections import OrderedDict
-        df_values = OrderedDict(list(zip(df.columns,df_values)))
-    except ImportError:
-        df_values = dict(list(zip(df.columns,df_values)))
-    return json.dumps(df_values)

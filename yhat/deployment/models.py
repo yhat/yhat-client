@@ -7,7 +7,7 @@ import warnings
 import random
 import re
 
-from .input_and_output import df_to_df, parse_json, preprocess
+from .input_and_output import preprocess
 
 try:
     import pandas as pd
@@ -40,8 +40,7 @@ class YhatModel(object):
         Parameters
         ----------
         data: dict or DataFrame
-            the datatype is decided by the IO Specification; (df_to_df,
-            dict_to_dict, etc.).
+            the datatype is decided by the IO Specification
         """
         pass
 

@@ -409,7 +409,7 @@ class Yhat(API):
 
         return bundle
 
-    def deploy(self, name, model, session, sure=False, packages=[], patch=None, dry_run=False, verbose=0, autodetect=True, is_tensorflow=False):
+    def deploy(self, name, model, session, sure=False, packages=[], patch=None, dry_run=False, verbose=0, autodetect=True, is_tensorflow=False, custom_image=None):
         """
         Deploys your model to a Yhat server
 
@@ -447,6 +447,7 @@ class Yhat(API):
                 sys.exit()
         bundle = self._extract_model(name, model, session, verbose=verbose, autodetect=autodetect, is_tensorflow=is_tensorflow)
         bundle['packages'] = packages
+        bundle['custom_image'] = custom_image
         if isinstance(patch, string_types) == True:
             patch = "\n".join([line.strip() for line in patch.strip().split('\n')])
             bundle['code'] = patch + "\n" + bundle['code']
@@ -459,10 +460,11 @@ class Yhat(API):
             raise Exception("Model is too large to deploy over HTTP")
         else:
             # upload the model to the server
+            print("image??: ", bundle["custom_image"])
             data = self._post_file("deployer/model/large", self.q, bundle, pb=True)
             return data
 
-    def deploy_tensorflow(self, name, model, session, sess, sure=False, packages=[], patch=None, dry_run=False, verbose=0, autodetect=True):
+    def deploy_tensorflow(self, name, model, session, sess, sure=False, packages=[], patch=None, dry_run=False, verbose=0, autodetect=True, custom_image=None):
         """
         Deploys a TensorFlow model to a Yhat server. This is a special case of deploy.
 
@@ -506,7 +508,7 @@ class Yhat(API):
         return self.deploy(name, model, session, sure=sure, packages=packages,
             patch=patch, dry_run=dry_run, verbose=verbose, autodetect=autodetect, is_tensorflow=True)
 
-    def deploy_spark(self, name, model, session, sc, sure=False, packages=[], patch=None, dry_run=False, verbose=0, autodetect=True):
+    def deploy_spark(self, name, model, session, sc, sure=False, packages=[], patch=None, dry_run=False, verbose=0, autodetect=True, custom_image=None):
         """
         Deploys a Spark model to a Yhat server. This is a special case of deploy.
 

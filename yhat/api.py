@@ -460,7 +460,6 @@ class Yhat(API):
             raise Exception("Model is too large to deploy over HTTP")
         else:
             # upload the model to the server
-            print("image??: ", bundle["custom_image"])
             data = self._post_file("deployer/model/large", self.q, bundle, pb=True)
             return data
 

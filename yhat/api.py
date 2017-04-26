@@ -432,6 +432,8 @@ class Yhat(API):
         autodetect: flag for using the requirement auto-detection feature.
             if False, you should explicitly state the packages required for
             your model, or it may not run on the server.
+        custom_image: string
+            Docker image to be used with this model (optional)
         """
         # first let's check and make sure the user actually wants to deploy
         # a new version
@@ -488,6 +490,8 @@ class Yhat(API):
         autodetect: flag for using the requirement auto-detection feature.
             if False, you should explicitly state the packages required for
             your model, or it may not run on the server.
+        custom_image: string
+            Docker image to be used with this model (optional)
         """
 
         try:

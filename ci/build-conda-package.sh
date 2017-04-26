@@ -22,7 +22,10 @@ echo "building ${pkgname} ${pkgversion}"
 # build conda for default OS and then cross-compile for other OS
 mkdir ~/conda-builds/
 conda package --pkg-name "$pkgname" --pkg-version "$pkgversion"
-conda convert --platform all "./yhat-${pkgversion}-py27_0.tar.bz2" -o ~/conda-builds/
+conda convert --platform  linux-64  "./yhat-${pkgversion}-py27_0.tar.bz2" -o ~/conda-builds/
+conda convert --platform  linux-32  "./yhat-${pkgversion}-py27_0.tar.bz2" -o ~/conda-builds/
+conda convert --platform  osx-64  "./yhat-${pkgversion}-py27_0.tar.bz2" -o ~/conda-builds/
+echo "Converted to linux-32, linux-64, and osx-64. Converting to windows is no longer available"
 
 # index for the conda <=4.0 format
 cd ~/${bucket_name}

@@ -136,29 +136,31 @@ class API(object):
         zlib_compress(data, f)
         f.close()
 
-        def createCallback(encoder):
-            # Stuff for progress bar setup
-            widgets = ['Transfering Model: ', Bar(), Percentage(), ' ', ETA(), ' ', FileTransferSpeed()]
-            pbar = ProgressBar(max_value=encoder.len, widgets=widgets).start()
-            def callback(monitor):
-                current = monitor.bytes_read
-                pbar.update(current)
-            return callback
+        # def createCallback(encoder):
+        #     # Stuff for progress bar setup
+        #     widgets = ['Transfering Model: ', Bar(), Percentage(), ' ', ETA(), ' ', FileTransferSpeed()]
+        #     pbar = ProgressBar(max_value=encoder.len, widgets=widgets).start()
+        #     def callback(monitor):
+        #         current = monitor.bytes_read
+        #         pbar.update(current)
+        #     return callback
 
-        encoder = MultipartEncoder(
-            fields={'model_name': (open(f.name, 'rb'))}
-        )
+        # encoder = MultipartEncoder(
+        #     fields={'model_name': (open(f.name, 'rb'))}
+        # )
+
+        files = {'bundle': open(f.name, 'rb')}
 
         username, apikey = params['username'], params['apikey']
-        headers = {'Content-Type': encoder.content_type,}
+        # headers = {'Content-Type': encoder.content_type,}
 
-        callback = createCallback(encoder)
-        monitor = MultipartEncoderMonitor(encoder, callback)
+        # callback = createCallback(encoder)
+        # monitor = MultipartEncoderMonitor(encoder, callback)
         url = self.base_uri + endpoint
 
         # Actually do the request, and get the response
         try:
-            r = requests.post(url=url, data=monitor, headers=headers, params=params, auth=(username, apikey))
+            r = requests.post(url=url, files=files, params=params, auth=(username, apikey))
             if r.status_code != requests.codes.ok:
                 r.raise_for_status()
         except requests.exceptions.HTTPError as err:

@@ -31,7 +31,7 @@ setup(
         "dill==0.2.5",
         "terragon==0.3.1",
         "progressbar2==3.10.1",
-        "requests==2.11.1",
+        "requests==2.20.0",
         "requests-toolbelt==0.7.0"
     ],
     long_description=open("README.rst").read(),
